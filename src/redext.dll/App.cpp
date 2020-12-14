@@ -12,7 +12,7 @@ REDext::App* REDext::App::Get()
     return &app;
 }
 
-void REDext::App::Init()
+void REDext::App::Init(HMODULE aModule)
 {
     // Make sure there is a "REDext" directory in the "Documents".
     auto [err, docsPath] = GetDocumentsPath();
@@ -27,7 +27,7 @@ void REDext::App::Init()
     {
         return;
     }
-
+    Sleep(5000);
 #ifdef _DEBUG
     DevConsole::Alloc();
 #endif
@@ -35,17 +35,27 @@ void REDext::App::Init()
     // Initialize the logger.
     InitializeLogger(docsPath);
 
-    // Make sure we have the plugin directories.
+    // Make sure we have the plugin directories and create a list of plugins to load.
+    std::vector<std::filesystem::path> plugins;
+
     auto pluginsDir = docsPath / "plugins";
     if (!std::filesystem::exists(pluginsDir))
     {
         std::filesystem::create_directories(pluginsDir);
     }
 
+    for (auto& path : std::filesystem::recursive_directory_iterator(pluginsDir))
+    {
+        if (path.path().extension() == L".dll")
+        {
+            plugins.emplace_back(path);
+        }
+    }
+
     std::filesystem::path currDir;
     {
         wchar_t pathPtr[MAX_PATH];
-        GetModuleFileName(nullptr, pathPtr, MAX_PATH);
+        GetModuleFileName(aModule, pathPtr, MAX_PATH);
 
         currDir = pathPtr;
         currDir = currDir.parent_path();
@@ -57,8 +67,22 @@ void REDext::App::Init()
         std::filesystem::create_directories(pluginsDir);
     }
 
+    for (auto& path : std::filesystem::directory_iterator(pluginsDir))
+    {
+        if (path.path().extension() == L".dll")
+        {
+            plugins.emplace_back(path);
+        }
+    }
+
     spdlog::info(L"REDext started");
     spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
+
+    for (auto& plugin : plugins)
+    {
+        LoadLibrary(plugin.c_str());
+        spdlog::info(L"'{}' loaded", plugin.stem().c_str());
+    }
 }
 
 void REDext::App::Run()

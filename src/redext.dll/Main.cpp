@@ -9,7 +9,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
     case DLL_PROCESS_ATTACH:
     {
         DisableThreadLibraryCalls(aModule);
-        Main::Attach();
+        Main::Attach(aModule);
 
         break;
     }

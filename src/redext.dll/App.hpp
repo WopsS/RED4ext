@@ -10,7 +10,7 @@ namespace REDext
 
         static App* Get();
 
-        void Init();
+        void Init(HMODULE aModule);
         void Run();
         void Shutdown();
 

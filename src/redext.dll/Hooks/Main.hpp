@@ -2,6 +2,6 @@
 
 namespace REDext::Hooks::Main
 {
-    void Attach();
+    void Attach(HMODULE aModule);
     void Detach();
 }
