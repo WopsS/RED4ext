@@ -9,13 +9,24 @@ project("REDext.Loader")
     pchsource("stdafx.cpp")
     dependson({ "REDext.Dll" })
 
+    defines(
+    {
+        redext.project.defines("spdlog")
+    })
+
     includedirs(
     {
-        "."
+        ".",
+        redext.project.includes("spdlog")
     })
 
     files(
     {
         "**.cpp",
         "**.hpp"
+    })
+
+    links(
+    {
+        redext.project.links("spdlog")
     })
