@@ -38,6 +38,10 @@ workspace("REDext")
     group("Dependencies")
         include(redext.paths.modules("spdlog"))
 
+        include(redext.paths.modules("zycore"))
+        include(redext.paths.modules("zydis"))
+        include(redext.paths.modules("renhook"))
+
     group("")
         include(redext.paths.src("redext.dll"))
         include(redext.paths.src("redext.loader"))

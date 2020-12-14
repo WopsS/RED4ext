@@ -1,3 +1,6 @@
 [submodule "deps/spdlog"]
 	path = deps/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "deps/renhook"]
+	path = deps/renhook
+	url = https://github.com/WopsS/RenHook.git
