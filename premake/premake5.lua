@@ -35,6 +35,10 @@ workspace("REDext")
 
     filter({})
 
-    include(redext.paths.src("redext.dll"))
-    include(redext.paths.src("redext.loader"))
-    include(redext.paths.src("redext.sdk"))
+    group("Dependencies")
+        include(redext.paths.modules("spdlog"))
+
+    group("")
+        include(redext.paths.src("redext.dll"))
+        include(redext.paths.src("redext.loader"))
+        include(redext.paths.src("redext.sdk"))
