@@ -1,6 +1,7 @@
 #include <stdafx.hpp>
 #include <Hooks/CShutdownState.hpp>
 
+#include <App.hpp>
 #include <REDs/REDhook.hpp>
 
 namespace
@@ -13,6 +14,11 @@ namespace
 
     bool CShutdownState_Run(uintptr_t aThis, uintptr_t aApp)
     {
+        using Callback = REDext::PluginManager::Callback;
+        auto app = REDext::App::Get();
+        auto pluginManager = app->GetPluginManager();
+
+        pluginManager->Call(Callback::OnShutdown);
         return CShutdownState_Run_h(aThis, aApp);
     }
 }

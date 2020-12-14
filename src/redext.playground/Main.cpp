@@ -1,19 +1,16 @@
 #include <stdafx.hpp>
+#include <REDext/REDext.hpp>
 
-BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
+
+
+REDEXT_EXPORT void OnInitialization()
 {
-    switch (aReason)
-    {
-    case DLL_PROCESS_ATTACH:
-    {
-        DisableThreadLibraryCalls(aModule);
-        break;
-    }
-    case DLL_PROCESS_DETACH:
-    {
-        break;
-    }
-    }
+}
 
-    return TRUE;
+REDEXT_EXPORT void OnUpdate()
+{
+}
+
+REDEXT_EXPORT void OnShutdown()
+{
 }

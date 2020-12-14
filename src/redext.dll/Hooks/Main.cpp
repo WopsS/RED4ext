@@ -1,6 +1,7 @@
 #include <stdafx.hpp>
-#include <App.hpp>
 #include <Hooks/Main.hpp>
+
+#include <App.hpp>
 #include <REDs/REDhook.hpp>
 
 namespace

@@ -35,58 +35,10 @@ void REDext::App::Init(HMODULE aModule)
     // Initialize the logger.
     InitializeLogger(docsPath);
 
-    // Make sure we have the plugin directories and create a list of plugins to load.
-    std::vector<std::filesystem::path> plugins;
-
-    auto pluginsDir = docsPath / "plugins";
-    if (!std::filesystem::exists(pluginsDir))
-    {
-        std::filesystem::create_directories(pluginsDir);
-    }
-
-    for (auto& path : std::filesystem::recursive_directory_iterator(pluginsDir))
-    {
-        if (path.path().extension() == L".dll")
-        {
-            plugins.emplace_back(path);
-        }
-    }
-
-    std::filesystem::path currDir;
-    {
-        wchar_t pathPtr[MAX_PATH];
-        GetModuleFileName(aModule, pathPtr, MAX_PATH);
-
-        currDir = pathPtr;
-        currDir = currDir.parent_path();
-    }
-
-    pluginsDir = currDir / "plugins";
-    if (!std::filesystem::exists(pluginsDir))
-    {
-        std::filesystem::create_directories(pluginsDir);
-    }
-
-    for (auto& path : std::filesystem::directory_iterator(pluginsDir))
-    {
-        if (path.path().extension() == L".dll")
-        {
-            plugins.emplace_back(path);
-        }
-    }
-
     spdlog::info(L"REDext started");
     spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
 
-    for (auto& plugin : plugins)
-    {
-        PluginInfo info{};
-        info.Handle = LoadLibrary(plugin.c_str());
-
-        spdlog::info(L"'{}' loaded", plugin.stem().c_str());
-
-        m_plugins.emplace_back(info);
-    }
+    m_pluginManager.Init(aModule, docsPath);
 }
 
 void REDext::App::Run()
@@ -95,11 +47,17 @@ void REDext::App::Run()
 
 void REDext::App::Shutdown()
 {
+    m_pluginManager.Shutdown();
     spdlog::shutdown();
 
 #ifdef _DEBUG
     DevConsole::Free();
 #endif
+}
+
+REDext::PluginManager* REDext::App::GetPluginManager()
+{
+    return &m_pluginManager;
 }
 
 std::tuple<std::error_code, std::filesystem::path> REDext::App::GetDocumentsPath()

@@ -1,6 +1,7 @@
 #include <stdafx.hpp>
 #include <Hooks/CRunningState.hpp>
 
+#include <App.hpp>
 #include <REDs/REDhook.hpp>
 
 namespace
@@ -13,7 +14,13 @@ namespace
 
     bool CRunningState_Run(uintptr_t aThis, uintptr_t aApp)
     {
+        using Callback = REDext::PluginManager::Callback;
         auto result = CRunningState_Run_h(aThis, aApp);
+        auto app = REDext::App::Get();
+
+        auto pluginManager = app->GetPluginManager();
+        pluginManager->Call(Callback::OnUpdate);
+
         return result;
     }
 }

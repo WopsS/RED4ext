@@ -1,5 +1,7 @@
 #pragma once
 
+#include <PluginManager.hpp>
+
 namespace REDext
 {
     class App
@@ -14,15 +16,12 @@ namespace REDext
         void Run();
         void Shutdown();
 
+        PluginManager* GetPluginManager();
+
     private:
         std::tuple<std::error_code, std::filesystem::path> GetDocumentsPath();
         void InitializeLogger(std::filesystem::path aRoot);
 
-        struct PluginInfo
-        {
-            HMODULE Handle;
-        };
-
-        std::vector<PluginInfo> m_plugins;
+        PluginManager m_pluginManager;
     };
 }

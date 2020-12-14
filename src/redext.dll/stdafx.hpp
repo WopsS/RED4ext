@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <functional>
 #include <sstream>
 #include <system_error>
 #include <tuple>

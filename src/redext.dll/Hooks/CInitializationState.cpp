@@ -1,6 +1,7 @@
 #include <stdafx.hpp>
 #include <Hooks/CInitializationState.hpp>
 
+#include <App.hpp>
 #include <REDs/REDhook.hpp>
 
 namespace
@@ -14,7 +15,13 @@ namespace
 
     bool CInitializationState_Init(uintptr_t aThis, uintptr_t aApp)
     {
+        using Callback = REDext::PluginManager::Callback;
         auto result = CInitializationState_Init_h(aThis, aApp);
+        auto app = REDext::App::Get();
+
+        auto pluginManager = app->GetPluginManager();
+        pluginManager->Call(Callback::OnInitialization);
+
         return result;
     }
 }
