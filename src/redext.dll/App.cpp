@@ -58,7 +58,7 @@ void REDext::App::Init()
     }
 
     spdlog::info(L"REDext started");
-    spdlog::debug("Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
+    spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
 }
 
 void REDext::App::Run()
