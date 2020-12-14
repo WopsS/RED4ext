@@ -1,7 +1,9 @@
 #include <stdafx.hpp>
 #include <REDext/REDext.hpp>
 
-
+REDEXT_EXPORT void OnBaseInitialization()
+{
+}
 
 REDEXT_EXPORT void OnInitialization()
 {
