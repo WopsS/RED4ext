@@ -27,7 +27,7 @@ void REDext::App::Init(HMODULE aModule)
     {
         return;
     }
-    Sleep(5000);
+
 #ifdef _DEBUG
     DevConsole::Alloc();
 #endif
@@ -80,8 +80,12 @@ void REDext::App::Init(HMODULE aModule)
 
     for (auto& plugin : plugins)
     {
-        LoadLibrary(plugin.c_str());
+        PluginInfo info{};
+        info.Handle = LoadLibrary(plugin.c_str());
+
         spdlog::info(L"'{}' loaded", plugin.stem().c_str());
+
+        m_plugins.emplace_back(info);
     }
 }
 

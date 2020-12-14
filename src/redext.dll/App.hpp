@@ -17,5 +17,12 @@ namespace REDext
     private:
         std::tuple<std::error_code, std::filesystem::path> GetDocumentsPath();
         void InitializeLogger(std::filesystem::path aRoot);
+
+        struct PluginInfo
+        {
+            HMODULE Handle;
+        };
+
+        std::vector<PluginInfo> m_plugins;
     };
 }
