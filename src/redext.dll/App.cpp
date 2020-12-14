@@ -4,6 +4,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <DevConsole.hpp>
+
 REDext::App* REDext::App::Get()
 {
     static App app;
@@ -25,6 +27,10 @@ void REDext::App::Init()
     {
         return;
     }
+
+#ifdef _DEBUG
+    DevConsole::Alloc();
+#endif
 
     // Initialize the logger.
     InitializeLogger(docsPath);
@@ -62,6 +68,10 @@ void REDext::App::Run()
 void REDext::App::Shutdown()
 {
     spdlog::shutdown();
+
+#ifdef _DEBUG
+    DevConsole::Free();
+#endif
 }
 
 std::tuple<std::error_code, std::filesystem::path> REDext::App::GetDocumentsPath()
