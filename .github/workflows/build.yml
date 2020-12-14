@@ -1,0 +1,36 @@
+name: Build Workflow
+on: push
+
+jobs:
+  build:
+    name: Build (${{ matrix.config }})
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        config: [ Debug, Release ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Generate projects
+        run: |
+          cd premake
+          ./generate_projects.bat
+
+      - name: Build
+        run: |
+          cd premake/projects
+          MSBuild.exe REDext.sln -v:minimal -m -property:Configuration=${{ matrix.config }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: REDext-${{ matrix.config }}
+          path: build/${{ matrix.config }}/

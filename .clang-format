@@ -1,0 +1,42 @@
+---
+BasedOnStyle: Microsoft
+---
+Language: Cpp
+
+AccessModifierOffset: -4
+AlignEscapedNewlines: Left
+AllowShortLambdasOnASingleLine: None
+AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: false
+FixNamespaceComments: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: All
+PointerAlignment: Left
+SpaceAfterTemplateKeyword: false
+
+IncludeCategories:
+    - Regex:        'stdafx'
+      Priority:     -1
+    - Regex:        'Windows'
+      Priority:     0
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterClass: true
+    AfterControlStatement: Always
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterStruct: true
+    AfterUnion: true
+    AfterExternBlock: true
+    BeforeCatch: true
+    BeforeElse: true
+    IndentBraces: false
+    SplitEmptyFunction: true
+    SplitEmptyRecord: true
+    SplitEmptyNamespace: true
