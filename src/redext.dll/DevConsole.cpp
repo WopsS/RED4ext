@@ -5,7 +5,7 @@ void REDext::DevConsole::Alloc()
 {
     if (AllocConsole())
     {
-        auto a = freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stdout);
         SetConsoleTitle(L"REDext Console");
     }
     else
