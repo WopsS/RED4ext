@@ -16,6 +16,11 @@ namespace REDext::Playground
             return m_address;
         }
 
+        T GetPtr()
+        {
+            return m_address;
+        }
+
     private:
 
         T m_address;
