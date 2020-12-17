@@ -5,11 +5,11 @@ premake.downloadModule = function(modname, versions)
     return false
 end
 
-redext = require("extensions/redext")
+red4ext = require("extensions/red4ext")
 
-workspace("REDext")
+workspace("RED4ext")
     location("projects")
-    startproject("REDext.Loader")
+    startproject("RED4ext.Loader")
 
     architecture("x86_64")
     configurations({ "Debug", "Release" })
@@ -36,14 +36,14 @@ workspace("REDext")
     filter({})
 
     group("Dependencies")
-        include(redext.paths.modules("spdlog"))
+        include(red4ext.paths.modules("spdlog"))
 
-        include(redext.paths.modules("zycore"))
-        include(redext.paths.modules("zydis"))
-        include(redext.paths.modules("renhook"))
+        include(red4ext.paths.modules("zycore"))
+        include(red4ext.paths.modules("zydis"))
+        include(red4ext.paths.modules("renhook"))
 
     group("")
-        include(redext.paths.src("redext.dll"))
-        include(redext.paths.src("redext.loader"))
-        include(redext.paths.src("redext.sdk"))
-        include(redext.paths.src("redext.playground"))
+        include(red4ext.paths.src("red4ext.dll"))
+        include(red4ext.paths.src("red4ext.loader"))
+        include(red4ext.paths.src("red4ext.sdk"))
+        include(red4ext.paths.src("red4ext.playground"))

@@ -1,17 +1,17 @@
 project("Zycore")
-    targetdir(redext.paths.build("libs"))
+    targetdir(red4ext.paths.build("libs"))
 
     kind("StaticLib")
     language("C")
 
     includedirs(
     {
-        redext.paths.deps("zyantific"),
-        redext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "include")
+        red4ext.paths.deps("zyantific"),
+        red4ext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "include")
     })
 
     files(
     {
-        redext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "src", "**.c"),
-        redext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "include", "**.h")
+        red4ext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "src", "**.c"),
+        red4ext.paths.deps("renhook", "deps", "zydis", "dependencies", "zycore", "include", "**.h")
     })

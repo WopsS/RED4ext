@@ -27,10 +27,10 @@ jobs:
       - name: Build
         run: |
           cd premake/projects
-          MSBuild.exe REDext.sln -v:minimal -m -property:Configuration=${{ matrix.config }}
+          MSBuild.exe RED4ext.sln -v:minimal -m -property:Configuration=${{ matrix.config }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: REDext-${{ matrix.config }}
+          name: RED4ext-${{ matrix.config }}
           path: build/${{ matrix.config }}/

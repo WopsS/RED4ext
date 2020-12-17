@@ -1,5 +1,5 @@
 project("RenHook")
-    targetdir(redext.paths.build("libs"))
+    targetdir(red4ext.paths.build("libs"))
 
     kind("StaticLib")
     language("C++")
@@ -12,17 +12,17 @@ project("RenHook")
 
     includedirs(
     {
-        redext.paths.deps("renhook", "src"),
-        redext.project.includes("Zydis")
+        red4ext.paths.deps("renhook", "src"),
+        red4ext.project.includes("Zydis")
     })
 
     files(
     {
-        redext.paths.deps("renhook", "src", "**.cpp"),
-        redext.paths.deps("renhook", "src", "**.hpp")
+        red4ext.paths.deps("renhook", "src", "**.cpp"),
+        red4ext.paths.deps("renhook", "src", "**.hpp")
     })
 
     links(
     {
-        redext.project.links("Zydis")
+        red4ext.project.links("Zydis")
     })

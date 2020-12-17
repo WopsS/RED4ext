@@ -1,6 +1,6 @@
-# REDext
+# RED4ext
 
-A script extender for [Cyberpunk 2077](https://www.cyberpunk.net).
+A script extender for REDengine 4 ([Cyberpunk 2077](https://www.cyberpunk.net)).
 
 ## Build instructions
 
@@ -10,5 +10,5 @@ A script extender for [Cyberpunk 2077](https://www.cyberpunk.net).
 2. Clone this repository.
 3. Clone the dependencies (`git submodule update --init --recursive`).
 4. Go to the `premake` directory and run `generate_projects.bat`.
-5. Open the solution (`REDext.sln`) located in `projects` directory.
+5. Open the solution (`RED4ext.sln`) located in `projects` directory.
 6. Build the projects.

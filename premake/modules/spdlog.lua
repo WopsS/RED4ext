@@ -1,5 +1,5 @@
 project("spdlog")
-    targetdir(redext.paths.build("libs"))
+    targetdir(red4ext.paths.build("libs"))
 
     kind("StaticLib")
     language("C++")
@@ -15,11 +15,11 @@ project("spdlog")
 
     includedirs(
     {
-        redext.paths.deps("spdlog", "include")
+        red4ext.paths.deps("spdlog", "include")
     })
 
     files(
     {
-        redext.paths.deps("spdlog", "src", "**.cpp"),
-        redext.paths.deps("spdlog", "include", "**.h"),
+        red4ext.paths.deps("spdlog", "src", "**.cpp"),
+        red4ext.paths.deps("spdlog", "include", "**.h"),
     })
