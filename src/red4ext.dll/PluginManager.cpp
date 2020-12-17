@@ -2,7 +2,8 @@
 #include <PluginManager.hpp>
 
 void RED4ext::PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPath)
-{// Make sure we have the plugin directories and create a list of plugins to load.
+{
+    // Make sure we have the plugin directories and create a list of plugins to load.
     std::vector<std::filesystem::path> plugins;
 
     auto pluginsDir = aDocsPath / "plugins";
@@ -73,7 +74,6 @@ void RED4ext::PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPa
             {
                 spdlog::debug(L"'{}' does not export 'OnShutdown' function", plugin.Name);
             }
-
 
             spdlog::info(L"'{}' loaded", plugin.Name);
             m_plugins.emplace_back(plugin);
