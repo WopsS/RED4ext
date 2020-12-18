@@ -43,7 +43,7 @@ workspace("RED4ext")
         include(red4ext.paths.modules("renhook"))
 
     group("")
+        include(red4ext.paths.src("red4ext.sdk"))
         include(red4ext.paths.src("red4ext.dll"))
         include(red4ext.paths.src("red4ext.loader"))
-        include(red4ext.paths.src("red4ext.sdk"))
         include(red4ext.paths.src("red4ext.playground"))

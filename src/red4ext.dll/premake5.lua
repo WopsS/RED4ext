@@ -1,6 +1,7 @@
 project("RED4ext.Dll")
     targetname("RED4ext")
     targetdir(red4ext.paths.build("bin"))
+    implibdir(red4ext.paths.build("libs"))
 
     kind("SharedLib")
     language("C++")

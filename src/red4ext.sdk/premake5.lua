@@ -4,6 +4,7 @@ project("RED4ext.SDK")
 
     kind("StaticLib")
     language("C++")
+    dependson({ "RED4ext.Dll" })
 
     includedirs(
     {

@@ -31,7 +31,14 @@ function m.links(name)
     end
 
     local links = table.deepcopy(project.links)
-    table.insert(links, name)
+
+    if project.implibname then
+        table.insert(links, project.implibname)
+    elseif project.targetname then
+        table.insert(links, project.targetname)
+    else
+        table.insert(links, project.name)
+    end
 
     return links
 end
