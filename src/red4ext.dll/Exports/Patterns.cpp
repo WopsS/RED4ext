@@ -1,7 +1,6 @@
 #include <stdafx.hpp>
+#include <Exports/Exports.hpp>
 #include <Utils.hpp>
-
-#define RED4EXT_EXPORT __declspec(dllexport)
 
 namespace RED4ext
 {

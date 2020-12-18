@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <sstream>
 #include <string_view>
 
+#include <RED4ext/RED4ext.hpp>
 #include <RED4ext/REDhash.hpp>
 #include <RED4ext/REDreverse/CStackFrame.hpp>
 #include <RED4ext/REDreverse/Function.hpp>
@@ -20,12 +22,20 @@ namespace RED4ext
         auto type = rtti->GetType<RED4ext::REDreverse::CClass*>(RED4ext::FNV1a(aClass));
         if (!type)
         {
+            std::stringstream message;
+            message << "Class '" << aClass << "' not found";
+
+            Log::Error("RED4ext.SDK", message.str().c_str());
             return;
         }
 
         auto func = type->GetFunction(RED4ext::FNV1a(aName));
         if (!func)
         {
+            std::stringstream message;
+            message << "Function '" << aClass << "::" << aName << "' not found";
+
+            Log::Error("RED4ext.SDK", message.str().c_str());
             return;
         }
 
