@@ -43,16 +43,16 @@ RED4EXT_EXPORT void OnUpdate()
 
         using namespace std::chrono_literals;
 
-        // Every 1 minute, skip time by 24 hours, 5 minutes and 30 seconds.
+        // Every 1 minute, skip time by 6 hours, 5 minutes and 30 seconds.
         if ((now - last) > 1min)
         {
             char byteCode[] = {
-                0x06, 0x00, 0x00, 0x00, 0x00, // Int32Const hours + 24
+                0x06, 0x00, 0x00, 0x00, 0x00, // Int32Const hours + 6
                 0x06, 0x00, 0x00, 0x00, 0x00,  // Int32Const minutes + 5
                 0x06, 0x00, 0x00, 0x00, 0x00 // Int32Const seconds + 30
             };
 
-            *(int32_t*)(&byteCode[1]) = hours + 24;
+            *(int32_t*)(&byteCode[1]) = hours + 6;
             *(int32_t*)(&byteCode[6]) = minutes + 5;
             *(int32_t*)(&byteCode[11]) = seconds + 30;
 
