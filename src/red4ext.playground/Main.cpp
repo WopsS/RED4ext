@@ -47,9 +47,12 @@ RED4EXT_EXPORT void OnUpdate()
         if ((now - last) > 1min)
         {
             char byteCode[] = {
-                0x06, 0x00, 0x00, 0x00, 0x00, // Int32Const hours + 6
-                0x06, 0x00, 0x00, 0x00, 0x00,  // Int32Const minutes + 5
-                0x06, 0x00, 0x00, 0x00, 0x00 // Int32Const seconds + 30
+                0x06, 0x00, 0x00, 0x00, 0x00,   // Int32Const hours + 6
+                0x06, 0x00, 0x00, 0x00, 0x00,   // Int32Const minutes + 5
+                0x06, 0x00, 0x00, 0x00, 0x00,   // Int32Const seconds + 30
+                0x26,                           // ParamEnd
+                0x0                             // Nop
+
             };
 
             *(int32_t*)(&byteCode[1]) = hours + 6;
