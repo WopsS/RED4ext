@@ -49,7 +49,7 @@ RED4EXT_EXPORT void OnUpdate()
                 hours += 3;
                 minutes += 30;
                 seconds += 10;
-                auto test = std::is_pointer_v<std::nullptr_t>;
+                
                 RED4ext::ExecuteFunction("gameTimeSystem", "SetGameTimeByHMS", nullptr, hours, minutes, seconds);
                 RED4ext::ExecuteFunction("gameTimeSystem", "GetGameTime", &time);
 
@@ -58,6 +58,19 @@ RED4EXT_EXPORT void OnUpdate()
                 minutes = (time % 0x0E10 / 0x3C);
                 seconds = (time % 0x3C);
                 spdlog::debug(L"GetGameTime(): {} {} {}:{}:{}", time, days, hours, minutes, seconds);
+
+                auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
+                auto gameInstance = rtti->GetType(RED4ext::FNV1a("ScriptGameInstance"));
+
+                auto test = *(uintptr_t*)(0x1442FD030 - 0x140000000 + (uintptr_t)GetModuleHandle(nullptr));
+                auto test2 = &test;
+
+                auto engine = RED4ext::REDreverse::CGameEngine::Get();
+                auto unk10 = engine->framework->unk10;
+
+                RED4ext::REDreverse::CString item("Items.Jacket_03_old_04");
+                RED4ext::REDreverse::CString quantity("1");
+                RED4ext::ExecuteGlobalFunction("AddToInventory", nullptr, unk10, item, quantity);
             }
         }
     }
