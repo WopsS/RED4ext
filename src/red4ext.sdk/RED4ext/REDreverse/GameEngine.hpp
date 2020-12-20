@@ -4,6 +4,7 @@
 
 #include <RED4ext/RED4define.hpp>
 #include <RED4ext/REDreverse/RTTI/CRTTIBaseType.hpp>
+#include <RED4ext/REDreverse/Scripting/IScriptable.hpp>
 
 namespace RED4ext::REDreverse
 {
@@ -27,7 +28,7 @@ namespace RED4ext::REDreverse
             struct Unk
             {
                 virtual ~Unk() = 0;
-                virtual uintptr_t GetTypeInstance(CRTTIBaseType* aClass) = 0;
+                virtual Scripting::IScriptable* GetTypeInstance(CRTTIBaseType* aClass) = 0;
             };
 
             RED4EXT_ASSERT_SIZE(Unk, 0x8);
