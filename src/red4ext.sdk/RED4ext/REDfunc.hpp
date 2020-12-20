@@ -20,8 +20,7 @@ namespace RED4ext
         REDfunc(std::initializer_list<uint8_t> aPattern, size_t aExpectedMatches, size_t aIndex = 0,
                 uint8_t aWildcard = 0xCC)
         {
-            auto address =
-              RED4ext::GetPatternAddress(aPattern.begin(), aPattern.size(), aExpectedMatches, aIndex, aWildcard);
+            auto address = GetPatternAddress(aPattern.begin(), aPattern.size(), aExpectedMatches, aIndex, aWildcard);
             m_address = reinterpret_cast<T>(address);
         }
 

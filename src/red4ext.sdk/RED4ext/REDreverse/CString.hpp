@@ -16,6 +16,7 @@ namespace RED4ext::REDreverse
         } str;
 #pragma pack(pop)
 
+        CString();
         CString(const char* aText);
 
         uint32_t length;
