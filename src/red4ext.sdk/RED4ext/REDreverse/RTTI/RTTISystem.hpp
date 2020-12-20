@@ -4,6 +4,7 @@
 #include <type_traits>
 
 #include <RED4ext/REDreverse/RTTI/CRTTIBaseType.hpp>
+#include <RED4ext/REDreverse/Function.hpp>
 
 namespace RED4ext::REDreverse
 {
@@ -15,7 +16,7 @@ namespace RED4ext::REDreverse
         virtual void sub_18() = 0;
         virtual void sub_20() = 0;
         virtual void sub_28() = 0;
-        virtual void sub_30() = 0;
+        virtual CGlobalFunction* GetGloblaFunction(uint64_t aNameHash) = 0;
         virtual void sub_38() = 0;
         virtual void sub_40() = 0;
         virtual void sub_48() = 0;
