@@ -28,7 +28,7 @@ namespace RED4ext::REDreverse
             struct Unk
             {
                 virtual ~Unk() = 0;
-                virtual Scripting::IScriptable* GetTypeInstance(CRTTIBaseType* aClass) = 0;
+                virtual Scripting::IScriptable* GetTypeInstance(const CRTTIBaseType* aClass) = 0;
             };
 
             RED4EXT_ASSERT_SIZE(Unk, 0x8);

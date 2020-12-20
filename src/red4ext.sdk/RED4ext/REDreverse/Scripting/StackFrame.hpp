@@ -38,9 +38,9 @@ namespace RED4ext::REDreverse
             void* value;
         };
 
-        static CScriptableStackFrame* Construct(CScriptableStackFrame* aThis, Scripting::IScriptable* aScriptable,
-                                                CScriptableStackFrame::CStackType* aArgs, uint32_t aArgsCount,
-                                                CScriptableStackFrame::CStackType* aResult, int64_t a6);
+        static CScriptableStackFrame* Construct(CScriptableStackFrame* aThis, const Scripting::IScriptable* aScriptable,
+                                                const CStackType* aArgs, uint32_t aArgsCount,
+                                                CStackType* aResult, int64_t a6);
 
         CStackType* args;
         int32_t argCount;

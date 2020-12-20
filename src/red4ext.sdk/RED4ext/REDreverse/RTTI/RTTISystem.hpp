@@ -17,7 +17,7 @@ namespace RED4ext::REDreverse
         virtual CRTTIBaseType* GetEnum(uint64_t aNameHash) = 0;
         virtual CRTTIBaseType* GetBitField(uint64_t aNameHash) = 0;
         virtual void sub_28() = 0;
-        virtual CGlobalFunction* GetGloblaFunction(uint64_t aNameHash) = 0;
+        virtual CGlobalFunction* GetGlobalFunction(uint64_t aNameHash) = 0;
         virtual void sub_38() = 0;
         virtual void sub_40() = 0;
         virtual void sub_48() = 0;

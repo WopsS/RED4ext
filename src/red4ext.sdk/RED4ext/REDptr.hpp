@@ -21,7 +21,7 @@ namespace RED4ext
                uint8_t aWildcard = 0xCC)
         {
             auto address =
-              RED4ext::GetPatternAddress(aPattern.begin(), aPattern.size(), aExpectedMatches, aIndex, aWildcard) +
+              GetPatternAddress(aPattern.begin(), aPattern.size(), aExpectedMatches, aIndex, aWildcard) +
               aOffset;
 
             m_address = reinterpret_cast<T*>(address + *reinterpret_cast<int32_t*>(address) + 4);
