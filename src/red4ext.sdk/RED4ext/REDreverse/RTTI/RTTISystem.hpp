@@ -3,18 +3,19 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <RED4ext/REDreverse/RTTI/CRTTIBaseType.hpp>
 #include <RED4ext/REDreverse/Function.hpp>
+#include <RED4ext/REDreverse/RTTI/CClass.hpp>
+#include <RED4ext/REDreverse/RTTI/CRTTIBaseType.hpp>
 
 namespace RED4ext::REDreverse
 {
     struct IRTTISystem
     {
-        virtual void sub_0() = 0;
-        virtual void sub_8() = 0;
         virtual CRTTIBaseType* GetType(uint64_t aNameHash) = 0;
-        virtual void sub_18() = 0;
-        virtual void sub_20() = 0;
+        virtual void sub_8() = 0;
+        virtual CClass* GetClass(uint64_t aNameHash) = 0;
+        virtual CRTTIBaseType* GetEnum(uint64_t aNameHash) = 0;
+        virtual CRTTIBaseType* GetBitField(uint64_t aNameHash) = 0;
         virtual void sub_28() = 0;
         virtual CGlobalFunction* GetGloblaFunction(uint64_t aNameHash) = 0;
         virtual void sub_38() = 0;
