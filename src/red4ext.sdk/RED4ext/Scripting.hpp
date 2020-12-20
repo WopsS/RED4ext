@@ -56,19 +56,14 @@ namespace RED4ext
       REDreverse::Scripting::IScriptable* aScriptable, std::string_view aFunc, T aOut, Args&&... aArgs)
     {
         auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
-        auto func = rtti->GetGloblaFunction(RED4ext::FNV1a(aFunc));
+        auto func = rtti->GetGlobalFunction(RED4ext::FNV1a(aFunc));
         if (!func)
         {
-            std::stringstream message;
-            message << "Function '" << aFunc << "' not found";
-
-            Log::Error("RED4ext.SDK", message.str().c_str());
             return false;
         }
 
         auto engine = RED4ext::REDreverse::CGameEngine::Get();
         auto unk10 = engine->framework->unk10;
-
         return ExecuteFunction(aScriptable, func, aOut, std::forward<Args>(aArgs)...);
     }
 
@@ -79,12 +74,11 @@ namespace RED4ext
         static auto name = RED4ext::FNV1a("cpPlayerSystem");
 
         auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
-        auto type = rtti->GetType(name);
-
         auto engine = RED4ext::REDreverse::CGameEngine::Get();
         auto unk10 = engine->framework->unk10;
-        auto scriptable = unk10->GetTypeInstance(type);
 
+        auto type = rtti->GetType(name);
+        auto scriptable = unk10->GetTypeInstance(type);
         return ExecuteGlobalFunction(scriptable, aFunc, aOut, std::forward<Args>(aArgs)...);
     }
 
@@ -96,20 +90,12 @@ namespace RED4ext
         auto type = rtti->GetType<RED4ext::REDreverse::CClass*>(RED4ext::FNV1a(aClass));
         if (!type)
         {
-            std::stringstream message;
-            message << "Class '" << aClass << "' not found";
-
-            Log::Error("RED4ext.SDK", message.str().c_str());
             return false;
         }
 
         auto func = type->GetFunction(RED4ext::FNV1a(aFunc));
         if (!func)
         {
-            std::stringstream message;
-            message << "Function '" << aClass << "::" << aFunc << "' not found";
-
-            Log::Error("RED4ext.SDK", message.str().c_str());
             return false;
         }
 
