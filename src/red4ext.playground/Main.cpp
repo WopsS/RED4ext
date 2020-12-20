@@ -59,12 +59,6 @@ RED4EXT_EXPORT void OnUpdate()
                 seconds = (time % 0x3C);
                 spdlog::debug(L"GetGameTime(): {} {} {}:{}:{}", time, days, hours, minutes, seconds);
 
-                auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
-                auto gameInstance = rtti->GetType(RED4ext::FNV1a("ScriptGameInstance"));
-
-                auto test = *(uintptr_t*)(0x1442FD030 - 0x140000000 + (uintptr_t)GetModuleHandle(nullptr));
-                auto test2 = &test;
-
                 auto engine = RED4ext::REDreverse::CGameEngine::Get();
                 auto unk10 = engine->framework->unk10;
 
