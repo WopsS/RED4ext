@@ -57,15 +57,13 @@ const bool RED4ext::Launchers::Steam::Launch() const
 
 std::error_code RED4ext::Launchers::Steam::CreateGame(wchar_t* aCmdLine)
 {
-    auto result = BaseLauncher::CreateGame(aCmdLine);
-
     if (IsRunning())
     {
         SetEnvironmentVariable(L"SteamAppId", GAME_ID);
         SetEnvironmentVariable(L"SteamGameId", GAME_ID);
     }
 
-    return result;
+    return BaseLauncher::CreateGame(aCmdLine);
 }
 
 RED4ext::Launchers::BaseLauncher::GameInfo RED4ext::Launchers::Steam::GetGameInfo()

@@ -33,6 +33,7 @@ project("RED4ext.Playground")
 
     links(
     {
+        "Dbghelp",
         red4ext.project.links("RenHook"),
         red4ext.project.links("spdlog"),
         red4ext.project.links("RED4ext.Dll"),
