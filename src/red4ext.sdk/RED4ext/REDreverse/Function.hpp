@@ -27,7 +27,7 @@ namespace RED4ext::REDreverse
 
         uint64_t nameHash;
         uint64_t nameHash2;
-        int64_t unk18;
+        CRTTIBaseType** returnType;
         int64_t unk20;
         Unk params;
         Unk unk38;
