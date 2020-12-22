@@ -17,10 +17,10 @@ namespace RED4ext::REDreverse
 
         struct CProperty
         {
-            void* unk0;
+            CRTTIBaseType* type;
             uint64_t name;
             CClass* parent;
-            CRTTIBaseType* type;
+            CRTTIBaseType* unk18;
         };
 
         struct Properties
@@ -32,7 +32,7 @@ namespace RED4ext::REDreverse
 
         CClassFunction* GetFunction(uint64_t aName);
 
-        CClass* parent;
+        CRTTIBaseType* parent;
         uint64_t nameHash;
         uint64_t unk20;
         Properties properties;
