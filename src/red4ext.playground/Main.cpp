@@ -60,7 +60,7 @@ RED4EXT_EXPORT void OnUpdate()
                 spdlog::debug(L"GetGameTime(): {} {} {}:{}:{}", time, days, hours, minutes, seconds);
 
                 auto engine = RED4ext::REDreverse::CGameEngine::Get();
-                auto unk10 = engine->framework->unk10;
+                auto unk10 = engine->framework->gameInstance;
 
                 RED4ext::REDreverse::CString item("Items.Jacket_03_old_04");
                 RED4ext::REDreverse::CString quantity("1");
