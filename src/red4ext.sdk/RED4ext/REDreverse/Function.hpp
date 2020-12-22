@@ -10,7 +10,7 @@ namespace RED4ext::REDreverse
     {
         struct Unk
         {
-            uintptr_t* unk0;
+            CRTTIBaseType*** types;
             uint32_t capacity;
             uint32_t size;
         };
