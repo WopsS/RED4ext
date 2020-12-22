@@ -19,6 +19,16 @@ namespace RED4ext::REDreverse
         CString();
         CString(const char* aText);
 
+        CString* Copy(CString* apRhs);
+        void Destroy();
+
+        const char* ToString()
+        {
+            if (length >= 0x40000000u)
+                return str.ptr;
+            return str.cstr;
+        }
+
         uint32_t length;
         uint64_t capacity;
     };
