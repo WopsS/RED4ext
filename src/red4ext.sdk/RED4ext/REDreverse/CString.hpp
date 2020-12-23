@@ -22,7 +22,7 @@ namespace RED4ext::REDreverse
         CString* Copy(CString* apRhs);
         void Destroy();
 
-        const char* ToString()
+        const char* ToString() const
         {
             if (length >= 0x40000000u)
                 return str.ptr;
