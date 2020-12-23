@@ -31,7 +31,7 @@ namespace RED4ext
         if (args.size() && aFunc->params.size)
         {
             size_t i = 0;
-            ((args[i].type = *(REDreverse::CRTTIBaseType**)aFunc->params.unk0[i], args[i++].value = &aArgs), ...);
+            ((args[i].type = *(REDreverse::CRTTIBaseType**)aFunc->params.types[i], args[i++].value = &aArgs), ...);
         }
 
         CStackType result;
@@ -63,7 +63,7 @@ namespace RED4ext
         }
 
         auto engine = RED4ext::REDreverse::CGameEngine::Get();
-        auto unk10 = engine->framework->unk10;
+        auto unk10 = engine->framework->gameInstance;
         return ExecuteFunction(aScriptable, func, aOut, std::forward<Args>(aArgs)...);
     }
 
@@ -75,7 +75,7 @@ namespace RED4ext
 
         auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
         auto engine = RED4ext::REDreverse::CGameEngine::Get();
-        auto unk10 = engine->framework->unk10;
+        auto unk10 = engine->framework->gameInstance;
 
         auto type = rtti->GetType(name);
         auto scriptable = unk10->GetTypeInstance(type);
@@ -100,7 +100,7 @@ namespace RED4ext
         }
 
         auto engine = RED4ext::REDreverse::CGameEngine::Get();
-        auto unk10 = engine->framework->unk10;
+        auto unk10 = engine->framework->gameInstance;
 
         // I think we should increment some ref here, but didn't really check into it.
         auto scriptable = unk10->GetTypeInstance(type);
