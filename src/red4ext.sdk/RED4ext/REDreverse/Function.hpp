@@ -10,7 +10,14 @@ namespace RED4ext::REDreverse
     {
         struct Unk
         {
-            CRTTIBaseType*** types;
+            struct Param
+            {
+                CRTTIBaseType* type;
+                uint8_t pad8[0x28 - 0x8];
+                uint32_t flag;
+            };
+
+            Param** arr;
             uint32_t capacity;
             uint32_t size;
         };
@@ -44,6 +51,7 @@ namespace RED4ext::REDreverse
     };
 
     RED4EXT_ASSERT_SIZE(CBaseFunction, 0x80);
+    RED4EXT_ASSERT_OFFSET(CBaseFunction::Unk::Param, flag, 0x28);
 
     struct CGlobalFunction : CBaseFunction
     {

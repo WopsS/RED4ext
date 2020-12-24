@@ -31,7 +31,7 @@ namespace RED4ext
         if (args.size() && aFunc->params.size)
         {
             size_t i = 0;
-            ((args[i].type = *(REDreverse::CRTTIBaseType**)aFunc->params.types[i], args[i++].value = &aArgs), ...);
+            ((args[i].type = *aFunc->params.arr[i].type, args[i++].value = &aArgs), ...);
         }
 
         CStackType result;
