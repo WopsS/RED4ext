@@ -21,8 +21,7 @@ project("RED4ext.Playground")
     {
         ".",
         red4ext.project.includes("RenHook"),
-        red4ext.project.includes("spdlog"),
-        red4ext.project.includes("RED4ext.SDK")
+        red4ext.project.includes("spdlog")
     })
 
     files(
@@ -36,6 +35,5 @@ project("RED4ext.Playground")
         "Dbghelp",
         red4ext.project.links("RenHook"),
         red4ext.project.links("spdlog"),
-        red4ext.project.links("RED4ext.Dll"),
-        red4ext.project.links("RED4ext.SDK")
+        red4ext.project.links("RED4ext.Dll")
     })
