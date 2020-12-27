@@ -4,8 +4,8 @@
 
 #include <App.hpp>
 #include <RED4ext/RED4ext.hpp>
-#include <RED4ext/REDreverse/CString.hpp>
-#include <RED4ext/Scripting.hpp>
+
+#define RED4EXT_EXPORT extern "C" __declspec(dllexport)
 
 RED4EXT_EXPORT void OnBaseInitialization()
 {
@@ -32,7 +32,6 @@ RED4EXT_EXPORT void OnUpdate()
         {
             lastGet = now;
 
-            auto rtti = RED4ext::REDreverse::CRTTISystem::Get();
             uint32_t time{};
             RED4ext::ExecuteFunction("gameTimeSystem", "GetGameTime", &time);
 
@@ -40,7 +39,7 @@ RED4EXT_EXPORT void OnUpdate()
             auto hours = (time % 0x15180 / 0x0E10);
             auto minutes = (time % 0x0E10 / 0x3C);
             auto seconds = (time % 0x3C);
-            spdlog::debug(L"GetGameTime(): {} {} {}:{}:{}", time, days, hours, minutes, seconds);
+            spdlog::debug(L"GetGameTime(): {} {} {:02}:{:02}:{:02}", time, days, hours, minutes, seconds);
 
             if ((now - lastSet) >= 1min)
             {
@@ -57,13 +56,13 @@ RED4EXT_EXPORT void OnUpdate()
                 hours = (time % 0x15180 / 0x0E10);
                 minutes = (time % 0x0E10 / 0x3C);
                 seconds = (time % 0x3C);
-                spdlog::debug(L"GetGameTime(): {} {} {}:{}:{}", time, days, hours, minutes, seconds);
+                spdlog::debug(L"GetGameTime(): {} {} {:02}:{:02}:{:02}", time, days, hours, minutes, seconds);
 
-                auto engine = RED4ext::REDreverse::CGameEngine::Get();
+                auto engine = RED4ext::CGameEngine::Get();
                 auto unk10 = engine->framework->gameInstance;
 
-                RED4ext::REDreverse::CString item("Items.Jacket_03_old_04");
-                RED4ext::REDreverse::CString quantity("1");
+                RED4ext::CString item("Items.Jacket_03_old_04");
+                RED4ext::CString quantity("1");
                 RED4ext::ExecuteGlobalFunction("AddToInventory", nullptr, unk10, item, quantity);
             }
         }

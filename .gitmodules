@@ -4,3 +4,6 @@
 [submodule "deps/renhook"]
 	path = deps/renhook
 	url = https://github.com/WopsS/RenHook.git
+[submodule "src/red4ext.sdk"]
+	path = src/red4ext.sdk
+	url = https://github.com/WopsS/RED4ext.SDK

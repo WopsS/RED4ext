@@ -21,7 +21,8 @@ project("RED4ext.Playground")
     {
         ".",
         red4ext.project.includes("RenHook"),
-        red4ext.project.includes("spdlog")
+        red4ext.project.includes("spdlog"),
+        red4ext.paths.src("red4ext.sdk", "include")
     })
 
     files(

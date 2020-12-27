@@ -17,8 +17,8 @@ function m.modules(module)
     return path.join(m.root(), "premake", "modules", module)
 end
 
-function m.src(project)
-    return path.join(m.root(), "src", project)
+function m.src(path1, ...)
+    return path.join(m.root(), "src", path1, ...)
 end
 
 return m
