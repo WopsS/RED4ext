@@ -124,7 +124,7 @@ namespace
             {
                 file << "\tvar ";
                 prop->Dump(file);
-                file << std::endl;
+                file << ";" << std::endl;
             }
 
             if (props.size())
