@@ -93,7 +93,9 @@ namespace
         ClassType* parent;
 
         std::vector<std::unique_ptr<Property>> props;
-        std::vector<std::unique_ptr<Function>> funcs;
+
+        std::vector<std::unique_ptr<ClassFunction>> funcs;
+        std::vector<std::unique_ptr<GlobalFunction>> staticFuncs;
 
         void Dump(std::fstream& file)
         {
@@ -102,6 +104,18 @@ namespace
                 parent->Dump(file);
                 file << std::endl << std::endl;
             }
+
+            std::sort(props.begin(), props.end(), [](auto& lhs, auto& rhs) {
+                return std::strcmp(lhs->name.ToString(), rhs->name.ToString()) < 0;
+            });
+
+            std::sort(funcs.begin(), funcs.end(), [](auto& lhs, auto& rhs) {
+                return std::strcmp(lhs->name2.ToString(), rhs->name2.ToString()) < 0;
+            });
+
+            std::sort(staticFuncs.begin(), staticFuncs.end(), [](auto& lhs, auto& rhs) {
+                return std::strcmp(lhs->name2.ToString(), rhs->name2.ToString()) < 0;
+            });
 
             file << "class ";
             if (name.hash == 0)
@@ -127,7 +141,19 @@ namespace
                 file << ";" << std::endl;
             }
 
-            if (props.size())
+            if (props.size() && (funcs.size() || staticFuncs.size()))
+            {
+                file << std::endl;
+            }
+
+            for (auto& func : staticFuncs)
+            {
+                file << "\t";
+                func->Dump(file);
+                file << std::endl;
+            }
+
+            if (funcs.size() && staticFuncs.size())
             {
                 file << std::endl;
             }
@@ -170,7 +196,14 @@ namespace
                 func->params.emplace_back(param);
             }
 
-            aClass->funcs.emplace_back(func);
+            if constexpr (std::is_same_v<T, ClassFunction>)
+            {
+                aClass->funcs.emplace_back(func);
+            }
+            else
+            {
+                aClass->staticFuncs.emplace_back(func);
+            }
         }
     }
 
@@ -253,13 +286,13 @@ void RED4ext::Playground::DumpTypes()
     rtti->funcs.for_each([rtti, global = global.get()](uint64_t aHash, RED4ext::CGlobalFunction* aFunc) {
         std::string name = aFunc->name.ToString();
 
-        Function* func;
+        GlobalFunction* func;
 
         auto pos = name.find_first_of("::");
         if (pos == std::string::npos)
         {
             func = new GlobalFunction();
-            global->funcs.emplace_back(func);
+            global->staticFuncs.emplace_back(func);
         }
         else
         {
@@ -276,8 +309,8 @@ void RED4ext::Playground::DumpTypes()
                 classPtr = ProcessClass(rtti->GetClass(className));
             }
 
-            func = new ClassFunction();
-            classPtr->funcs.emplace_back(func);
+            func = new GlobalFunction();
+            classPtr->staticFuncs.emplace_back(func);
         }
 
         if (aFunc->returnType)
