@@ -4,6 +4,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <Dumps/TypeDump.hpp>
+
 RED4ext::Playground::App* RED4ext::Playground::App::Get()
 {
     static App app;
@@ -12,17 +14,14 @@ RED4ext::Playground::App* RED4ext::Playground::App::Get()
 
 void RED4ext::Playground::App::Init()
 {
-    constexpr auto name = L"RED4ext";
-
     // Make sure there is a "RED4ext" directory in the "Documents".
     auto [err, docsPath] = GetDocumentsPath();
     if (err)
     {
-        MessageBox(nullptr, L"Could not get the path to 'Documents' folder.", name, MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(nullptr, L"Could not get the path to 'Documents' folder.", L"RED4ext", MB_ICONEXCLAMATION | MB_OK);
         return;
     }
 
-    docsPath /= name;
     if (!std::filesystem::exists(docsPath) && !std::filesystem::create_directories(docsPath))
     {
         return;
@@ -34,6 +33,10 @@ void RED4ext::Playground::App::Init()
 
 void RED4ext::Playground::App::Run()
 {
+    static std::once_flag flag;
+    std::call_once(flag, []() {
+        //DumpTypes();
+    });
 }
 
 void RED4ext::Playground::App::Shutdown()
@@ -41,7 +44,7 @@ void RED4ext::Playground::App::Shutdown()
     spdlog::shutdown();
 }
 
-std::tuple<std::error_code, std::filesystem::path> RED4ext::Playground::App::GetDocumentsPath()
+std::tuple<std::error_code, std::filesystem::path> RED4ext::Playground::App::GetDocumentsPath() const
 {
     wchar_t* pathRaw = nullptr;
     std::filesystem::path path;
@@ -54,7 +57,7 @@ std::tuple<std::error_code, std::filesystem::path> RED4ext::Playground::App::Get
     path = pathRaw;
     CoTaskMemFree(pathRaw);
 
-    return { { std::error_code() }, path };
+    return { { std::error_code() }, path / L"RED4ext" };
 }
 
 void RED4ext::Playground::App::InitializeLogger(std::filesystem::path aRoot)

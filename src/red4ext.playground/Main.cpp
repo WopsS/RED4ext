@@ -3,7 +3,6 @@
 #include <chrono>
 
 #include <App.hpp>
-#include <RED4ext/RED4ext.hpp>
 
 #define RED4EXT_EXPORT extern "C" __declspec(dllexport)
 
@@ -48,7 +47,7 @@ RED4EXT_EXPORT void OnUpdate()
                 hours += 3;
                 minutes += 30;
                 seconds += 10;
-                
+
                 RED4ext::ExecuteFunction("gameTimeSystem", "SetGameTimeByHMS", nullptr, hours, minutes, seconds);
                 RED4ext::ExecuteFunction("gameTimeSystem", "GetGameTime", &time);
 
