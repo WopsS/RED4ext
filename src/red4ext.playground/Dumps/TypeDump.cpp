@@ -12,7 +12,7 @@ namespace
         virtual void Dump(std::fstream& file) = 0;
     };
 
-    std::unordered_map<uint64_t, std::unique_ptr<IType>> types;
+    std::unordered_map<uint64_t, std::shared_ptr<IType>> types;
 
     struct Type : IType
     {
@@ -90,7 +90,7 @@ namespace
 
     struct ClassType : IType
     {
-        ClassType* parent;
+        std::shared_ptr<ClassType> parent;
 
         std::vector<std::unique_ptr<Property>> props;
 
@@ -170,7 +170,7 @@ namespace
     };
 
     template<typename T>
-    void ProcessClassFunction(ClassType* aClass, RED4ext::DynArray<RED4ext::CClassFunction*>& aFuncs)
+    void ProcessClassFunction(std::shared_ptr<ClassType> aClass, RED4ext::DynArray<RED4ext::CClassFunction*>& aFuncs)
     {
         for (uint32_t i = 0; i < aFuncs.size; i++)
         {
@@ -207,32 +207,38 @@ namespace
         }
     }
 
-    ClassType* ProcessClass(RED4ext::CClass* aClass)
+    struct ProcessResult
     {
-        ClassType* parent = nullptr;
+        bool isNew;
+        std::shared_ptr<IType> type;
+    };
+
+    ProcessResult ProcessClass(RED4ext::CClass* aClass)
+    {
+        std::shared_ptr<ClassType> parent = nullptr;
         if (aClass->parent)
         {
-            parent = ProcessClass(aClass->parent);
+            auto processed = ProcessClass(aClass->parent);
+            if (processed.isNew)
+            {
+                types.insert({ processed.type->name.hash, processed.type });
+            }
+
+            parent = std::dynamic_pointer_cast<ClassType>(processed.type);
         }
 
         RED4ext::CName name;
         aClass->GetName(name);
 
-        ClassType* classPtr = nullptr;
-
         auto find = types.find(name.hash);
         if (find != types.end())
         {
-            return static_cast<ClassType*>(find->second.get());
+            return { false, find->second };
         }
 
-        auto ptr = std::make_unique<ClassType>();
-        classPtr = ptr.get();
-
-        types.insert({ name.hash, std::move(ptr) });
-
-        classPtr->name = name;
-        classPtr->parent = parent;
+        auto ptr = std::make_shared<ClassType>();
+        ptr->name = name;
+        ptr->parent = parent;
 
         auto& props = aClass->props;
         for (uint32_t i = 0; i < props.size; i++)
@@ -243,13 +249,14 @@ namespace
             prop->type.reset(new Type());
             props[i]->type->GetName(prop->type->name);
 
-            classPtr->props.emplace_back(prop);
+            ptr->props.emplace_back(prop);
         }
 
-        ProcessClassFunction<ClassFunction>(classPtr, aClass->funcs);
-        ProcessClassFunction<GlobalFunction>(classPtr, aClass->staticFuncs);
+        ProcessClassFunction<ClassFunction>(ptr, aClass->funcs);
+        ProcessClassFunction<GlobalFunction>(ptr, aClass->staticFuncs);
 
-        return classPtr;
+        return { true, ptr };
+
     }
 }
 
@@ -278,11 +285,13 @@ void RED4ext::Playground::DumpTypes()
         if (aType->GetType() == RED4ext::ERTTIType::Class)
         {
             auto castedType = static_cast<RED4ext::CClass*>(aType);
-            ProcessClass(castedType);
+            auto processed = ProcessClass(castedType);
+
+            types.insert({ name.hash, processed.type });
         }
     });
 
-    auto global = std::make_unique<ClassType>();
+    auto global = std::make_shared<ClassType>();
     rtti->funcs.for_each([rtti, global = global.get()](uint64_t aHash, RED4ext::CGlobalFunction* aFunc) {
         std::string name = aFunc->name.ToString();
 
@@ -297,16 +306,17 @@ void RED4ext::Playground::DumpTypes()
         else
         {
             CName className(name.substr(0, pos).c_str());
-            ClassType* classPtr;
+            std::shared_ptr<ClassType> classPtr;
 
             auto find = types.find(className.hash);
             if (find != types.end())
             {
-                classPtr = static_cast<ClassType*>(find->second.get());
+                classPtr = std::dynamic_pointer_cast<ClassType>(find->second);
             }
             else
             {
-                classPtr = ProcessClass(rtti->GetClass(className));
+                auto processed = ProcessClass(rtti->GetClass(className));
+                classPtr = std::dynamic_pointer_cast<ClassType>(processed.type);
             }
 
             func = new GlobalFunction();
