@@ -169,6 +169,38 @@ namespace
         }
     };
 
+    struct EnumType : IType
+    {
+        struct Values
+        {
+            RED4ext::CName enumerator;
+            uint64_t value;
+        };
+
+        std::vector<Values> values;
+
+        void Dump(std::fstream& file)
+        {
+            file << "enum " << name.ToString() << std::endl;
+            file << "{" << std::endl;
+
+            for (size_t i = 0; i < values.size(); i++)
+            {
+                auto& value = values[i];
+                file << "\t" << value.enumerator.ToString() << " = " << value.value;
+
+                if (i < values.size() - 1)
+                {
+                    file << ",";
+                }
+
+                file << std::endl;
+            }
+
+            file << "}";
+        }
+    };
+
     template<typename T>
     void ProcessClassFunction(std::shared_ptr<ClassType> aClass, RED4ext::DynArray<RED4ext::CClassFunction*>& aFuncs)
     {
@@ -256,7 +288,42 @@ namespace
         ProcessClassFunction<GlobalFunction>(ptr, aClass->staticFuncs);
 
         return { true, ptr };
+    }
 
+    ProcessResult ProcessEnum(RED4ext::CEnum* aEnum)
+    {
+        auto ptr = std::make_shared<EnumType>();
+        aEnum->GetName(ptr->name);
+
+        for (uint32_t i = 0; i < aEnum->hashList.size; i++)
+        {
+            auto& enumerator = aEnum->hashList[i];
+            auto& value = aEnum->valueList[i];
+
+            EnumType::Values values;
+            values.enumerator = enumerator;
+            values.value = value;
+
+            ptr->values.emplace_back(std::move(values));
+        }
+
+        for (uint32_t i = 0; i < aEnum->unk48.size; i++)
+        {
+            auto& enumerator = aEnum->unk48[i];
+            auto& value = aEnum->unk58[i];
+
+            EnumType::Values values;
+            values.enumerator = enumerator;
+            values.value = value;
+
+            ptr->values.emplace_back(std::move(values));
+        }
+
+        std::sort(ptr->values.begin(), ptr->values.end(), [](auto& lhs, auto& rhs) {
+            return lhs.value < rhs.value;
+        });
+
+        return { true, ptr };
     }
 }
 
@@ -286,6 +353,13 @@ void RED4ext::Playground::DumpTypes()
         {
             auto castedType = static_cast<RED4ext::CClass*>(aType);
             auto processed = ProcessClass(castedType);
+
+            types.insert({ name.hash, processed.type });
+        }
+        else if (aType->GetType() == ERTTIType::Enum)
+        {
+            auto castedType = static_cast<RED4ext::CEnum*>(aType);
+            auto processed = ProcessEnum(castedType);
 
             types.insert({ name.hash, processed.type });
         }
@@ -347,9 +421,18 @@ void RED4ext::Playground::DumpTypes()
 
     for (auto& i : types)
     {
-        auto ptr = i.second.get();
+        auto& ptr = i.second;
+        auto path = docsPath;
 
-        auto path = docsPath / L"classes";
+        if (std::dynamic_pointer_cast<ClassType>(ptr))
+        {
+            path /= L"classes";
+        }
+        else if (std::dynamic_pointer_cast<EnumType>(ptr))
+        {
+            path /= L"enums";
+        }
+
         if (!std::filesystem::exists(path))
         {
             std::filesystem::create_directories(path);
