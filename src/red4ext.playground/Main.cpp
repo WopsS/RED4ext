@@ -29,6 +29,31 @@ RED4EXT_EXPORT void OnUpdate()
         using namespace std::chrono_literals;
         if ((now - lastGet) >= 10s)
         {
+            {
+                auto rtti = RED4ext::CRTTISystem::Get();
+                auto gameTimeCls = rtti->GetClass("GameTime");
+
+                struct GameTime
+                {
+                    int32_t seconds;
+                };
+
+                GameTime gameTime{};
+                RED4ext::ExecuteFunction("gameTimeSystem", "GetGameTime", &gameTime);
+
+                auto secondsProp = gameTimeCls->GetProperty("seconds");
+
+                auto seconds = secondsProp->GetValue<uint32_t>(&gameTime);
+                spdlog::debug("GetProperty: {} - {}", gameTime.seconds, seconds);
+
+                seconds += 10000;
+                secondsProp->SetValue<uint32_t>(&gameTime, seconds);
+                spdlog::debug("SetProperty: {} - {}", gameTime.seconds, seconds);
+
+                seconds = secondsProp->GetValue<uint32_t>(&gameTime);
+                spdlog::debug("GetProperty: {} - {}", gameTime.seconds, seconds);
+            }
+
             lastGet = now;
 
             uint32_t time{};
