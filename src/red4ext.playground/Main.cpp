@@ -18,8 +18,12 @@ RED4EXT_EXPORT void OnInitialization()
 
 RED4EXT_EXPORT void OnUpdate()
 {
+    auto test = RED4ext::CName(0xD11655952FCBAB9F).ToString();
+    auto test2 = RED4ext::CName(0x7B4F006D7682569B).ToString();
+    auto test3 = RED4ext::CName(0xCA31D88820D9C446).ToString();
+
     auto app = RED4ext::Playground::App::Get();
-    app->Run();
+    // app->Run();
 
     {
         static auto lastGet = std::chrono::high_resolution_clock::now();

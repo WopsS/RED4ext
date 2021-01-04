@@ -35,7 +35,7 @@ void RED4ext::Playground::App::Run()
 {
     static std::once_flag flag;
     std::call_once(flag, []() {
-        //DumpTypes();
+        DumpTypes();
     });
 }
 

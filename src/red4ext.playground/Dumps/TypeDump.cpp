@@ -207,8 +207,8 @@ namespace
         for (uint32_t i = 0; i < aFuncs.size; i++)
         {
             auto func = new T();
-            func->name = aFuncs[i]->name;
-            func->name2 = aFuncs[i]->name2;
+            func->name = aFuncs[i]->fullName;
+            func->name2 = aFuncs[i]->shortName;
 
             if (aFuncs[i]->returnType)
             {
@@ -367,7 +367,7 @@ void RED4ext::Playground::DumpTypes()
 
     auto global = std::make_shared<ClassType>();
     rtti->funcs.for_each([rtti, global = global.get()](uint64_t aHash, RED4ext::CGlobalFunction* aFunc) {
-        std::string name = aFunc->name.ToString();
+        std::string name = aFunc->fullName.ToString();
 
         GlobalFunction* func;
 
@@ -403,8 +403,8 @@ void RED4ext::Playground::DumpTypes()
             aFunc->returnType->type->GetName(func->type->name);
         }
 
-        func->name = aFunc->name;
-        func->name2 = aFunc->name2;
+        func->name = aFunc->fullName;
+        func->name2 = aFunc->shortName;
 
         auto& params = aFunc->params;
         for (uint32_t i = 0; i < params.size; i++)
