@@ -15,13 +15,8 @@ RED4EXT_EXPORT void OnBaseInitialization()
 RED4EXT_EXPORT void OnInitialization()
 {
 }
-
 RED4EXT_EXPORT void OnUpdate()
 {
-    auto test = RED4ext::CName(0xD11655952FCBAB9F).ToString();
-    auto test2 = RED4ext::CName(0x7B4F006D7682569B).ToString();
-    auto test3 = RED4ext::CName(0xCA31D88820D9C446).ToString();
-
     auto app = RED4ext::Playground::App::Get();
     // app->Run();
 
@@ -33,6 +28,24 @@ RED4EXT_EXPORT void OnUpdate()
         using namespace std::chrono_literals;
         if ((now - lastGet) >= 10s)
         {
+            {
+                auto rtti = RED4ext::CRTTISystem::Get();
+                auto engine = RED4ext::CGameEngine::Get();
+                auto gameInstance = engine->framework->gameInstance;
+
+                RED4ext::Handle<uintptr_t> handle;
+                RED4ext::ExecuteGlobalFunction("GetPlayer;GameInstance", &handle, gameInstance);
+
+                if (handle.instance)
+                {
+                    auto playerPuppetCls = rtti->GetClass("PlayerPuppet");
+                    auto inCrouch = playerPuppetCls->GetProperty("inCrouch");
+                    auto value = inCrouch->GetValue<bool>(handle.instance);
+
+                    spdlog::debug("inCourch: {}", value);
+                }
+            }
+
             {
                 auto rtti = RED4ext::CRTTISystem::Get();
                 auto gameTimeCls = rtti->GetClass("GameTime");
