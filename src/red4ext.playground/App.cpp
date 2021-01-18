@@ -4,7 +4,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <Dumps/TypeDump.hpp>
 
 RED4ext::Playground::App* RED4ext::Playground::App::Get()
 {
@@ -33,10 +32,6 @@ void RED4ext::Playground::App::Init()
 
 void RED4ext::Playground::App::Run()
 {
-    static std::once_flag flag;
-    std::call_once(flag, []() {
-        DumpTypes();
-    });
 }
 
 void RED4ext::Playground::App::Shutdown()
