@@ -1,9 +1,5 @@
-#include <stdafx.hpp>
-#include <App.hpp>
-
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-
+#include "stdafx.hpp"
+#include "App.hpp"
 
 RED4ext::Playground::App* RED4ext::Playground::App::Get()
 {

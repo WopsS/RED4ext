@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <DevConsole.hpp>
+#include "stdafx.hpp"
+#include "DevConsole.hpp"
 
 void RED4ext::DevConsole::Alloc()
 {

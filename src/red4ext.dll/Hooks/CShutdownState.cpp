@@ -1,8 +1,8 @@
-#include <stdafx.hpp>
-#include <Hooks/CShutdownState.hpp>
+#include "stdafx.hpp"
+#include "Hooks/CShutdownState.hpp"
 
-#include <App.hpp>
-#include <REDs/REDhook.hpp>
+#include "App.hpp"
+#include "REDs/REDhook.hpp"
 
 namespace
 {

@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <Launchers/CustomLauncher.hpp>
+#include "stdafx.hpp"
+#include "Launchers/CustomLauncher.hpp"
 
 RED4ext::Launchers::CustomLauncher::CustomLauncher()
 {

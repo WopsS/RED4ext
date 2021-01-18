@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <PluginManager.hpp>
+#include "stdafx.hpp"
+#include "PluginManager.hpp"
 
 void RED4ext::PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPath)
 {

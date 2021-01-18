@@ -1,8 +1,8 @@
-#include <stdafx.hpp>
-#include <Hooks/CInitializationState.hpp>
+#include "stdafx.hpp"
+#include "Hooks/CInitializationState.hpp"
 
-#include <App.hpp>
-#include <REDs/REDhook.hpp>
+#include "App.hpp"
+#include "REDs/REDhook.hpp"
 
 namespace
 {

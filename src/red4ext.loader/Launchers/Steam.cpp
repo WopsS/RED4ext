@@ -1,6 +1,6 @@
-#include <stdafx.hpp>
-#include <Launchers/Steam.hpp>
-#include <Registry.hpp>
+#include "stdafx.hpp"
+#include "Launchers/Steam.hpp"
+#include "Registry.hpp"
 
 namespace
 {

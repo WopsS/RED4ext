@@ -1,10 +1,10 @@
-#include <stdafx.hpp>
-#include <App.hpp>
+#include "stdafx.hpp"
+#include "App.hpp"
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <DevConsole.hpp>
+#include "DevConsole.hpp"
 
 RED4ext::App* RED4ext::App::Get()
 {

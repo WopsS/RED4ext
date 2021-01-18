@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <Launchers/BaseLauncher.hpp>
+#include "stdafx.hpp"
+#include "Launchers/BaseLauncher.hpp"
 
 RED4ext::Launchers::BaseLauncher::BaseLauncher()
     : m_processInfo{ 0 }

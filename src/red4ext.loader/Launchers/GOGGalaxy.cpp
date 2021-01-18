@@ -1,6 +1,6 @@
-#include <stdafx.hpp>
-#include <Launchers/GOGGalaxy.hpp>
-#include <Registry.hpp>
+#include "stdafx.hpp"
+#include "Launchers/GOGGalaxy.hpp"
+#include "Registry.hpp"
 
 namespace
 {

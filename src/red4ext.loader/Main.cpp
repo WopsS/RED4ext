@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <App.hpp>
+#include "stdafx.hpp"
+#include "App.hpp"
 
 int wmain(int aArgc, wchar_t* aArgv[], wchar_t* aEnvp[])
 {

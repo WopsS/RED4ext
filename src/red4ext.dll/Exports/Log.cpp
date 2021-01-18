@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <Exports/Exports.hpp>
+#include "stdafx.hpp"
+#include "Exports/Exports.hpp"
 
 namespace
 {

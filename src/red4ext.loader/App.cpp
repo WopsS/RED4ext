@@ -1,13 +1,10 @@
-#include <stdafx.hpp>
-#include <App.hpp>
+#include "stdafx.hpp"
+#include "App.hpp"
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-
-#include <Launchers/CustomLauncher.hpp>
-#include <Launchers/GOGGalaxy.hpp>
-#include <Launchers/Steam.hpp>
-#include <Registry.hpp>
+#include "Launchers/CustomLauncher.hpp"
+#include "Launchers/GOGGalaxy.hpp"
+#include "Launchers/Steam.hpp"
+#include "Registry.hpp"
 
 namespace
 {

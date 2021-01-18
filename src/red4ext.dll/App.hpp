@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PluginManager.hpp>
+#include "PluginManager.hpp"
 
 namespace RED4ext
 {

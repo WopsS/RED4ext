@@ -33,7 +33,7 @@ RED4EXT_EXPORT void OnUpdate()
                 auto engine = RED4ext::CGameEngine::Get();
                 auto gameInstance = engine->framework->gameInstance;
 
-                RED4ext::Handle<uintptr_t> handle;
+                RED4ext::Handle<RED4ext::IScriptable> handle;
                 RED4ext::ExecuteGlobalFunction("GetPlayer;GameInstance", &handle, gameInstance);
 
                 if (handle.instance)

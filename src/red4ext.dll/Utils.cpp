@@ -1,5 +1,5 @@
-#include <stdafx.hpp>
-#include <Utils.hpp>
+#include "stdafx.hpp"
+#include "Utils.hpp"
 
 uintptr_t RED4ext::Utils::FindPattern(std::vector<uint8_t> aPattern, size_t aExpectedMatches, size_t aIndex,
                                       uint8_t aWildcard)
