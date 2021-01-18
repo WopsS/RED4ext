@@ -4,16 +4,11 @@ BasedOnStyle: Microsoft
 Language: Cpp
 
 AccessModifierOffset: -4
-AlignEscapedNewlines: Left
-AllowShortLambdasOnASingleLine: None
 AlwaysBreakTemplateDeclarations: Yes
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
-ContinuationIndentWidth: 2
-Cpp11BracedListStyle: false
-FixNamespaceComments: false
 KeepEmptyLinesAtTheStartOfBlocks: false
-NamespaceIndentation: All
+NamespaceIndentation: Inner
 PointerAlignment: Left
 SpaceAfterTemplateKeyword: false
 
