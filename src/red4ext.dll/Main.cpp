@@ -1,8 +1,6 @@
 #include "stdafx.hpp"
 
-#include "Hooks/CBaseInitializationState.hpp"
 #include "Hooks/CInitializationState.hpp"
-#include "Hooks/CRunningState.hpp"
 #include "Hooks/CShutdownState.hpp"
 #include "Hooks/Main.hpp"
 
@@ -16,20 +14,16 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
         DisableThreadLibraryCalls(aModule);
 
         Main::Attach(aModule);
-        CBaseInitializationState::Attach();
         CInitializationState::Attach();
-        CRunningState::Attach();
         CShutdownState::Attach();
 
         break;
     }
     case DLL_PROCESS_DETACH:
     {
-        Main::Detach();
         CShutdownState::Detach();
-        CRunningState::Detach();
         CInitializationState::Detach();
-        CBaseInitializationState::Detach();
+        Main::Detach();
 
         break;
     }
