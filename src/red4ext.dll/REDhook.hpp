@@ -10,7 +10,7 @@ public:
         renhook::pattern pattern(aPattern);
 
         auto addresses = pattern.find(aWildcard);
-        if (addresses.size() == aExpectedMatches)
+        if (addresses.size() != aExpectedMatches)
         {
             fmt::wmemory_buffer out;
             fmt::format_to(out, L"The pattern {{ 0x{:02X} }} ", fmt::join(aPattern, L", 0x"));
