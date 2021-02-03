@@ -10,40 +10,27 @@ public:
         renhook::pattern pattern(aPattern);
 
         auto addresses = pattern.find(aWildcard);
-        if (addresses.size() != aExpectedMatches)
+        if (addresses.size() == aExpectedMatches)
         {
-            std::wstring message;
-            std::wostringstream stream;
-
-            stream << L"The pattern { ";
-
-            for (auto it = aPattern.begin(); it != aPattern.end(); ++it)
-            {
-                if (it != aPattern.begin())
-                {
-                    stream << L", ";
-                }
-
-                stream << L"0x" << std::uppercase << std::setfill(L'0') << std::setw(2) << std::hex
-                       << static_cast<uint32_t>(*it);
-            }
-
-            stream << L" } ";
+            fmt::wmemory_buffer out;
+            fmt::format_to(out, L"The pattern {{ 0x{:02X} }} ", fmt::join(aPattern, L", 0x"));
 
             if (addresses.size() == 0)
             {
-                stream << L"could not be found.";
+                fmt::format_to(out, L"could not be found.");
             }
             else
             {
-                stream << L"returned " << addresses.size() << L" match(es) but " << aExpectedMatches
-                       << L" match(es) were expected.";
+                fmt::format_to(out, L"returned {} match(es) but {} match(es) were expected.", addresses.size(),
+                               aExpectedMatches);
             }
 
-            stream << L"\n\nThe process will be terminated.";
-            message = stream.str();
+            fmt::format_to(out, L"\n\nThis might be because the game's version is not supported. Try to use a version "
+                                L"that is compatible with the game's version.\n\n"
+                                L"The process will be terminated.");
 
-            MessageBox(nullptr, message.c_str(), L"RED4ext", MB_OK | MB_ICONERROR);
+            auto message = fmt::to_string(out);
+            MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
             ExitProcess(1);
         }
 
