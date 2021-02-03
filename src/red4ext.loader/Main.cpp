@@ -58,7 +58,13 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
         auto dllPath = modPath / MOD_DLL;
         if (!LoadLibrary(dllPath.c_str()))
         {
-            auto message = fmt::format(L"RED4ext could not be loaded, error {}.", GetLastError());
+            wchar_t* buffer = nullptr;
+            auto errorCode = GetLastError();
+
+            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                          nullptr, errorCode, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
+
+            auto message = fmt::format(L"{}\n\nRED4ext could not be loaded, error code 0x{:X}.", buffer, errorCode);
             MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
         }
 
