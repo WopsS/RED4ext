@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "PluginManager.hpp"
 
-void RED4ext::PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPath)
+void PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPath)
 {
     // Make sure we have the plugin directories and create a list of plugins to load.
     std::vector<std::filesystem::path> plugins;
@@ -81,7 +81,7 @@ void RED4ext::PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPa
     }
 }
 
-void RED4ext::PluginManager::Shutdown()
+void PluginManager::Shutdown()
 {
     for (auto& plugin : m_plugins)
     {
@@ -90,7 +90,7 @@ void RED4ext::PluginManager::Shutdown()
     }
 }
 
-void RED4ext::PluginManager::Call(Callback aCallback)
+void PluginManager::Call(Callback aCallback)
 {
     for (auto& plugin : m_plugins)
     {

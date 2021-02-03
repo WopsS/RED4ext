@@ -6,7 +6,6 @@
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
-    using namespace RED4ext::Hooks;
     switch (aReason)
     {
     case DLL_PROCESS_ATTACH:

@@ -2,26 +2,23 @@
 
 #include "PluginManager.hpp"
 
-namespace RED4ext
+class App
 {
-    class App
-    {
-    public:
-        App() = default;
-        ~App() = default;
+public:
+    App() = default;
+    ~App() = default;
 
-        static App* Get();
+    static App* Get();
 
-        void Init(HMODULE aModule);
-        void Run();
-        void Shutdown();
+    void Init(HMODULE aModule);
+    void Run();
+    void Shutdown();
 
-        PluginManager* GetPluginManager();
+    PluginManager* GetPluginManager();
 
-    private:
-        std::tuple<std::error_code, std::filesystem::path> GetDocumentsPath();
-        void InitializeLogger(std::filesystem::path aRoot);
+private:
+    std::tuple<std::error_code, std::filesystem::path> GetDocumentsPath();
+    void InitializeLogger(std::filesystem::path aRoot);
 
-        PluginManager m_pluginManager;
-    };
-}
+    PluginManager m_pluginManager;
+};

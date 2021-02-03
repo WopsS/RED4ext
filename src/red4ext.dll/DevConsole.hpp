@@ -1,6 +1,6 @@
 #pragma once
 
-namespace RED4ext::DevConsole
+namespace DevConsole
 {
     void Alloc();
     void Free();

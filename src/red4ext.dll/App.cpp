@@ -6,13 +6,13 @@
 
 #include "DevConsole.hpp"
 
-RED4ext::App* RED4ext::App::Get()
+App* App::Get()
 {
     static App app;
     return &app;
 }
 
-void RED4ext::App::Init(HMODULE aModule)
+void App::Init(HMODULE aModule)
 {
     constexpr auto name = L"RED4ext";
 
@@ -43,11 +43,11 @@ void RED4ext::App::Init(HMODULE aModule)
     m_pluginManager.Init(aModule, docsPath);
 }
 
-void RED4ext::App::Run()
+void App::Run()
 {
 }
 
-void RED4ext::App::Shutdown()
+void App::Shutdown()
 {
     m_pluginManager.Shutdown();
     spdlog::shutdown();
@@ -57,33 +57,33 @@ void RED4ext::App::Shutdown()
 #endif
 }
 
-RED4ext::PluginManager* RED4ext::App::GetPluginManager()
+PluginManager* App::GetPluginManager()
 {
     return &m_pluginManager;
 }
 
-std::tuple<std::error_code, std::filesystem::path> RED4ext::App::GetDocumentsPath()
+std::tuple<std::error_code, std::filesystem::path> App::GetDocumentsPath()
 {
     wchar_t* pathRaw = nullptr;
     std::filesystem::path path;
 
     if (FAILED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pathRaw)))
     {
-        return { std::error_code(ERROR_PATH_NOT_FOUND, std::system_category()), "" };
+        return {std::error_code(ERROR_PATH_NOT_FOUND, std::system_category()), ""};
     }
 
     path = pathRaw;
     CoTaskMemFree(pathRaw);
 
-    return { { std::error_code() }, path };
+    return {{std::error_code()}, path};
 }
 
-void RED4ext::App::InitializeLogger(std::filesystem::path aRoot)
+void App::InitializeLogger(std::filesystem::path aRoot)
 {
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
     auto file = std::make_shared<spdlog::sinks::basic_file_sink_st>(aRoot / L"game.log", true);
 
-    spdlog::sinks_init_list sinks = { console, file };
+    spdlog::sinks_init_list sinks = {console, file};
 
     auto logger = std::make_shared<spdlog::logger>("", sinks);
     spdlog::set_default_logger(logger);
