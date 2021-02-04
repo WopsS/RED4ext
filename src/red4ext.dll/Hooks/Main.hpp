@@ -2,6 +2,6 @@
 
 namespace Main
 {
-void Attach(HMODULE aModule);
+void Attach();
 void Detach();
 } // namespace Main

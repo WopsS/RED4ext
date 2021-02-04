@@ -1,18 +1,35 @@
 #include "stdafx.hpp"
 #include "App.hpp"
+#include "DevConsole.hpp"
+#include "Utils.hpp"
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "DevConsole.hpp"
+std::unique_ptr<App> App::m_instance;
+
+App::App(HMODULE aModule)
+    : m_module(aModule)
+{
+}
+
+void App::Construct(HMODULE aModule)
+{
+    static std::once_flag flag;
+    std::call_once(flag, [aModule]() {
+        if (!m_instance)
+        {
+            m_instance.reset(new App(aModule));
+        }
+    });
+}
 
 App* App::Get()
 {
-    static App app;
-    return &app;
+    return m_instance.get();
 }
 
-void App::Init(HMODULE aModule)
+void App::Init()
 {
     constexpr auto name = L"RED4ext";
 

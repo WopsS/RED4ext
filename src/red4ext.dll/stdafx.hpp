@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <functional>
+#include <memory>
 #include <sstream>
 #include <system_error>
 #include <tuple>

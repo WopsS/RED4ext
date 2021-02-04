@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 
+#include "App.hpp"
 #include "Hooks/CInitializationState.hpp"
 #include "Hooks/CShutdownState.hpp"
 #include "Hooks/Main.hpp"
@@ -12,7 +13,9 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
     {
         DisableThreadLibraryCalls(aModule);
 
-        Main::Attach(aModule);
+        App::Construct(aModule);
+
+        Main::Attach();
         CInitializationState::Attach();
         CShutdownState::Attach();
 

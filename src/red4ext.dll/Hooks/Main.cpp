@@ -5,8 +5,6 @@
 
 namespace
 {
-HMODULE dllModule;
-
 int64_t Main();
 REDhook<decltype(&Main)> Main_h({0x40, 0x53, 0x48, 0x81, 0xEC, 0xC0, 0x01, 0x00, 0x00, 0xFF, 0x15, 0xCC, 0xCC,
                                  0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
@@ -16,7 +14,7 @@ int64_t Main()
 {
     auto app = App::Get();
 
-    app->Init(dllModule);
+    app->Init();
     auto result = Main_h();
     app->Shutdown();
 
@@ -24,10 +22,9 @@ int64_t Main()
 }
 } // namespace
 
-void Main::Attach(HMODULE aModule)
+void Main::Attach()
 {
     Main_h.Attach();
-    dllModule = aModule;
 }
 
 void Main::Detach()
