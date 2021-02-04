@@ -66,6 +66,9 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 
             auto message = fmt::format(L"{}\n\nRED4ext could not be loaded, error code 0x{:X}.", buffer, errorCode);
             MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+
+            LocalFree(buffer);
+            buffer = nullptr;
         }
 
         break;
