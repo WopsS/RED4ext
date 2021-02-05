@@ -56,8 +56,6 @@ void App::Init()
 
     spdlog::info(L"{} started", name);
     spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
-
-    m_pluginManager.Init(aModule, docsPath);
 }
 
 void App::Run()
