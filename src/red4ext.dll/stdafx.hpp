@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include <filesystem>
 #include <functional>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <system_error>
 #include <tuple>
 #include <vector>

@@ -1,137 +1,222 @@
 #include "stdafx.hpp"
 #include "PluginManager.hpp"
+#include "Utils.hpp"
 
-void PluginManager::Init(HMODULE aModule, std::filesystem::path aDocsPath)
+PluginManager::PluginManager()
 {
-    // Make sure we have the plugin directories and create a list of plugins to load.
-    std::vector<std::filesystem::path> plugins;
+}
 
-    auto pluginsDir = aDocsPath / "plugins";
-    if (!std::filesystem::exists(pluginsDir))
+PluginManager::~PluginManager()
+{
+    UnloadAll();
+}
+
+void PluginManager::LoadAll(const std::filesystem::path& aPluginsDir)
+{
+    std::vector<std::filesystem::path> pluginPaths;
+    m_logger = spdlog::default_logger();
+
+    if (!std::filesystem::exists(aPluginsDir))
     {
-        std::filesystem::create_directories(pluginsDir);
+        std::filesystem::create_directories(aPluginsDir);
     }
 
-    for (auto& path : std::filesystem::recursive_directory_iterator(pluginsDir))
+    for (auto& path : std::filesystem::directory_iterator(aPluginsDir))
     {
         if (path.path().extension() == L".dll")
         {
-            plugins.emplace_back(path);
+            pluginPaths.emplace_back(path);
         }
     }
 
-    std::filesystem::path currDir;
+    for (const auto& path : pluginPaths)
     {
-        wchar_t pathPtr[MAX_PATH];
-        GetModuleFileName(aModule, pathPtr, MAX_PATH);
-
-        currDir = pathPtr;
-        currDir = currDir.parent_path();
-    }
-
-    pluginsDir = currDir / "plugins";
-    if (!std::filesystem::exists(pluginsDir))
-    {
-        std::filesystem::create_directories(pluginsDir);
-    }
-
-    for (auto& path : std::filesystem::directory_iterator(pluginsDir))
-    {
-        if (path.path().extension() == L".dll")
-        {
-            plugins.emplace_back(path);
-        }
-    }
-
-    for (auto& path : plugins)
-    {
-        PluginInfo plugin{};
-        plugin.Name = path.stem().wstring();
-        plugin.Module = LoadLibrary(path.c_str());
-
-        if (plugin.Module)
-        {
-            plugin.OnBaseInitialization = GetProcAddress(plugin.Module, "OnBaseInitialization");
-            if (!plugin.OnBaseInitialization)
-            {
-                spdlog::debug(L"'{}' does not export 'OnBaseInitialization' function", plugin.Name);
-            }
-
-            plugin.OnInitialization = GetProcAddress(plugin.Module, "OnInitialization");
-            if (!plugin.OnInitialization)
-            {
-                spdlog::debug(L"'{}' does not export 'OnInitialization' function", plugin.Name);
-            }
-
-            plugin.OnUpdate = GetProcAddress(plugin.Module, "OnUpdate");
-            if (!plugin.OnUpdate)
-            {
-                spdlog::debug(L"'{}' does not export 'OnUpdate' function", plugin.Name);
-            }
-
-            plugin.OnShutdown = GetProcAddress(plugin.Module, "OnShutdown");
-            if (!plugin.OnShutdown)
-            {
-                spdlog::debug(L"'{}' does not export 'OnShutdown' function", plugin.Name);
-            }
-
-            spdlog::info(L"'{}' loaded", plugin.Name);
-            m_plugins.emplace_back(plugin);
-        }
+        Load(path);
     }
 }
 
-void PluginManager::Shutdown()
+void PluginManager::UnloadAll()
 {
-    for (auto& plugin : m_plugins)
+    for (const auto& plugin : m_plugins)
     {
-        FreeLibrary(plugin.Module);
-        spdlog::info(L"'{}' unloaded", plugin.Name);
+        Unload(plugin);
     }
+
+    m_plugins.clear();
 }
 
-void PluginManager::Call(Callback aCallback)
+void PluginManager::Load(const std::filesystem::path& aPath)
 {
-    for (auto& plugin : m_plugins)
+    if (aPath.extension() != L".dll")
     {
-        switch (aCallback)
-        {
-        case Callback::OnBaseInitialization:
-        {
-            if (plugin.OnBaseInitialization)
-            {
-                plugin.OnBaseInitialization();
-            }
+        return;
+    }
 
-            break;
-        }
-        case Callback::OnInitialization:
-        {
-            if (plugin.OnInitialization)
-            {
-                plugin.OnInitialization();
-            }
+    Plugin plugin;
+    auto filename = aPath.filename();
 
-            break;
-        }
-        case Callback::OnUpdate:
-        {
-            if (plugin.OnUpdate)
-            {
-                plugin.OnUpdate();
-            }
+    auto handle = LoadLibrary(aPath.c_str());
+    if (!handle)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
 
-            break;
-        }
-        case Callback::OnShutdown:
-        {
-            if (plugin.OnShutdown)
-            {
-                plugin.OnShutdown();
-            }
+        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename.c_str(), err, errMsg);
+        return;
+    }
 
-            break;
+    auto supports = reinterpret_cast<Supports_t>(GetProcAddress(handle, "Supports"));
+    if (!supports)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+
+        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename.c_str(), err, errMsg);
+        FreeLibrary(handle);
+
+        return;
+    }
+
+    uint32_t apiVersion;
+    bool success = false;
+
+    try
+    {
+        apiVersion = supports();
+        success = true;
+    }
+    catch (...)
+    {
+        spdlog::warn(L"An error occured while trying to get API version of '{}', the plugin will not be loaded",
+                     filename.c_str());
+    }
+
+    if (!success)
+    {
+        FreeLibrary(handle);
+        return;
+    }
+
+    if (apiVersion < MINIMUM_API_VERSION || apiVersion > LATEST_API_VERSION)
+    {
+        spdlog::warn(L"'{}' reported unsupported API version ({})", filename.c_str(), apiVersion);
+        FreeLibrary(handle);
+
+        return;
+    }
+
+    plugin.SetApiVersion(apiVersion);
+    plugin.SetHandle(handle);
+
+    auto query = reinterpret_cast<Query_t>(GetProcAddress(handle, "Query"));
+    if (!query)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+
+        spdlog::debug(L"Could not retrieve 'Query' function from '{}', error: 0x{:X}, description: {}",
+                      filename.c_str(), err, errMsg);
+        FreeLibrary(handle);
+
+        return;
+    }
+
+    success = false;
+    try
+    {
+        query(plugin.GetInfo());
+        success = true;
+    }
+    catch (...)
+    {
+        spdlog::warn(L"An exception occured while querying '{}', the plugin will not be loaded", filename.c_str());
+    }
+
+    if (!success)
+    {
+        FreeLibrary(handle);
+        return;
+    }
+
+    if (plugin.GetName().empty())
+    {
+        spdlog::warn(L"'{}' did not supply a name, the plugin will not be loaded", filename.c_str());
+        FreeLibrary(handle);
+
+        return;
+    }
+
+    if (!plugin.IsCompatibleRuntime())
+    {
+        auto runtime = v1::GetRuntimeVersion();
+        spdlog::warn(
+            L"{} ({}) is not compatible with the current game version ({}.{:02d}), the compatible version is {}",
+            plugin.GetName(), plugin.GetVersion(), runtime->major, runtime->minor, plugin.GetRuntime());
+        FreeLibrary(handle);
+
+        return;
+    }
+
+    auto load = reinterpret_cast<Load_t>(GetProcAddress(handle, "Load"));
+    if (!load)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+
+        spdlog::debug(L"Could not retrieve 'Load' function from {}, error: 0x{:X}, description: {}", plugin.GetName(),
+                      err, errMsg);
+        return;
+    }
+
+    success = false;
+    try
+    {
+        auto red4ext = plugin.GetInterface();
+
+        if (!load(plugin.GetHandle(), &red4ext))
+        {
+            spdlog::warn(L"{} could not be loaded, 'Load' returned false", plugin.GetName());
+            Unload(plugin);
+
+            return;
         }
+
+        success = true;
+    }
+    catch (...)
+    {
+        spdlog::warn(L"An error occured while loading {}, the plugin will not be loaded", plugin.GetName());
+    }
+
+    if (!success)
+    {
+        FreeLibrary(handle);
+        return;
+    }
+
+    spdlog::info(L"{} (version: {}, author: {}) loaded", plugin.GetName(), plugin.GetVersion(), plugin.GetAuthor());
+    m_plugins.emplace_back(std::move(plugin));
+}
+
+void PluginManager::Unload(const Plugin& aPlugin)
+{
+    auto handle = aPlugin.GetRawHandle();
+    auto unload = reinterpret_cast<Unload_t>(GetProcAddress(handle, "Unload"));
+
+    if (unload)
+    {
+        try
+        {
+            unload();
+            m_logger->info(L"{} unloaded", aPlugin.GetName());
+        }
+        catch (...)
+        {
+            spdlog::warn(L"An error occured while unloading '{}'. This does not affect unloading this plugin, but if "
+                         L"you are the plugin author you might want to fix this",
+                         aPlugin.GetName());
         }
     }
+
+    FreeLibrary(handle);
 }

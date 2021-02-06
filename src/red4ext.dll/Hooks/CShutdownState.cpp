@@ -12,6 +12,10 @@ REDhook<decltype(&CShutdownState_Run)> CShutdownState_Run_h({0x48, 0x89, 0x6C, 0
 
 bool CShutdownState_Run(uintptr_t aThis, uintptr_t aApp)
 {
+    auto app = App::Get();
+    auto pluginManager = app->GetPluginManager();
+
+    pluginManager->UnloadAll();
     return CShutdownState_Run_h(aThis, aApp);
 }
 } // namespace

@@ -14,6 +14,13 @@ REDhook<decltype(&CInitializationState_Init)> CInitializationState_Init_h({0x40,
 bool CInitializationState_Init(uintptr_t aThis, uintptr_t aApp)
 {
     auto result = CInitializationState_Init_h(aThis, aApp);
+
+    auto app = App::Get();
+    auto pluginsDir = app->GetPluginsDirectory();
+
+    auto pluginManager = app->GetPluginManager();
+    pluginManager->LoadAll(pluginsDir);
+
     return result;
 }
 } // namespace
