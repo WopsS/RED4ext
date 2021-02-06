@@ -16,15 +16,14 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
             return FALSE;
         }
    
-        constexpr auto mutexName = L"RED4ext";
-        s_mutex = CreateMutex(nullptr, true, mutexName);
+        constexpr auto name = L"RED4ext";
+        s_mutex = CreateMutex(nullptr, true, name);
 
         // Only load "RED4ext" in game's process. The game process is started first and then the crash handler is
         // created.
         auto err = GetLastError();
         if (err == ERROR_ALREADY_EXISTS)
         {
-            MessageBox(nullptr, L"already exists", L"", MB_OK);
             return TRUE;
         }
         else if (err != ERROR_SUCCESS)
@@ -34,7 +33,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                           nullptr, err, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
 
             auto message = fmt::format(L"{}\n\nRED4ext could not be loaded, error code 0x{:X}.", buffer, err);
-            MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+            MessageBox(nullptr, message.c_str(), name, MB_ICONERROR | MB_OK);
 
             LocalFree(buffer);
             buffer = nullptr;
@@ -72,7 +71,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                                        L"If this is intended please remove 'version.dll' from '{}' directory.",
                                        modPath.c_str(), exePath.remove_filename().c_str());
 
-            MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONWARNING | MB_OK);
+            MessageBox(nullptr, message.c_str(), name, MB_ICONWARNING | MB_OK);
         }
 
         auto dllPath = modPath / modDll;
@@ -85,7 +84,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                           nullptr, errorCode, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
 
             auto message = fmt::format(L"{}\n\nRED4ext could not be loaded, error code 0x{:X}.", buffer, errorCode);
-            MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+            MessageBox(nullptr, message.c_str(), name, MB_ICONERROR | MB_OK);
 
             LocalFree(buffer);
             buffer = nullptr;
