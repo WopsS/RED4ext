@@ -8,21 +8,36 @@
 
 namespace
 {
-bool CInitializationState_Init(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp);
-REDhook<decltype(&CInitializationState_Init)> CInitializationState_Init_h({0x40, 0x55, 0x48, 0x8D, 0x6C, 0x24, 0xA9,
-                                                                           0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,
-                                                                           0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
-                                                                          &CInitializationState_Init, 1);
+bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp);
+REDhook<decltype(&_CInitializationState_Run)> CInitializationState_Run({0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05,
+                                                                        0xCC, 0xCC, 0xCC, 0xCC, 0x4C, 0x8B, 0xC2,
+                                                                        0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
+                                                                       &_CInitializationState_Run, 1);
 
-bool CInitializationState_Init(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp)
+bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp)
 {
-    auto result = CInitializationState_Init_h(aThis, aApp);
+    auto result = CInitializationState_Run(aThis, aApp);
 
-    auto app = App::Get();
-    auto pluginsDir = app->GetPluginsDirectory();
+    /*
+     * This is called multiple times, maybe it is doing some internal initalization while showing the intro. It returns
+     * true when the state is finished and it should call `Done`, false if it is not and will be run again.
+     *
+     * The engine is doing some game checks to see if it should set the state to "CRunningState" or not. We are going to
+     * copy this behavior here, but not as the game does it.
+     */
+    auto nextState = aApp->nextState;
+    if (result && nextState)
+    {
+        auto name = nextState->GetName();
+        if (strcmp(name, "Running") == 0)
+        {
+            auto app = App::Get();
+            auto pluginsDir = app->GetPluginsDirectory();
 
-    auto pluginManager = app->GetPluginManager();
-    pluginManager->LoadAll(pluginsDir);
+            auto pluginManager = app->GetPluginManager();
+            pluginManager->LoadAll(pluginsDir);
+        }
+    }
 
     return result;
 }
@@ -30,10 +45,10 @@ bool CInitializationState_Init(RED4ext::CInitializationState* aThis, RED4ext::CG
 
 void CInitializationState::Attach()
 {
-    CInitializationState_Init_h.Attach();
+    CInitializationState_Run.Attach();
 }
 
 void CInitializationState::Detach()
 {
-    CInitializationState_Init_h.Detach();
+    CInitializationState_Run.Detach();
 }
