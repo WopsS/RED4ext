@@ -69,8 +69,11 @@ const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
             return;
         }
 
-        version.major = (buffer->dwProductVersionMS >> 16) & 0xFF;
-        version.minor = (buffer->dwProductVersionLS >> 16) & 0xFFFF;
+        uint8_t major = (buffer->dwProductVersionMS >> 16) & 0xFF;
+        uint16_t minor = buffer->dwProductVersionMS & 0xFFFF;
+        uint32_t patch = (buffer->dwProductVersionLS >> 16) & 0xFFFF;
+
+        version = RED4EXT_V1_SEMVER(major, minor, patch);
 
         _freea(data);
     });

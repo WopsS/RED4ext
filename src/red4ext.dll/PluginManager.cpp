@@ -149,9 +149,9 @@ void PluginManager::Load(const std::filesystem::path& aPath)
     if (!plugin.IsCompatibleRuntime())
     {
         auto runtime = v1::GetRuntimeVersion();
-        spdlog::warn(
-            L"{} ({}) is not compatible with the current game version ({}.{:02d}), the compatible version is {}",
-            plugin.GetName(), plugin.GetVersion(), runtime->major, runtime->minor, plugin.GetRuntime());
+        spdlog::warn(L"{} ({}) is not compatible with the current game version ({}.{}{}), the compatible version is {}",
+                     plugin.GetName(), plugin.GetVersion(), runtime->major, runtime->minor, runtime->patch,
+                     plugin.GetRuntime());
         FreeLibrary(handle);
 
         return;

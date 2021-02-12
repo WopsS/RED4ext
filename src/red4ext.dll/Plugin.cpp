@@ -151,7 +151,7 @@ std::wstring Plugin::GetRuntime() const
     case RED4EXT_API_VERSION_1:
     {
         auto& runtime = m_info.v1.runtime;
-        return fmt::format(L"{}.{:02d}", runtime.major, runtime.minor);
+        return fmt::format(L"{}.{}{}", runtime.major, runtime.minor, runtime.patch);
     }
     default:
     {
