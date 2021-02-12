@@ -1,4 +1,4 @@
-#include <stdafx.hpp>
+#include "stdafx.hpp"
 
 RED4EXT_C_EXPORT bool RED4EXT_CALL Load(RED4ext::PluginHandle aHandle, const RED4ext::IRED4ext* aInterface)
 {

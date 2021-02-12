@@ -17,7 +17,6 @@ union PluginInfo
     RED4ext::v1::PluginInfo v1;
 };
 
-
 namespace v1
 {
 const RED4ext::v1::VersionInfo* GetSDKVersion();
