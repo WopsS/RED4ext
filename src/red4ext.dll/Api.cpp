@@ -31,7 +31,7 @@ const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
             return;
         }
 
-        auto data = _malloca(size);
+        auto data = new char[size];
         if (!data)
         {
             spdlog::error(L"Could not allocate {} bytes on stack or heap", size);
@@ -44,7 +44,7 @@ const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
             auto errMsg = Utils::FormatErrorMessage(err);
             spdlog::error(L"Could not retrive game's version info, error: 0x{:X}, description: {}", err, errMsg);
 
-            _freea(data);
+            delete[] data;
             return;
         }
 
@@ -57,14 +57,14 @@ const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
             auto errMsg = Utils::FormatErrorMessage(err);
             spdlog::error(L"Could not query version info, error: 0x{:X}, description: {}", err, errMsg);
 
-            _freea(data);
+            delete[] data;
             return;
         }
 
         if (buffer->dwSignature != 0xFEEF04BD)
         {
             spdlog::error(L"Retrived version signature does not match");
-            _freea(data);
+            delete[] data;
 
             return;
         }
@@ -74,8 +74,7 @@ const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
         uint32_t patch = (buffer->dwProductVersionLS >> 16) & 0xFFFF;
 
         version = RED4EXT_V1_SEMVER(major, minor, patch);
-
-        _freea(data);
+        delete[] data;
     });
 
     return &version;
