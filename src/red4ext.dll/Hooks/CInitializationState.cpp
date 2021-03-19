@@ -2,6 +2,7 @@
 #include "Hooks/CInitializationState.hpp"
 #include "App.hpp"
 #include "REDhook.hpp"
+#include "Patterns.hpp"
 
 #include <RED4ext/GameApplication.hpp>
 #include <RED4ext/GameStates.hpp>
@@ -34,8 +35,8 @@ bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CG
             auto app = App::Get();
             auto pluginsDir = app->GetPluginsDirectory();
 
-            auto pluginManager = app->GetPluginManager();
-            pluginManager->LoadAll(pluginsDir);
+            auto pluginsManager = app->GetPluginsManager();
+            pluginsManager->LoadAll(pluginsDir);
         }
     }
 
@@ -45,10 +46,10 @@ bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CG
 
 void CInitializationState::Attach()
 {
-    CInitializationState_Run.Attach();
+    CInitializationState_Run.attach();
 }
 
 void CInitializationState::Detach()
 {
-    CInitializationState_Run.Detach();
+    CInitializationState_Run.detach();
 }

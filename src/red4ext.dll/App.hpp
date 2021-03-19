@@ -1,6 +1,8 @@
 #pragma once
 
-#include "PluginManager.hpp"
+#include "HookingManager.hpp"
+#include "PluginsManager.hpp"
+#include "TrampolinesManager.hpp"
 
 class App
 {
@@ -11,10 +13,14 @@ public:
     void Init();
     void Shutdown();
 
-    PluginManager* GetPluginManager();
+    HookingManager* GetHookingManager();
+    TrampolinesManager* GetTrampolinesManager();
+
+    PluginsManager* GetPluginsManager();
 
     std::filesystem::path GetRootDirectory();
     std::filesystem::path GetPluginsDirectory();
+    std::filesystem::path GetLogsDirectory();
     std::filesystem::path GetExecutablePath();
 
 private:
@@ -28,5 +34,9 @@ private:
     static std::unique_ptr<App> m_instance;
 
     HMODULE m_module;
-    PluginManager m_pluginManager;
+
+    HookingManager m_hookingManager;
+    TrampolinesManager m_trampolinesManager;
+
+    PluginsManager m_pluginsManager;
 };

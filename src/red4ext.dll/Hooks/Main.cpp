@@ -24,10 +24,10 @@ int64_t Main()
 
 void Main::Attach()
 {
-    Main_h.Attach();
+    Main_h.attach();
 }
 
 void Main::Detach()
 {
-    Main_h.Detach();
+    Main_h.detach();
 }

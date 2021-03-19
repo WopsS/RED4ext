@@ -10,18 +10,14 @@ std::unique_ptr<App> App::m_instance;
 
 App::App(HMODULE aModule)
     : m_module(aModule)
+    , m_pluginsManager(&m_hookingManager, &m_trampolinesManager)
 {
 }
 
 void App::Construct(HMODULE aModule)
 {
     static std::once_flag flag;
-    std::call_once(flag, [aModule]() {
-        if (!m_instance)
-        {
-            m_instance.reset(new App(aModule));
-        }
-    });
+    std::call_once(flag, [aModule]() { m_instance.reset(new App(aModule)); });
 }
 
 App* App::Get()
@@ -37,8 +33,8 @@ void App::Init()
 
     CreateLogger();
 
-    spdlog::info(L"RED4ext started");
-    spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
+    spdlog::info("RED4ext started");
+    spdlog::debug("Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
 }
 
 void App::Shutdown()
@@ -50,9 +46,19 @@ void App::Shutdown()
 #endif
 }
 
-PluginManager* App::GetPluginManager()
+HookingManager* App::GetHookingManager()
 {
-    return &m_pluginManager;
+    return &m_hookingManager;
+}
+
+TrampolinesManager* App::GetTrampolinesManager()
+{
+    return &m_trampolinesManager;
+}
+
+PluginsManager* App::GetPluginsManager()
+{
+    return &m_pluginsManager;
 }
 
 std::filesystem::path App::GetRootDirectory()
@@ -78,7 +84,12 @@ std::filesystem::path App::GetRootDirectory()
 
 std::filesystem::path App::GetPluginsDirectory()
 {
-    return GetRootDirectory() / L"plugins";
+    return GetRootDirectory() / "plugins";
+}
+
+std::filesystem::path App::GetLogsDirectory()
+{
+    return GetRootDirectory() / "logs";
 }
 
 std::filesystem::path App::GetExecutablePath()
@@ -104,7 +115,7 @@ std::filesystem::path App::GetExecutablePath()
 
 void App::CreateLogger()
 {
-    auto logsPath = GetRootDirectory() / L"logs";
+    auto logsPath = GetLogsDirectory();
     if (!std::filesystem::exists(logsPath) && !std::filesystem::create_directories(logsPath))
     {
         auto err = GetLastError();
@@ -115,7 +126,7 @@ void App::CreateLogger()
     }
 
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
-    auto file = std::make_shared<spdlog::sinks::basic_file_sink_st>(logsPath / L"game.log", true);
+    auto file = std::make_shared<spdlog::sinks::basic_file_sink_st>(logsPath / "game.log", true);
 
     spdlog::sinks_init_list sinks = {console, file};
 
