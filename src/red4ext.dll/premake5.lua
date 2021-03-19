@@ -17,7 +17,8 @@ project("RED4ext.Dll")
     {
         ".",
         red4ext.project.includes("RenHook"),
-        red4ext.project.includes("spdlog")
+        red4ext.project.includes("spdlog"),
+        red4ext.paths.src("red4ext.sdk", "include")
     })
 
     files(
@@ -28,6 +29,7 @@ project("RED4ext.Dll")
 
     links(
     {
+        "version",
         red4ext.project.links("RenHook"),
         red4ext.project.links("spdlog")
     })

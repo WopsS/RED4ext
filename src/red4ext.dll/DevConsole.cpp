@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "DevConsole.hpp"
 
-void RED4ext::DevConsole::Alloc()
+void DevConsole::Alloc()
 {
     if (AllocConsole())
     {
@@ -15,7 +15,7 @@ void RED4ext::DevConsole::Alloc()
     }
 }
 
-void RED4ext::DevConsole::Free()
+void DevConsole::Free()
 {
     if (!FreeConsole())
     {

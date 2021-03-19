@@ -1,55 +1,44 @@
 #include "stdafx.hpp"
 #include "App.hpp"
+#include "DevConsole.hpp"
+#include "Utils.hpp"
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "DevConsole.hpp"
+std::unique_ptr<App> App::m_instance;
 
-RED4ext::App* RED4ext::App::Get()
+App::App(HMODULE aModule)
+    : m_module(aModule)
+    , m_pluginsManager(&m_hookingManager, &m_trampolinesManager)
 {
-    static App app;
-    return &app;
 }
 
-void RED4ext::App::Init(HMODULE aModule)
+void App::Construct(HMODULE aModule)
 {
-    constexpr auto name = L"RED4ext";
+    static std::once_flag flag;
+    std::call_once(flag, [aModule]() { m_instance.reset(new App(aModule)); });
+}
 
-    // Make sure there is a "RED4ext" directory in the "Documents".
-    auto [err, docsPath] = GetDocumentsPath();
-    if (err)
-    {
-        MessageBox(nullptr, L"Could not get the path to 'Documents' folder.", name, MB_ICONEXCLAMATION | MB_OK);
-        return;
-    }
+App* App::Get()
+{
+    return m_instance.get();
+}
 
-    docsPath /= name;
-    if (!std::filesystem::exists(docsPath) && !std::filesystem::create_directories(docsPath))
-    {
-        return;
-    }
-
+void App::Init()
+{
 #ifdef _DEBUG
     DevConsole::Alloc();
 #endif
 
-    // Initialize the logger.
-    InitializeLogger(docsPath);
+    CreateLogger();
 
-    spdlog::info(L"{} started", name);
-    spdlog::debug(L"Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
-
-    m_pluginManager.Init(aModule, docsPath);
+    spdlog::info("RED4ext started");
+    spdlog::debug("Base address is {:#x}", reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)));
 }
 
-void RED4ext::App::Run()
+void App::Shutdown()
 {
-}
-
-void RED4ext::App::Shutdown()
-{
-    m_pluginManager.Shutdown();
     spdlog::shutdown();
 
 #ifdef _DEBUG
@@ -57,37 +46,94 @@ void RED4ext::App::Shutdown()
 #endif
 }
 
-RED4ext::PluginManager* RED4ext::App::GetPluginManager()
+HookingManager* App::GetHookingManager()
 {
-    return &m_pluginManager;
+    return &m_hookingManager;
 }
 
-std::tuple<std::error_code, std::filesystem::path> RED4ext::App::GetDocumentsPath()
+TrampolinesManager* App::GetTrampolinesManager()
 {
-    wchar_t* pathRaw = nullptr;
-    std::filesystem::path path;
+    return &m_trampolinesManager;
+}
 
-    if (FAILED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pathRaw)))
+PluginsManager* App::GetPluginsManager()
+{
+    return &m_pluginsManager;
+}
+
+std::filesystem::path App::GetRootDirectory()
+{
+    constexpr auto pathLength = MAX_PATH + 1;
+
+    // Try to get the executable path until we can fit the length of the path.
+    std::wstring filename;
+    do
     {
-        return { std::error_code(ERROR_PATH_NOT_FOUND, std::system_category()), "" };
+        filename.resize(filename.size() + pathLength, '\0');
+
+        auto length = GetModuleFileName(m_module, filename.data(), static_cast<uint32_t>(filename.size()));
+        if (length > 0)
+        {
+            // Resize it to the real, std::filesystem::path" will use the string's length instead of recounting it.
+            filename.resize(length);
+        }
+    } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+    return std::filesystem::path(filename).parent_path();
+}
+
+std::filesystem::path App::GetPluginsDirectory()
+{
+    return GetRootDirectory() / "plugins";
+}
+
+std::filesystem::path App::GetLogsDirectory()
+{
+    return GetRootDirectory() / "logs";
+}
+
+std::filesystem::path App::GetExecutablePath()
+{
+    constexpr auto pathLength = MAX_PATH + 1;
+
+    // Try to get the executable path until we can fit the length of the path.
+    std::wstring filename;
+    do
+    {
+        filename.resize(filename.size() + pathLength, '\0');
+
+        auto length = GetModuleFileName(nullptr, filename.data(), static_cast<uint32_t>(filename.size()));
+        if (length > 0)
+        {
+            // Resize it to the real, std::filesystem::path" will use the string's length instead of recounting it.
+            filename.resize(length);
+        }
+    } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+    return filename;
+}
+
+void App::CreateLogger()
+{
+    auto logsPath = GetLogsDirectory();
+    if (!std::filesystem::exists(logsPath) && !std::filesystem::create_directories(logsPath))
+    {
+        auto err = GetLastError();
+        auto message = fmt::format(L"{}\nCould not create '{}' directory, error 0x{:X}.",
+                                   Utils::FormatErrorMessage(err), logsPath.c_str(), err);
+        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+        return;
     }
 
-    path = pathRaw;
-    CoTaskMemFree(pathRaw);
-
-    return { { std::error_code() }, path };
-}
-
-void RED4ext::App::InitializeLogger(std::filesystem::path aRoot)
-{
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
-    auto file = std::make_shared<spdlog::sinks::basic_file_sink_st>(aRoot / L"game.log", true);
+    auto file = std::make_shared<spdlog::sinks::basic_file_sink_st>(logsPath / "game.log", true);
 
-    spdlog::sinks_init_list sinks = { console, file };
+    spdlog::sinks_init_list sinks = {console, file};
 
     auto logger = std::make_shared<spdlog::logger>("", sinks);
     spdlog::set_default_logger(logger);
 
+    // Setting the flush on every log, game might crash and spdlog won't flush the buffer.
 #ifdef _DEBUG
     logger->flush_on(spdlog::level::trace);
     spdlog::set_level(spdlog::level::trace);

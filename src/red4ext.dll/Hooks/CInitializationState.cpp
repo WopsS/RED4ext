@@ -1,37 +1,55 @@
 #include "stdafx.hpp"
 #include "Hooks/CInitializationState.hpp"
-
 #include "App.hpp"
-#include "REDs/REDhook.hpp"
+#include "REDhook.hpp"
+#include "Patterns.hpp"
+
+#include <RED4ext/GameApplication.hpp>
+#include <RED4ext/GameStates.hpp>
 
 namespace
 {
-    bool CInitializationState_Init(uintptr_t aThis, uintptr_t aApp);
-    RED4ext::REDhook<decltype(&CInitializationState_Init)> CInitializationState_Init_h({ 0x40, 0x55, 0x48, 0x8D, 0x6C,
-                                                                                         0x24, 0xA9, 0x48, 0x81, 0xEC,
-                                                                                         0x90, 0x00, 0x00, 0x00, 0xE8,
-                                                                                         0xCC, 0xCC, 0xCC, 0xCC },
-                                                                                       &CInitializationState_Init, 1);
+bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp);
+REDhook<decltype(&_CInitializationState_Run)> CInitializationState_Run({0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05,
+                                                                        0xCC, 0xCC, 0xCC, 0xCC, 0x4C, 0x8B, 0xC2,
+                                                                        0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
+                                                                       &_CInitializationState_Run, 1);
 
-    bool CInitializationState_Init(uintptr_t aThis, uintptr_t aApp)
+bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp)
+{
+    auto result = CInitializationState_Run(aThis, aApp);
+
+    /*
+     * This is called multiple times, maybe it is doing some internal initalization while showing the intro. It returns
+     * true when the state is finished and it should call `Done`, false if it is not and will be run again.
+     *
+     * The engine is doing some game checks to see if it should set the state to "CRunningState" or not. We are going to
+     * copy this behavior here, but not as the game does it.
+     */
+    auto nextState = aApp->nextState;
+    if (result && nextState)
     {
-        using Callback = RED4ext::PluginManager::Callback;
-        auto result = CInitializationState_Init_h(aThis, aApp);
-        auto app = RED4ext::App::Get();
+        auto name = nextState->GetName();
+        if (strcmp(name, "Running") == 0)
+        {
+            auto app = App::Get();
+            auto pluginsDir = app->GetPluginsDirectory();
 
-        auto pluginManager = app->GetPluginManager();
-        pluginManager->Call(Callback::OnInitialization);
-
-        return result;
+            auto pluginsManager = app->GetPluginsManager();
+            pluginsManager->LoadAll(pluginsDir);
+        }
     }
+
+    return result;
+}
+} // namespace
+
+void CInitializationState::Attach()
+{
+    CInitializationState_Run.attach();
 }
 
-void RED4ext::Hooks::CInitializationState::Attach()
+void CInitializationState::Detach()
 {
-    CInitializationState_Init_h.Attach();
-}
-
-void RED4ext::Hooks::CInitializationState::Detach()
-{
-    CInitializationState_Init_h.Detach();
+    CInitializationState_Run.detach();
 }

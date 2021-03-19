@@ -1,7 +1,7 @@
 #pragma once
 
-namespace RED4ext::Hooks::Main
+namespace Main
 {
-    void Attach(HMODULE aModule);
-    void Detach();
-}
+void Attach();
+void Detach();
+} // namespace Main

@@ -1,7 +1,7 @@
 #pragma once
 
-namespace RED4ext::Hooks::CInitializationState
+namespace CInitializationState
 {
-    void Attach();
-    void Detach();
-}
+void Attach();
+void Detach();
+} // namespace CInitializationState

@@ -1,54 +1,80 @@
 #include "stdafx.hpp"
 #include "Utils.hpp"
+#include "App.hpp"
 
-uintptr_t RED4ext::Utils::FindPattern(std::vector<uint8_t> aPattern, size_t aExpectedMatches, size_t aIndex,
-                                      uint8_t aWildcard)
+std::wstring Utils::FormatErrorMessage(uint32_t aErrorCode)
 {
-    renhook::pattern pattern(aPattern);
+    wchar_t* buffer = nullptr;
+    auto errorCode = GetLastError();
 
-    auto addresses = pattern.find(aWildcard);
-    if (addresses.size() != aExpectedMatches)
-    {
-        std::wstring message;
-        std::wostringstream stream;
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
+                  errorCode, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
 
-        stream << L"The pattern { ";
+    std::wstring result = buffer;
 
-        for (auto it = aPattern.begin(); it != aPattern.end(); ++it)
-        {
-            if (it != aPattern.begin())
-            {
-                stream << L", ";
-            }
+    LocalFree(buffer);
+    buffer = nullptr;
 
-            stream << L"0x" << std::uppercase << std::setfill(L'0') << std::setw(2) << std::hex
-                   << static_cast<uint32_t>(*it);
-        }
-
-        stream << L" } ";
-
-        if (addresses.size() == 0)
-        {
-            stream << L"could not be found.";
-        }
-        else
-        {
-            stream << L"returned " << addresses.size() << L" match(es) but " << aExpectedMatches
-                   << L" match(es) were expected.";
-        }
-
-        stream << L"\n\nThe process will be terminated.";
-        message = stream.str();
-
-        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_OK | MB_ICONERROR);
-        ExitProcess(1);
-    }
-
-    return addresses.at(aIndex);
+    return result;
 }
 
-uintptr_t RED4ext::Utils::FindPattern(std::initializer_list<uint8_t> aPattern, size_t aExpectedMatches, size_t aIndex,
-                                      uint8_t aWildcard)
+const RED4ext::VersionInfo Utils::GetRuntimeVersion()
 {
-    return FindPattern(std::vector(aPattern), aExpectedMatches, aIndex, aWildcard);
+    auto app = App::Get();
+    auto filename = app->GetExecutablePath();
+
+    auto size = GetFileVersionInfoSize(filename.c_str(), nullptr);
+    if (!size)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+        spdlog::error(L"Could not retrive game's version size, error: 0x{:X}, description: {}", err, errMsg);
+
+        return RED4EXT_SEMVER(0, 0, 0);
+    }
+
+    auto data = new char[size];
+    if (!data)
+    {
+        spdlog::error(L"Could not allocate {} bytes on stack or heap", size);
+        return RED4EXT_SEMVER(0, 0, 0);
+    }
+
+    if (!GetFileVersionInfo(filename.c_str(), 0, size, data))
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+        spdlog::error(L"Could not retrive game's version info, error: 0x{:X}, description: {}", err, errMsg);
+
+        delete[] data;
+        return RED4EXT_SEMVER(0, 0, 0);
+    }
+
+    VS_FIXEDFILEINFO* buffer = nullptr;
+    uint32_t length = 0;
+
+    if (!VerQueryValue(data, L"\\", reinterpret_cast<LPVOID*>(&buffer), &length) || !length)
+    {
+        auto err = GetLastError();
+        auto errMsg = Utils::FormatErrorMessage(err);
+        spdlog::error(L"Could not query version info, error: 0x{:X}, description: {}", err, errMsg);
+
+        delete[] data;
+        return RED4EXT_SEMVER(0, 0, 0);
+    }
+
+    if (buffer->dwSignature != 0xFEEF04BD)
+    {
+        spdlog::error(L"Retrived version signature does not match");
+        delete[] data;
+
+        return RED4EXT_SEMVER(0, 0, 0);
+    }
+
+    uint8_t major = (buffer->dwProductVersionMS >> 16) & 0xFF;
+    uint16_t minor = buffer->dwProductVersionMS & 0xFFFF;
+    uint32_t patch = (buffer->dwProductVersionLS >> 16) & 0xFFFF;
+
+    delete[] data;
+    return RED4EXT_SEMVER(major, minor, patch);
 }

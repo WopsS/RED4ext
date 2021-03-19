@@ -1,7 +1,7 @@
 #pragma once
 
-namespace RED4ext::Hooks::CShutdownState
+namespace CShutdownState
 {
-    void Attach();
-    void Detach();
-}
+void Attach();
+void Detach();
+} // namespace CShutdownState

@@ -1,18 +1,12 @@
 project("RED4ext.Loader")
-    targetname("RED4ext")
+    targetname("version")
     targetdir(red4ext.paths.build("bin"))
-    symbolspath(red4ext.paths.build("bin", "RED4ext.Loader.pdb"))
 
-    kind("ConsoleApp")
+    kind("SharedLib")
     language("C++")
     pchheader("stdafx.hpp")
     pchsource("stdafx.cpp")
     dependson({ "RED4ext.Dll" })
-
-    defines(
-    {
-        red4ext.project.defines("spdlog")
-    })
 
     includedirs(
     {
@@ -23,7 +17,8 @@ project("RED4ext.Loader")
     files(
     {
         "**.cpp",
-        "**.hpp"
+        "**.hpp",
+        "**.def"
     })
 
     links(

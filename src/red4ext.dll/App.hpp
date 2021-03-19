@@ -1,27 +1,42 @@
 #pragma once
 
-#include "PluginManager.hpp"
+#include "HookingManager.hpp"
+#include "PluginsManager.hpp"
+#include "TrampolinesManager.hpp"
 
-namespace RED4ext
+class App
 {
-    class App
-    {
-    public:
-        App() = default;
-        ~App() = default;
+public:
+    static void Construct(HMODULE aModule);
+    static App* Get();
 
-        static App* Get();
+    void Init();
+    void Shutdown();
 
-        void Init(HMODULE aModule);
-        void Run();
-        void Shutdown();
+    HookingManager* GetHookingManager();
+    TrampolinesManager* GetTrampolinesManager();
 
-        PluginManager* GetPluginManager();
+    PluginsManager* GetPluginsManager();
 
-    private:
-        std::tuple<std::error_code, std::filesystem::path> GetDocumentsPath();
-        void InitializeLogger(std::filesystem::path aRoot);
+    std::filesystem::path GetRootDirectory();
+    std::filesystem::path GetPluginsDirectory();
+    std::filesystem::path GetLogsDirectory();
+    std::filesystem::path GetExecutablePath();
 
-        PluginManager m_pluginManager;
-    };
-}
+private:
+    friend struct std::unique_ptr<App>::deleter_type;
+
+    App(HMODULE aModule);
+    ~App() = default;
+
+    void CreateLogger();
+
+    static std::unique_ptr<App> m_instance;
+
+    HMODULE m_module;
+
+    HookingManager m_hookingManager;
+    TrampolinesManager m_trampolinesManager;
+
+    PluginsManager m_pluginsManager;
+};

@@ -12,11 +12,6 @@ project("RED4ext.Playground")
         red4ext.project.defines("spdlog")
     })
 
-    libdirs(
-    {
-        red4ext.paths.build("libs")
-    })
-
     includedirs(
     {
         ".",
@@ -35,6 +30,5 @@ project("RED4ext.Playground")
     {
         "Dbghelp",
         red4ext.project.links("RenHook"),
-        red4ext.project.links("spdlog"),
-        red4ext.project.links("RED4ext.Dll")
+        red4ext.project.links("spdlog")
     })

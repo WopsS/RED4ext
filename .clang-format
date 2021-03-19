@@ -8,7 +8,6 @@ AlwaysBreakTemplateDeclarations: Yes
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
 KeepEmptyLinesAtTheStartOfBlocks: false
-NamespaceIndentation: Inner
 PointerAlignment: Left
 SpaceAfterTemplateKeyword: false
 
