@@ -17,21 +17,6 @@ void* PluginBase::GetInterface() const
     return m_interface;
 }
 
-void PluginBase::AddTrampoline(void* aMemory)
-{
-    m_trampolines.emplace(aMemory);
-}
-
-void PluginBase::RemoveTrampoline(void* aMemory)
-{
-    m_trampolines.erase(aMemory);
-}
-
-const std::unordered_set<void*>& PluginBase::GetTrampolines() const
-{
-    return m_trampolines;
-}
-
 RED4ext::PluginHandle PluginBase::GetHandle() const
 {
     return m_handle;
