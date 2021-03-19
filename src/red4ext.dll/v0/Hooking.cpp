@@ -2,7 +2,7 @@
 #include "Hooking.hpp"
 #include "App.hpp"
 
-void v1::Hooking::Create(RED4ext::PluginHandle aHandle, void* aTarget, void* aDetour, void** aOriginal)
+void v0::Hooking::Create(RED4ext::PluginHandle aHandle, void* aTarget, void* aDetour, void** aOriginal)
 {
     auto app = App::Get();
     auto pluginsManager = app->GetPluginsManager();
@@ -15,7 +15,7 @@ void v1::Hooking::Create(RED4ext::PluginHandle aHandle, void* aTarget, void* aDe
     }
 }
 
-void v1::Hooking::Remove(RED4ext::PluginHandle aHandle, void* aTarget)
+void v0::Hooking::Remove(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
     auto pluginsManager = app->GetPluginsManager();
@@ -28,7 +28,7 @@ void v1::Hooking::Remove(RED4ext::PluginHandle aHandle, void* aTarget)
     }
 }
 
-bool v1::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget)
+bool v0::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
     auto pluginsManager = app->GetPluginsManager();
@@ -43,7 +43,7 @@ bool v1::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget)
     return false;
 }
 
-bool v1::Hooking::Detach(RED4ext::PluginHandle aHandle, void* aTarget)
+bool v0::Hooking::Detach(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
     auto pluginsManager = app->GetPluginsManager();
@@ -58,7 +58,7 @@ bool v1::Hooking::Detach(RED4ext::PluginHandle aHandle, void* aTarget)
     return false;
 }
 
-void* v1::Hooking::FindPattern(uint8_t* aPattern, size_t aPatternSize, uint8_t aWildcard, size_t aExpectedMatches,
+void* v0::Hooking::FindPattern(uint8_t* aPattern, size_t aPatternSize, uint8_t aWildcard, size_t aExpectedMatches,
                                size_t aIndex)
 {
     assert(aIndex < aExpectedMatches);

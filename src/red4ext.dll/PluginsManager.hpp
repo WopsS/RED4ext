@@ -17,8 +17,8 @@ public:
     std::shared_ptr<PluginBase> GetPlugin(RED4ext::PluginHandle aHandle);
     std::shared_ptr<PluginBase> GetPlugin(const wchar_t* aName);
 
-    const RED4ext::v1::IHooking* GetV1Hooking();
-    const RED4ext::v1::ITrampoline* GetV1Trampoline();
+    const RED4ext::v0::IHooking* GetV0Hooking();
+    const RED4ext::v0::ITrampoline* GetV0Trampoline();
 
 private:
     using Load_t = bool (*)(RED4ext::PluginHandle, const void*);
@@ -32,9 +32,9 @@ private:
     HookingManager* m_hookingManager;
     TrampolinesManager* m_trampolinesManager;
 
-    RED4ext::v1::IRED4ext m_v1Interface;
-    RED4ext::v1::IHooking m_v1Hooking;
-    RED4ext::v1::ITrampoline m_v1Trampoline;
+    RED4ext::v0::IRED4ext m_v0Interface;
+    RED4ext::v0::IHooking m_v0Hooking;
+    RED4ext::v0::ITrampoline m_v0Trampoline;
 
     std::unordered_map<RED4ext::PluginHandle, std::shared_ptr<PluginBase>> m_plugins;
     std::unordered_map<std::wstring_view, std::shared_ptr<PluginBase>> m_pluginsByName;

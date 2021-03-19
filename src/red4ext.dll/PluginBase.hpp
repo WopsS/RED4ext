@@ -22,13 +22,7 @@ public:
     void SetInterface(void* aInterface);
     void* GetInterface() const;
 
-    void AddTrampoline(void* aMemory);
-    void RemoveTrampoline(void* aMemory);
-    const std::unordered_set<void*>& GetTrampolines() const;
-
 private:
     RED4ext::PluginHandle m_handle;
     void* m_interface;
-
-    std::unordered_set<void*> m_trampolines;
 };

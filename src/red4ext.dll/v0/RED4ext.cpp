@@ -3,23 +3,23 @@
 #include "App.hpp"
 #include "Utils.hpp"
 
-const RED4ext::v1::VersionInfo* v1::GetSDKVersion()
+const RED4ext::v0::VersionInfo* v0::GetSDKVersion()
 {
-    static const RED4ext::v1::VersionInfo version = RED4EXT_SDK_LATEST;
+    static const RED4ext::v0::VersionInfo version = RED4EXT_SDK_LATEST;
     return &version;
 }
 
-const RED4ext::v1::VersionInfo* v1::GetRuntimeVersion()
+const RED4ext::v0::VersionInfo* v0::GetRuntimeVersion()
 {
-    static const RED4ext::v1::VersionInfo version = []() {
+    static const RED4ext::v0::VersionInfo version = []() {
         const auto version = Utils::GetRuntimeVersion();
-        return RED4EXT_V1_SEMVER(version.major, version.minor, version.patch);
+        return RED4EXT_V0_SEMVER(version.major, version.minor, version.patch);
     }();
 
     return &version;
 }
 
-void v1::RegisterInterface(RED4ext::PluginHandle aHandle, void* aInterface)
+void v0::RegisterInterface(RED4ext::PluginHandle aHandle, void* aInterface)
 {
     auto app = App::Get();
     auto manager = app->GetPluginsManager();
@@ -31,7 +31,7 @@ void v1::RegisterInterface(RED4ext::PluginHandle aHandle, void* aInterface)
     }
 }
 
-void* v1::GetInterface(const wchar_t* aName)
+void* v0::GetInterface(const wchar_t* aName)
 {
     auto app = App::Get();
     auto manager = app->GetPluginsManager();
@@ -45,16 +45,16 @@ void* v1::GetInterface(const wchar_t* aName)
     return nullptr;
 }
 
-const RED4ext::v1::IHooking* v1::GetHookingInterface()
+const RED4ext::v0::IHooking* v0::GetHookingInterface()
 {
     auto app = App::Get();
     auto manager = app->GetPluginsManager();
-    return manager->GetV1Hooking();
+    return manager->GetV0Hooking();
 }
 
-const RED4ext::v1::ITrampoline* v1::GetTrampolineInterface()
+const RED4ext::v0::ITrampoline* v0::GetTrampolineInterface()
 {
     auto app = App::Get();
     auto manager = app->GetPluginsManager();
-    return manager->GetV1Trampoline();
+    return manager->GetV0Trampoline();
 }

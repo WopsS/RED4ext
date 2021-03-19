@@ -2,30 +2,30 @@
 #include "PluginsManager.hpp"
 #include "Api.hpp"
 #include "Utils.hpp"
-#include "v1/RED4ext.hpp"
-#include "v1/Hooking.hpp"
-#include "v1/Plugin.hpp"
-#include "v1/Trampoline.hpp"
+#include "v0/RED4ext.hpp"
+#include "v0/Hooking.hpp"
+#include "v0/Plugin.hpp"
+#include "v0/Trampoline.hpp"
 
 PluginsManager::PluginsManager(HookingManager* aHookingManager, TrampolinesManager* aTrampolinesManager)
     : m_hookingManager(aHookingManager)
     , m_trampolinesManager(aTrampolinesManager)
 {
-    m_v1Interface.GetSDKVersion = &v1::GetSDKVersion;
-    m_v1Interface.GetRuntimeVersion = &v1::GetRuntimeVersion;
-    m_v1Interface.RegisterInterface = &v1::RegisterInterface;
-    m_v1Interface.GetInterface = &v1::GetInterface;
-    m_v1Interface.GetHookingInterface = &v1::GetHookingInterface;
-    m_v1Interface.GetTrampolineInterface = &v1::GetTrampolineInterface;
+    m_v0Interface.GetSDKVersion = &v0::GetSDKVersion;
+    m_v0Interface.GetRuntimeVersion = &v0::GetRuntimeVersion;
+    m_v0Interface.RegisterInterface = &v0::RegisterInterface;
+    m_v0Interface.GetInterface = &v0::GetInterface;
+    m_v0Interface.GetHookingInterface = &v0::GetHookingInterface;
+    m_v0Interface.GetTrampolineInterface = &v0::GetTrampolineInterface;
 
-    m_v1Hooking.Create = &v1::Hooking::Create;
-    m_v1Hooking.Remove = &v1::Hooking::Remove;
-    m_v1Hooking.Attach = &v1::Hooking::Attach;
-    m_v1Hooking.Detach = &v1::Hooking::Detach;
-    m_v1Hooking.FindPattern = &v1::Hooking::FindPattern;
+    m_v0Hooking.Create = &v0::Hooking::Create;
+    m_v0Hooking.Remove = &v0::Hooking::Remove;
+    m_v0Hooking.Attach = &v0::Hooking::Attach;
+    m_v0Hooking.Detach = &v0::Hooking::Detach;
+    m_v0Hooking.FindPattern = &v0::Hooking::FindPattern;
 
-    m_v1Trampoline.Alloc = &v1::Trampoline::Alloc;
-    m_v1Trampoline.Free = &v1::Trampoline::Free;
+    m_v0Trampoline.Alloc = &v0::Trampoline::Alloc;
+    m_v0Trampoline.Free = &v0::Trampoline::Free;
 }
 
 PluginsManager::~PluginsManager()
@@ -89,14 +89,14 @@ std::shared_ptr<PluginBase> PluginsManager::GetPlugin(const wchar_t* aName)
     return nullptr;
 }
 
-const RED4ext::v1::IHooking* PluginsManager::GetV1Hooking()
+const RED4ext::v0::IHooking* PluginsManager::GetV0Hooking()
 {
-    return &m_v1Hooking;
+    return &m_v0Hooking;
 }
 
-const RED4ext::v1::ITrampoline* PluginsManager::GetV1Trampoline()
+const RED4ext::v0::ITrampoline* PluginsManager::GetV0Trampoline()
 {
-    return &m_v1Trampoline;
+    return &m_v0Trampoline;
 }
 
 void PluginsManager::Load(const std::filesystem::path& aPath)
@@ -170,8 +170,8 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     {
     case RED4EXT_API_VERSION_1:
     {
-        plugin = std::make_shared<v1::Plugin>(handle);
-        extInterface = &m_v1Interface;
+        plugin = std::make_shared<v0::Plugin>(handle);
+        extInterface = &m_v0Interface;
 
         break;
     }

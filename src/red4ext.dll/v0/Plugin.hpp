@@ -2,7 +2,7 @@
 
 #include "PluginBase.hpp"
 
-namespace v1
+namespace v0
 {
 class Plugin : public PluginBase
 {
@@ -19,6 +19,6 @@ public:
     const RED4ext::VersionInfo GetSdk() const final;
 
 private:
-    RED4ext::v1::PluginInfo m_info;
+    RED4ext::v0::PluginInfo m_info;
 };
 } // namespace v1
