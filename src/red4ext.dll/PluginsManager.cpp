@@ -2,9 +2,9 @@
 #include "PluginsManager.hpp"
 #include "Api.hpp"
 #include "Utils.hpp"
-#include "v0/RED4ext.hpp"
 #include "v0/Hooking.hpp"
 #include "v0/Plugin.hpp"
+#include "v0/RED4ext.hpp"
 #include "v0/Trampoline.hpp"
 
 PluginsManager::PluginsManager(HookingManager* aHookingManager, TrampolinesManager* aTrampolinesManager)
@@ -48,6 +48,11 @@ void PluginsManager::LoadAll(const std::filesystem::path& aPluginsDir)
         {
             Load(path);
         }
+    }
+
+    for (const auto& [handle, plugin] : m_plugins)
+    {
+        PostLoad(plugin);
     }
 
     m_hookingManager->AttachAll();
@@ -309,6 +314,25 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     }
 
     spdlog::info(L"{} (version: {}, author: {}) loaded", name, std::to_wstring(version), plugin->GetAuthor());
+}
+
+void PluginsManager::PostLoad(const std::shared_ptr<PluginBase> aPlugin)
+{
+    auto handle = aPlugin->GetHandle();
+
+    auto postLoad = reinterpret_cast<PostLoad_t>(GetProcAddress(handle, "OnPostLoad"));
+    if (postLoad)
+    {
+        try
+        {
+            postLoad();
+        }
+        catch (...)
+        {
+            auto name = aPlugin->GetName();
+            spdlog::warn(L"An error occured on post load in '{}'", name);
+        }
+    }
 }
 
 void PluginsManager::Unload(const std::shared_ptr<PluginBase> aPlugin)

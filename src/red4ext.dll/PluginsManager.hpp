@@ -22,11 +22,13 @@ public:
 
 private:
     using Load_t = bool (*)(RED4ext::PluginHandle, const void*);
+    using PostLoad_t = bool (*)();
     using Unload_t = void (*)();
     using Query_t = void (*)(void*);
     using Supports_t = uint32_t (*)();
 
     void Load(const std::filesystem::path& aPath);
+    void PostLoad(const std::shared_ptr<PluginBase> aPlugin);
     void Unload(const std::shared_ptr<PluginBase> aPlugin);
 
     HookingManager* m_hookingManager;
