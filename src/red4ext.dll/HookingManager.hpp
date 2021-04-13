@@ -18,8 +18,8 @@ public:
     bool Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget);
     bool Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget);
 
-    void AttachAll() const;
-    void DetachAll() const;
+    void AttachAll();
+    void DetachAll();
 
     void DetachAll(std::shared_ptr<PluginBase> aPlugin);
 
@@ -36,5 +36,6 @@ private:
     bool Attach(const HookItem& aItem) const;
     bool Detach(const HookItem& aItem) const;
 
+    std::mutex m_mutex;
     std::unordered_multimap<std::shared_ptr<PluginBase>, HookItem> m_hooks;
 };

@@ -24,6 +24,8 @@ void* TrampolinesManager::Alloc(std::shared_ptr<PluginBase> aPlugin)
         upperBound += twoGbInBytes;
     }
 
+    std::scoped_lock<std::mutex> _(m_mutex);
+
     auto trampoline = m_allocator.alloc(lowerBound, upperBound);
     if (trampoline)
     {
@@ -36,6 +38,8 @@ void* TrampolinesManager::Alloc(std::shared_ptr<PluginBase> aPlugin)
 
 void TrampolinesManager::Free(std::shared_ptr<PluginBase> aPlugin, void* aMemory)
 {
+    std::scoped_lock<std::mutex> _(m_mutex);
+
     auto range = m_trampolines.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
     {
@@ -52,6 +56,7 @@ void TrampolinesManager::Free(std::shared_ptr<PluginBase> aPlugin, void* aMemory
 
 void TrampolinesManager::FreeAll()
 {
+    std::scoped_lock<std::mutex> _(m_mutex);
     for (const auto [plugin, memory] : m_trampolines)
     {
         m_allocator.free(memory);
@@ -62,6 +67,8 @@ void TrampolinesManager::FreeAll()
 
 void TrampolinesManager::FreeAll(std::shared_ptr<PluginBase> aPlugin)
 {
+    std::scoped_lock<std::mutex> _(m_mutex);
+
     auto range = m_trampolines.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
     {
