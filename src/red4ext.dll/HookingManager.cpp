@@ -9,13 +9,13 @@ void HookingManager::Create(std::shared_ptr<PluginBase> aPlugin, void* aTarget, 
     item.original = aOriginal;
     item.hook = std::make_unique<REDhook<>>(aTarget, aDetour);
 
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
     m_hooks.emplace(aPlugin, std::move(item));
 }
 
 void HookingManager::Remove(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     auto range = m_hooks.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
@@ -33,7 +33,7 @@ void HookingManager::Remove(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 
 void HookingManager::RemoveAll()
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     DetachAll();
     m_hooks.clear();
@@ -41,7 +41,7 @@ void HookingManager::RemoveAll()
 
 void HookingManager::RemoveAll(std::shared_ptr<PluginBase> aPlugin)
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     DetachAll(aPlugin);
     m_hooks.erase(aPlugin);
@@ -49,7 +49,7 @@ void HookingManager::RemoveAll(std::shared_ptr<PluginBase> aPlugin)
 
 bool HookingManager::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     auto range = m_hooks.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
@@ -66,7 +66,7 @@ bool HookingManager::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 
 bool HookingManager::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     auto range = m_hooks.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
@@ -83,7 +83,7 @@ bool HookingManager::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 
 void HookingManager::AttachAll()
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
     for (const auto& [plugin, item] : m_hooks)
     {
         Attach(item);
@@ -92,7 +92,7 @@ void HookingManager::AttachAll()
 
 void HookingManager::DetachAll()
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
     for (const auto& [plugin, item] : m_hooks)
     {
         Detach(item);
@@ -101,7 +101,7 @@ void HookingManager::DetachAll()
 
 void HookingManager::DetachAll(std::shared_ptr<PluginBase> aPlugin)
 {
-    std::scoped_lock<std::mutex> _(m_mutex);
+    std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
     auto range = m_hooks.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)

@@ -36,6 +36,6 @@ private:
     bool Attach(const HookItem& aItem) const;
     bool Detach(const HookItem& aItem) const;
 
-    std::mutex m_mutex;
+    std::recursive_mutex m_mutex;
     std::unordered_multimap<std::shared_ptr<PluginBase>, HookItem> m_hooks;
 };
