@@ -17,29 +17,6 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
         }
    
         constexpr auto name = L"RED4ext";
-        s_mutex = CreateMutex(nullptr, true, name);
-
-        // Only load "RED4ext" in game's process. The game process is started first and then the crash handler is
-        // created.
-        auto err = GetLastError();
-        if (err == ERROR_ALREADY_EXISTS)
-        {
-            return TRUE;
-        }
-        else if (err != ERROR_SUCCESS)
-        {
-            wchar_t* buffer = nullptr;
-            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                          nullptr, err, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
-
-            auto message = fmt::format(L"{}\n\nRED4ext could not be loaded, error code 0x{:X}.", buffer, err);
-            MessageBox(nullptr, message.c_str(), name, MB_ICONERROR | MB_OK);
-
-            LocalFree(buffer);
-            buffer = nullptr;
-            return FALSE;
-        }
-
         constexpr auto pathLength = MAX_PATH + 1;
         constexpr auto modDir = L"red4ext";
         constexpr auto modDll = L"RED4ext.dll";

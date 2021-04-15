@@ -5,17 +5,15 @@
 
 namespace
 {
-int64_t Main();
-REDhook<decltype(&Main)> Main_h({0x40, 0x53, 0x48, 0x81, 0xEC, 0xC0, 0x01, 0x00, 0x00, 0xFF, 0x15, 0xCC, 0xCC,
-                                 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
-                                &Main, 1);
+int64_t _Main();
+REDhook<decltype(&_Main)> Main_Func;
 
-int64_t Main()
+int64_t _Main()
 {
     auto app = App::Get();
 
     app->Init();
-    auto result = Main_h();
+    auto result = Main_Func();
     app->Shutdown();
 
     return result;
@@ -24,10 +22,15 @@ int64_t Main()
 
 void Main::Attach()
 {
-    Main_h.attach();
+    new (&Main_Func)
+        REDhook<decltype(&_Main)>({0x40, 0x53, 0x48, 0x81, 0xEC, 0xC0, 0x01, 0x00, 0x00, 0xFF, 0x15, 0xCC, 0xCC,
+                                   0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
+                                  &_Main, 1);
+
+    Main_Func.attach();
 }
 
 void Main::Detach()
 {
-    Main_h.detach();
+    Main_Func.detach();
 }

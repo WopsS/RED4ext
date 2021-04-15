@@ -1,8 +1,8 @@
 #include "stdafx.hpp"
 #include "Hooks/CInitializationState.hpp"
 #include "App.hpp"
-#include "REDhook.hpp"
 #include "Patterns.hpp"
+#include "REDhook.hpp"
 
 #include <RED4ext/GameApplication.hpp>
 #include <RED4ext/GameStates.hpp>
@@ -10,10 +10,7 @@
 namespace
 {
 bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp);
-REDhook<decltype(&_CInitializationState_Run)> CInitializationState_Run({0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05,
-                                                                        0xCC, 0xCC, 0xCC, 0xCC, 0x4C, 0x8B, 0xC2,
-                                                                        0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
-                                                                       &_CInitializationState_Run, 1);
+REDhook<decltype(&_CInitializationState_Run)> CInitializationState_Run;
 
 bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp)
 {
@@ -46,6 +43,11 @@ bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CG
 
 void CInitializationState::Attach()
 {
+    new (&CInitializationState_Run)
+        REDhook<decltype(&_CInitializationState_Run)>({0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05, 0xCC, 0xCC, 0xCC,
+                                                       0xCC, 0x4C, 0x8B, 0xC2, 0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
+                                                      &_CInitializationState_Run, 1);
+
     CInitializationState_Run.attach();
 }
 

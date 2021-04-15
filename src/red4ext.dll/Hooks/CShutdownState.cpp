@@ -9,9 +9,7 @@
 namespace
 {
 bool _CShutdownState_Run(RED4ext::CShutdownState* aThis, RED4ext::CGameApplication* aApp);
-REDhook<decltype(&_CShutdownState_Run)> CShutdownState_Run({0x48, 0x89, 0x6C, 0x24, 0x18, 0x56, 0x48, 0x83, 0xEC, 0x30,
-                                                            0x48, 0x8B, 0x0D, 0xCC, 0xCC, 0xCC, 0xCC},
-                                                           &_CShutdownState_Run, 1);
+REDhook<decltype(&_CShutdownState_Run)> CShutdownState_Run;
 
 bool _CShutdownState_Run(RED4ext::CShutdownState* aThis, RED4ext::CGameApplication* aApp)
 {
@@ -25,6 +23,10 @@ bool _CShutdownState_Run(RED4ext::CShutdownState* aThis, RED4ext::CGameApplicati
 
 void CShutdownState::Attach()
 {
+    new (&CShutdownState_Run) REDhook<decltype(&_CShutdownState_Run)>(
+        {0x48, 0x89, 0x6C, 0x24, 0x18, 0x56, 0x48, 0x83, 0xEC, 0x30, 0x48, 0x8B, 0x0D, 0xCC, 0xCC, 0xCC, 0xCC},
+        &_CShutdownState_Run, 1);
+
     CShutdownState_Run.attach();
 }
 

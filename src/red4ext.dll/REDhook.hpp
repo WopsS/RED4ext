@@ -6,6 +6,8 @@ template<typename T = void (*)()>
 class REDhook : public renhook::inline_hook<T>
 {
 public:
+    REDhook() = default;
+
     REDhook(uintptr_t aTargetAddress, uintptr_t aDetourAddress)
         : renhook::inline_hook<T>(aTargetAddress, aDetourAddress)
     {
@@ -24,7 +26,6 @@ public:
     REDhook(std::initializer_list<uint8_t> aPattern, T aDetourAddress, size_t aExpectedMatches, size_t aIndex = 0,
             uint8_t aWildcard = 0xCC, bool aIsRequired = true)
         : REDhook(Patterns::Get()->Find(aPattern, aExpectedMatches, aIndex, aWildcard, aIsRequired), aDetourAddress)
-
     {
     }
 
