@@ -320,7 +320,7 @@ void PluginsManager::PostLoad(const std::shared_ptr<PluginBase> aPlugin)
 {
     auto handle = aPlugin->GetHandle();
 
-    auto postLoad = reinterpret_cast<PostLoad_t>(GetProcAddress(handle, "OnPostLoad"));
+    auto postLoad = reinterpret_cast<PostLoad_t>(GetProcAddress(handle, "PostLoad"));
     if (postLoad)
     {
         try
