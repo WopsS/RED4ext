@@ -2,7 +2,7 @@
 
 A script extender for REDengine 4 ([Cyberpunk 2077](https://www.cyberpunk.net)).
 
-## What is this library?
+## About this library
 
 RED4ext is a library that extends REDengine 4. It will allow modders to add new features, modify the game behavior, add new
 scripting functions or call existing ones in your own plugins.
@@ -12,15 +12,23 @@ This library is similar to:
 * [Script Hook V](http://dev-c.com/GTAV/scripthookv)
 * [Skyrim Script Extender](https://skse.silverlock.org/)
 
-**Note**: Until more research and engine understanding is done consider this a playground and **use at your own risk**.
+This library is split into two parts:
 
-## Build instructions
+* [RED4ext](https://github.com/WopsS/RED4ext) - This project which consist of the loader, it only takes care of managing plugins.
+* [RED4ext.SDK](https://github.com/WopsS/RED4ext.SDK) - This project contains the reversed types and helpers to extend the engine, it can be used independently of RED4ext.
 
-### Windows
+If you are developing a new plugin, add only [RED4ext.SDK](https://github.com/WopsS/RED4ext.SDK) in your project structure.
 
-1. Download and install [Visual Studio 2019 Community Edition](https://www.visualstudio.com/) or a higher version.
-2. Clone this repository.
-3. Clone the dependencies (`git submodule update --init --recursive`).
-4. Go to the `premake` directory and run `generate_projects.bat`.
-5. Open the solution (`RED4ext.sln`) located in `projects` directory.
-6. Build the projects.
+## How to install
+
+Instructions about how to install RED4ext can be found [here](/docs/how-to-install.md).
+
+## Building from source
+
+Instructions about how to build RED4ext can be found in [BUILDING.md](/BUILDING.md).
+
+## Contributing
+
+Do you want to contribute? Community feedback and contributions are highly appreciated!
+
+**For general rules and guidelines see [CONTRIBUTING.md](/CONTRIBUTING.md).**
