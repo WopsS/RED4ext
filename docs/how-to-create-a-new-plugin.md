@@ -23,6 +23,8 @@ and `RED4EXT_CALL` (equivalent of `__fastcall`).
 
 Returns the support API version supported by your plugins.
 
+---
+
 ### Query
 
 This function is used to fill your plugin information, like name, author, supported game version, etc..
@@ -41,6 +43,8 @@ the latest game's version that the SDK defined.
 
 If you want to use RED4ext only as a loader and you do not care about game's version use `RED4EXT_RUNTIME_INDEPENDENT`.
 
+---
+
 ### Load
 
 An optional function called when the plugin is loaded. Anything can be done here at this point, register functions, call scripting functions, etc..
@@ -57,7 +61,9 @@ Return `true` if your initalization succeeded, otherwise `false`. Returning `fal
 ### Notes
 
 All hooks created here will be attached automatically later, you do not need to attach them manually.
-Be sure to store the plugin handle and the interface because you cannot get it again later. The plugin handle is what identify your plugin through the extender
+Be sure to store the plugin handle and the interface because you cannot get it again later. The plugin handle is what identify your plugin through the extender.
+
+---
 
 ### Unload
 
