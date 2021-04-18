@@ -1,0 +1,82 @@
+name: Release Workflow
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+  upload_release_assets:
+    name: Upload Release Assets
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Create environment variables
+        run: |
+          $prefix = "refs/tags/v"
+          $version = $env:GITHUB_REF.Substring($prefix.Length)
+          echo "VERSION=${version}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Generate projects
+        run: |
+          cd premake
+          ./generate_projects.bat
+
+      - name: Build
+        run: |
+          cd premake/projects
+          MSBuild.exe RED4ext.sln -v:minimal -m -property:Configuration=Release
+
+      - name: Prepare files
+        run: |
+          # Create the necessary directories.
+          New-Item -ItemType directory -Path release
+          New-Item -ItemType directory -Path release/red4ext
+          New-Item -ItemType directory -Path release/red4ext/plugins
+          New-Item -ItemType directory -Path release/bin/x64
+
+          # Copy build artifacts.
+          Copy-Item build/release/bin/RED4ext.dll -Destination release/red4ext
+          Copy-Item build/release/bin/version.dll -Destination release/bin/x64
+
+          # Concatenate the license and third party licenses.
+          $license = Get-Content -Path LICENSE.md
+          Add-Content -Path release/red4ext/LICENSE.txt -Value $license
+
+          Add-Content -Path release/red4ext/LICENSE.txt -Value ""
+
+          $third_party = Get-Content -Path THIRD_PARTY_LICENSES.md
+          Add-Content -Path release/red4ext/LICENSE.txt -Value $third_party
+
+          # Create a zip file.
+          Compress-Archive -Path release/* -DestinationPath red4ext_${env:VERSION}.zip
+
+      - name: Prepare PDBs
+        run: |
+          # Create the necessary directories.
+          New-Item -ItemType directory -Path release_pdbs
+          New-Item -ItemType directory -Path release_pdbs/bin
+          New-Item -ItemType directory -Path release_pdbs/libs
+
+          # Copy the PDBs.
+          Copy-Item build/release/bin/*.pdb release_pdbs/bin
+          Copy-Item build/release/libs/*.pdb release_pdbs/libs
+
+          # Create a zip file.
+          Compress-Archive -Path release_pdbs/* -DestinationPath red4ext_${env:VERSION}_pdbs.zip
+
+      - name: Upload assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            red4ext_${{ env.VERSION }}.zip
+            red4ext_${{ env.VERSION }}_pdbs.zip
