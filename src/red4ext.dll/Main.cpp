@@ -35,13 +35,6 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
             LocalFree(buffer);
             buffer = nullptr;
 
-            // Just to be safe.
-            if (s_mutex)
-            {
-                ReleaseMutex(s_mutex);
-                CloseHandle(s_mutex);
-            }
-
             return FALSE;
         }
 
