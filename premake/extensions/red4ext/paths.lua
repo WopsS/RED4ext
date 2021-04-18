@@ -13,6 +13,10 @@ function m.deps(path1, ...)
     return path.join(m.root(), "deps", path1, ...)
 end
 
+function m.example()
+    return path.join(m.root(), "example")
+end
+
 function m.modules(module)
     return path.join(m.root(), "premake", "modules", module)
 end
