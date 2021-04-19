@@ -42,7 +42,7 @@ void PluginsManager::LoadAll(const std::filesystem::path& aPluginsDir)
         std::filesystem::create_directories(aPluginsDir);
     }
 
-    for (const auto& path : std::filesystem::directory_iterator(aPluginsDir))
+    for (const auto& path : std::filesystem::recursive_directory_iterator(aPluginsDir))
     {
         if (path.path().extension() == L".dll")
         {
