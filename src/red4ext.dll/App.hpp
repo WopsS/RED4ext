@@ -7,7 +7,7 @@
 class App
 {
 public:
-    static void Construct(HMODULE aModule);
+    static void Construct();
     static App* Get();
 
     void Init();
@@ -26,14 +26,12 @@ public:
 private:
     friend struct std::unique_ptr<App>::deleter_type;
 
-    App(HMODULE aModule);
+    App();
     ~App() = default;
 
     void CreateLogger();
 
     static std::unique_ptr<App> m_instance;
-
-    HMODULE m_module;
 
     HookingManager m_hookingManager;
     TrampolinesManager m_trampolinesManager;

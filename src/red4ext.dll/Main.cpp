@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
             return FALSE;
         }
 
-        App::Construct(aModule);
+        App::Construct();
 
         Main::Attach();
         CInitializationState::Attach();

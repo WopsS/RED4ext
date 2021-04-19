@@ -8,16 +8,15 @@
 
 std::unique_ptr<App> App::m_instance;
 
-App::App(HMODULE aModule)
-    : m_module(aModule)
-    , m_pluginsManager(&m_hookingManager, &m_trampolinesManager)
+App::App()
+    : m_pluginsManager(&m_hookingManager, &m_trampolinesManager)
 {
 }
 
-void App::Construct(HMODULE aModule)
+void App::Construct()
 {
     static std::once_flag flag;
-    std::call_once(flag, [aModule]() { m_instance.reset(new App(aModule)); });
+    std::call_once(flag, []() { m_instance.reset(new App()); });
 }
 
 App* App::Get()
@@ -71,7 +70,7 @@ std::filesystem::path App::GetRootDirectory()
     {
         filename.resize(filename.size() + pathLength, '\0');
 
-        auto length = GetModuleFileName(m_module, filename.data(), static_cast<uint32_t>(filename.size()));
+        auto length = GetModuleFileName(nullptr, filename.data(), static_cast<uint32_t>(filename.size()));
         if (length > 0)
         {
             // Resize it to the real, std::filesystem::path" will use the string's length instead of recounting it.
@@ -79,7 +78,12 @@ std::filesystem::path App::GetRootDirectory()
         }
     } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-    return std::filesystem::path(filename).parent_path();
+    auto gameRoot = std::filesystem::path(filename)
+                        .parent_path()  // Resolve to "x64" directory.
+                        .parent_path()  // Resolve to "bin" directory.
+                        .parent_path(); // Resolve to game root directory.
+
+    return gameRoot / L"red4ext";
 }
 
 std::filesystem::path App::GetPluginsDirectory()
