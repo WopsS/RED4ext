@@ -33,7 +33,7 @@ This function is used to fill your plugin information, like name, author, suppor
 
 * **RED4ext::PluginInfo\*** - The pointer to the structure that contains information about your plugin.
 
-### Notes
+#### Notes
 
 **Do not** do anything in this function yet (like creating a hook or allocating a trampoline).
 
@@ -54,11 +54,11 @@ An optional function called when the plugin is loaded. Anything can be done here
 * **RED4ext::PluginHandle** - The unique indentifier of your plugin.
 * **const RED4ext::IRED4ext\*** - The pointer to RED4ext interface.
 
-### Return value
+#### Return value
 
 Return `true` if your initalization succeeded, otherwise `false`. Returning `false` will also call `Unload`.
 
-### Notes
+#### Notes
 
 All hooks created here will be attached automatically later, you do not need to attach them manually.
 Be sure to store the plugin handle and the interface because you cannot get it again later. The plugin handle is what identify your plugin through the extender.
@@ -75,6 +75,6 @@ The unload function, called when the plugin is unloaded.
 
 Called after all plugins are loaded, here a plugin interface can be requested or any additional initializations.
 
-### Notes
+#### Notes
 
 All hooks created here will **not** be attached automatically, you **must** attach them manually.
