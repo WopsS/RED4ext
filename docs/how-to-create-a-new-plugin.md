@@ -9,6 +9,13 @@ Some examples you can use one of the following:
 * [Premake](https://premake.github.io/)
 * [Visual Studio](https://visualstudio.microsoft.com/)
 
+You can use one of the following project as a starter for your own plugin (all of the projects below are already configured for RED4ext
+plugin development):
+
+* [CMake](https://github.com/WopsS/RED4ext.Example.CMake)
+* [Premake](https://github.com/WopsS/RED4ext.Example.Premake)
+* [Visual Studio](https://github.com/WopsS/RED4ext.Example.VisualStudio)
+
 After you decide what build systen or toolchain you would like to use make sure to add [RED4ext.SDK](https://github.com/WopsS/RED4ext.SDK)
 to project's include paths. This dependency is necessary since it provides the API that RED4ext is using to load the plugin, as well as the
 game's structures that you might need.
