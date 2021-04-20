@@ -173,7 +173,7 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
 
     switch (apiVersion)
     {
-    case RED4EXT_API_VERSION_1:
+    case RED4EXT_API_VERSION_0:
     {
         plugin = std::make_shared<v0::Plugin>(handle);
         extInterface = &m_v0Interface;
