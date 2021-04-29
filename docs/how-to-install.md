@@ -12,7 +12,7 @@ The installation of the extender using RED4ext's loader can be done in two ways:
 ### First way (Precompiled artifacts)
 
 1. Download the compiled artifacts from the [Releases](https://github.com/WopsS/RED4ext/releases) page.
-2. Extract the content of the archieve in game's directory.
+2. Extract the content of the archive in the game's directory.
 
 ### Second way (Building from source)
 
@@ -23,4 +23,4 @@ The installation of the extender using RED4ext's loader can be done in two ways:
 ## Using another loader
 
 If you want to use another loader (for example [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader)),
-just copy (and rename if necessary) `RED4ext.dll` to the directory that the loader is using for loading plugins.
+just copy `RED4ext.dll` (and rename, if necessary) to the directory that the loader is using for loading plugins.
