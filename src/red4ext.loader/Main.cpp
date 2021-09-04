@@ -1,8 +1,6 @@
 #include "stdafx.hpp"
 #include "VersionDll.hpp"
 
-HANDLE s_mutex = nullptr;
-
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
     switch (aReason)
@@ -49,6 +47,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                                        modPath.c_str(), exePath.remove_filename().c_str());
 
             MessageBox(nullptr, message.c_str(), name, MB_ICONWARNING | MB_OK);
+            return FALSE;
         }
 
         auto dllPath = modPath / modDll;
@@ -65,18 +64,14 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 
             LocalFree(buffer);
             buffer = nullptr;
+
+            return FALSE;
         }
 
         break;
     }
     case DLL_PROCESS_DETACH:
     {
-        if (s_mutex)
-        {
-            ReleaseMutex(s_mutex);
-            CloseHandle(s_mutex);
-        }
-
         break;
     }
     }
