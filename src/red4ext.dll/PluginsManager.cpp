@@ -33,7 +33,7 @@ PluginsManager::~PluginsManager()
     UnloadAll();
 }
 
-void PluginsManager::LoadAll(const std::filesystem::path& aPluginsDir)
+void PluginsManager::PreloadAll(const std::filesystem::path& aPluginsDir)
 {
     m_logger = spdlog::default_logger();
 
@@ -46,8 +46,16 @@ void PluginsManager::LoadAll(const std::filesystem::path& aPluginsDir)
     {
         if (path.path().extension() == L".dll")
         {
-            Load(path);
+            Preload(path);
         }
+    }
+}
+
+void PluginsManager::LoadAll(const std::filesystem::path& aPluginsDir)
+{
+    for (const auto handle : m_preloadedPlugins)
+    {
+        Load(handle);
     }
 
     for (const auto& [handle, plugin] : m_plugins)
@@ -104,15 +112,9 @@ const RED4ext::v0::ITrampoline* PluginsManager::GetV0Trampoline()
     return &m_v0Trampoline;
 }
 
-void PluginsManager::Load(const std::filesystem::path& aPath)
+void PluginsManager::Preload(const std::filesystem::path& aPath)
 {
-    if (aPath.extension() != L".dll")
-    {
-        return;
-    }
-
     auto filename = aPath.filename();
-
     auto handle = LoadLibrary(aPath.c_str());
     if (!handle)
     {
@@ -123,14 +125,27 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
         return;
     }
 
-    auto supports = reinterpret_cast<Supports_t>(GetProcAddress(handle, "Supports"));
+    m_preloadedPlugins.emplace_back(handle);
+}
+
+void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
+{
+    if (!aHandle)
+    {
+        return;
+    }
+
+    wchar_t filename[MAX_PATH + 1];
+    auto length = GetModuleFileName(aHandle, filename, sizeof(filename));
+
+    auto supports = reinterpret_cast<Supports_t>(GetProcAddress(aHandle, "Supports"));
     if (!supports)
     {
         auto err = GetLastError();
         auto errMsg = Utils::FormatErrorMessage(err);
 
-        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename.c_str(), err, errMsg);
-        FreeLibrary(handle);
+        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename, err, errMsg);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -146,24 +161,24 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     catch (const std::exception& ex)
     {
         spdlog::warn(ex.what());
-        spdlog::warn(L"An exception occured while trying to get API version of '{}'", filename.c_str());
+        spdlog::warn(L"An exception occured while trying to get API version of '{}'", filename);
     }
     catch (...)
     {
         spdlog::warn(L"An error occured while trying to get API version of '{}', the plugin will not be loaded",
-                     filename.c_str());
+                     filename);
     }
 
     if (!success)
     {
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
         return;
     }
 
     if (apiVersion < MINIMUM_API_VERSION || apiVersion > LATEST_API_VERSION)
     {
-        spdlog::warn(L"'{}' reported unsupported API version ({})", filename.c_str(), apiVersion);
-        FreeLibrary(handle);
+        spdlog::warn(L"'{}' reported unsupported API version ({})", filename, apiVersion);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -175,7 +190,7 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     {
     case RED4EXT_API_VERSION_0:
     {
-        plugin = std::make_shared<v0::Plugin>(handle);
+        plugin = std::make_shared<v0::Plugin>(aHandle);
         extInterface = &m_v0Interface;
 
         break;
@@ -187,15 +202,15 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     }
     }
 
-    auto query = reinterpret_cast<Query_t>(GetProcAddress(handle, "Query"));
+    auto query = reinterpret_cast<Query_t>(GetProcAddress(aHandle, "Query"));
     if (!query)
     {
         auto err = GetLastError();
         auto errMsg = Utils::FormatErrorMessage(err);
 
         spdlog::debug(L"Could not retrieve 'Query' function from '{}', error: 0x{:X}, description: {}",
-                      filename.c_str(), err, errMsg);
-        FreeLibrary(handle);
+                      filename, err, errMsg);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -209,24 +224,24 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     catch (const std::exception& ex)
     {
         spdlog::warn(ex.what());
-        spdlog::warn(L"An exception occured while querying '{}'", filename.c_str());
+        spdlog::warn(L"An exception occured while querying '{}'", filename);
     }
     catch (...)
     {
-        spdlog::warn(L"An exception occured while querying '{}'", filename.c_str());
+        spdlog::warn(L"An exception occured while querying '{}'", filename);
     }
 
     if (!success)
     {
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
         return;
     }
 
     auto name = plugin->GetName();
     if (name.empty())
     {
-        spdlog::warn(L"'{}' did not supply a name, the plugin will not be loaded", filename.c_str());
-        FreeLibrary(handle);
+        spdlog::warn(L"'{}' did not supply a name, the plugin will not be loaded", filename);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -234,7 +249,7 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     if (plugin->GetAuthor().empty())
     {
         spdlog::warn(L"{} did not supply an author, the plugin will not be loaded", name);
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -250,7 +265,7 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
                      name, std::to_wstring(version), runtime.major, runtime.minor, runtime.patch,
                      requestedRuntime.major, requestedRuntime.minor, requestedRuntime.patch);
 
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
 
         return;
     }
@@ -260,12 +275,12 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
     {
         spdlog::warn(L"{} (version: {}) is built with an incompatible SDK version ({})", name, std::to_wstring(version),
                      std::to_wstring(sdk));
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
 
         return;
     }
 
-    auto load = reinterpret_cast<Load_t>(GetProcAddress(handle, "Load"));
+    auto load = reinterpret_cast<Load_t>(GetProcAddress(aHandle, "Load"));
     if (!load)
     {
         auto err = GetLastError();
@@ -275,15 +290,15 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
         return;
     }
 
-    m_plugins.emplace(handle, plugin);
+    m_plugins.emplace(aHandle, plugin);
     m_pluginsByName.emplace(name, plugin);
 
     success = false;
     try
     {
-        if (!load(handle, extInterface))
+        if (!load(aHandle, extInterface))
         {
-            m_plugins.erase(handle);
+            m_plugins.erase(aHandle);
             m_pluginsByName.erase(name);
 
             spdlog::warn(L"{} could not be loaded, 'Load' returned false", name);
@@ -306,10 +321,10 @@ void PluginsManager::Load(const std::filesystem::path& aPath)
 
     if (!success)
     {
-        m_plugins.erase(handle);
+        m_plugins.erase(aHandle);
         m_pluginsByName.erase(name);
 
-        FreeLibrary(handle);
+        FreeLibrary(aHandle);
         return;
     }
 

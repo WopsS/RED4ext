@@ -11,6 +11,7 @@ public:
     PluginsManager(HookingManager* aHookingManager, TrampolinesManager* aTrampolinesManager);
     ~PluginsManager();
 
+    void PreloadAll(const std::filesystem::path& aPluginsDir);
     void LoadAll(const std::filesystem::path& aPluginsDir);
     void UnloadAll();
 
@@ -27,7 +28,8 @@ private:
     using Query_t = void (*)(void*);
     using Supports_t = uint32_t (*)();
 
-    void Load(const std::filesystem::path& aPath);
+    void Preload(const std::filesystem::path& aPath);
+    void Load(const RED4ext::PluginHandle aHandle);
     void PostLoad(const std::shared_ptr<PluginBase> aPlugin);
     void Unload(const std::shared_ptr<PluginBase> aPlugin);
 
@@ -38,6 +40,7 @@ private:
     RED4ext::v0::IHooking m_v0Hooking;
     RED4ext::v0::ITrampoline m_v0Trampoline;
 
+    std::vector<RED4ext::PluginHandle> m_preloadedPlugins;
     std::unordered_map<RED4ext::PluginHandle, std::shared_ptr<PluginBase>> m_plugins;
     std::unordered_map<std::wstring_view, std::shared_ptr<PluginBase>> m_pluginsByName;
 

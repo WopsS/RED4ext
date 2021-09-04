@@ -13,6 +13,11 @@ int64_t _Main()
     auto app = App::Get();
 
     app->Init();
+
+    auto pluginsDir = app->GetPluginsDirectory();
+    auto pluginsManager = app->GetPluginsManager();
+    pluginsManager->PreloadAll(pluginsDir);
+
     auto result = Main_Func();
     app->Shutdown();
 
