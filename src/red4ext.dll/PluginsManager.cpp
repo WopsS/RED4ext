@@ -135,8 +135,21 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
         return;
     }
 
-    wchar_t filename[MAX_PATH + 1];
-    auto length = GetModuleFileName(aHandle, filename, static_cast<uint32_t>(std::size(filename)) - 1);
+    constexpr auto pathLength = MAX_PATH + 1;
+
+    // Try to get the executable path until we can fit the length of the path.
+    std::wstring filename;
+    do
+    {
+        filename.resize(filename.size() + pathLength, '\0');
+
+        auto length = GetModuleFileName(aHandle, filename.data(), static_cast<uint32_t>(filename.size()));
+        if (length > 0)
+        {
+            // Resize it to the real, std::filesystem::path" will use the string's length instead of recounting it.
+            filename.resize(length);
+        }
+    } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
     auto supports = reinterpret_cast<Supports_t>(GetProcAddress(aHandle, "Supports"));
     if (!supports)
