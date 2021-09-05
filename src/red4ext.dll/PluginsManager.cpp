@@ -136,7 +136,7 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
     }
 
     wchar_t filename[MAX_PATH + 1];
-    auto length = GetModuleFileName(aHandle, filename, sizeof(filename));
+    auto length = GetModuleFileName(aHandle, filename, static_cast<uint32_t>(std::size(filename)) - 1);
 
     auto supports = reinterpret_cast<Supports_t>(GetProcAddress(aHandle, "Supports"));
     if (!supports)
