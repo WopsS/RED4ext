@@ -14,7 +14,7 @@ Before filing a bug report or requesting a new features ensure the bug reproduce
 
 ### Language
 
-The project is using [C++17](https://en.cppreference.com/w/cpp/17), any C++17 features are allowed.
+The project is using [C++20](https://en.cppreference.com/w/cpp/20), any C++20 features are allowed.
 
 ### General
 
