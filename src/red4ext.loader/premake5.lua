@@ -11,7 +11,7 @@ project("RED4ext.Loader")
     includedirs(
     {
         ".",
-        red4ext.project.includes("spdlog")
+        red4ext.project.includes("fmt")
     })
 
     files(
@@ -23,5 +23,5 @@ project("RED4ext.Loader")
 
     links(
     {
-        red4ext.project.links("spdlog")
+        red4ext.project.links("fmt")
     })

@@ -6,4 +6,5 @@
 #include <Windows.h>
 #include <ShlObj_core.h>
 
-#include <spdlog/fmt/fmt.h>
+#include <fmt/core.h>
+#include <fmt/xchar.h>
