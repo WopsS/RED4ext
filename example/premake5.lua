@@ -8,7 +8,7 @@ project("RED4ext.Example")
     includedirs(
     {
         ".",
-        red4ext.paths.src("red4ext.sdk", "include")
+        red4ext.paths.deps("red4ext.sdk", "include")
     })
 
     files(
