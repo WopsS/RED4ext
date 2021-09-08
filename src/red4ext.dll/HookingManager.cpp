@@ -118,10 +118,10 @@ bool HookingManager::Attach(const HookItem& aItem) const
 
     try
     {
-        aItem.hook->attach();
-        *aItem.original = aItem.hook->get_block_address();
+        //aItem.hook->attach();
+        //*aItem.original = aItem.hook->get_block_address();
 
-        return aItem.hook->is_attached();
+        //return aItem.hook->is_attached();
     }
     catch (const std::exception& ex)
     {
@@ -139,10 +139,10 @@ bool HookingManager::Detach(const HookItem& aItem) const
 
     try
     {
-        *aItem.original = nullptr;
-        aItem.hook->detach();
+        //*aItem.original = nullptr;
+        //aItem.hook->detach();
 
-        return !aItem.hook->is_attached();
+        //return !aItem.hook->is_attached();
     }
     catch (const std::exception& ex)
     {

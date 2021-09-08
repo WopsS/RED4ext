@@ -48,10 +48,10 @@ void CInitializationState::Attach()
                                                        0xCC, 0x4C, 0x8B, 0xC2, 0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
                                                       &_CInitializationState_Run, 1);
 
-    CInitializationState_Run.attach();
+    //CInitializationState_Run.attach();
 }
 
 void CInitializationState::Detach()
 {
-    CInitializationState_Run.detach();
+    //CInitializationState_Run.detach();
 }

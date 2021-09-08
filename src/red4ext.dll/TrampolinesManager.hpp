@@ -17,6 +17,5 @@ public:
 private:
     std::mutex m_mutex;
 
-    renhook::memory::memory_allocator m_allocator;
     std::unordered_multimap<std::shared_ptr<PluginBase>, void*> m_trampolines;
 };

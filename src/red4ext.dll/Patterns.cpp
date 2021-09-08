@@ -18,8 +18,11 @@ uintptr_t Patterns::Find(const uint8_t* aPattern, size_t aPatternSize, size_t aE
     std::vector<uint8_t*> addresses;
     auto end = aPattern + aPatternSize;
 
-    auto codeStart = reinterpret_cast<uint8_t*>(renhook::executable::get_code_base_address());
-    auto codeEnd = reinterpret_cast<uint8_t*>(renhook::executable::get_code_end_address());
+    //auto codeStart = reinterpret_cast<uint8_t*>(renhook::executable::get_code_base_address());
+    //auto codeEnd = reinterpret_cast<uint8_t*>(renhook::executable::get_code_end_address());
+
+    uint8_t* codeStart = nullptr;
+    uint8_t* codeEnd = nullptr;
 
     while (true)
     {

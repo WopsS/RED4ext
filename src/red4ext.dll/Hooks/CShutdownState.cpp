@@ -27,10 +27,10 @@ void CShutdownState::Attach()
         {0x48, 0x89, 0x6C, 0x24, 0x18, 0x56, 0x48, 0x83, 0xEC, 0x30, 0x48, 0x8B, 0x0D, 0xCC, 0xCC, 0xCC, 0xCC},
         &_CShutdownState_Run, 1);
 
-    CShutdownState_Run.attach();
+    //CShutdownState_Run.attach();
 }
 
 void CShutdownState::Detach()
 {
-    CShutdownState_Run.detach();
+    //CShutdownState_Run.detach();
 }

@@ -15,7 +15,6 @@ project("RED4ext.Playground")
     includedirs(
     {
         ".",
-        red4ext.project.includes("RenHook"),
         red4ext.project.includes("spdlog"),
         red4ext.paths.deps("red4ext.sdk", "include")
     })
@@ -29,6 +28,5 @@ project("RED4ext.Playground")
     links(
     {
         "Dbghelp",
-        red4ext.project.links("RenHook"),
         red4ext.project.links("spdlog")
     })

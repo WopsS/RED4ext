@@ -18,5 +18,4 @@
 #include <ShlObj_core.h>
 
 #include <RED4ext/RED4ext.hpp>
-#include <renhook/renhook.hpp>
 #include <spdlog/spdlog.h>

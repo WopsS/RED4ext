@@ -32,10 +32,10 @@ void Main::Attach()
                                    0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
                                   &_Main, 1);
 
-    Main_Func.attach();
+    //Main_Func.attach();
 }
 
 void Main::Detach()
 {
-    Main_Func.detach();
+    //Main_Func.detach();
 }

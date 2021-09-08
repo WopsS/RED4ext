@@ -40,10 +40,6 @@ workspace("RED4ext")
         include(red4ext.paths.modules("fmt"))
         include(red4ext.paths.modules("spdlog"))
 
-        include(red4ext.paths.modules("zycore"))
-        include(red4ext.paths.modules("zydis"))
-        include(red4ext.paths.modules("renhook"))
-
     group("")
         include(red4ext.paths.src("red4ext.dll"))
         include(red4ext.paths.src("red4ext.loader"))
