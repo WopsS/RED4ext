@@ -11,7 +11,8 @@ project("RED4ext.Loader")
     includedirs(
     {
         ".",
-        red4ext.project.includes("fmt")
+        red4ext.project.includes("fmt"),
+        red4ext.paths.deps("wil", "include")
     })
 
     files(
