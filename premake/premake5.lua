@@ -1,9 +1,4 @@
-require("premake", ">=5.0.0-alpha15")
-
--- Disable premake.downloadModule, see https://github.com/premake/premake-core/issues/1381.
-premake.downloadModule = function(modname, versions)
-    return false
-end
+require("premake", ">=5.0.0-alpha16")
 
 red4ext = require("extensions/red4ext")
 
@@ -15,18 +10,17 @@ workspace("RED4ext")
     configurations({ "Debug", "Release" })
     characterset("Unicode")
     symbols("Full")
+    systemversion("latest")
+    vectorextensions("SSE3")
 
-    filter({ "action:vs*", "language:c or language:c++" })
-        systemversion("latest")
-
-        defines(
-        {
-            "WINVER=0x0601",
-            "_WIN32_WINNT=0x0601",
-            "WIN32_LEAN_AND_MEAN",
-            "_CRT_SECURE_NO_WARNINGS",
-            "NOMINMAX"
-        })
+    defines(
+    {
+        "WINVER=0x0601",
+        "_WIN32_WINNT=0x0601",
+        "WIN32_LEAN_AND_MEAN",
+        "_CRT_SECURE_NO_WARNINGS",
+        "NOMINMAX"
+    })
 
     filter({ "configurations:Release" })
         optimize("On")
