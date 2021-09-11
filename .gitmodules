@@ -7,3 +7,6 @@
 [submodule "deps/fmt"]
 	path = deps/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "deps/wil"]
+	path = deps/wil
+	url = https://github.com/microsoft/wil.git
