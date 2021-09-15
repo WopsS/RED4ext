@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 
             return FALSE;
         }
-        Sleep(5000);
+
         App::Construct();
 
         DetourTransactionBegin();
