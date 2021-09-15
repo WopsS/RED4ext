@@ -33,6 +33,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
             }
         } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
+        std::error_code errCode;
         std::filesystem::path exePath(filename);
         auto rootPath = exePath
                             .parent_path()  // Resolve to "x64" directory.
@@ -40,7 +41,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                             .parent_path(); // Resolve to game root directory.
 
         auto modPath = rootPath / modDir;
-        if (!std::filesystem::exists(modPath))
+        if (!std::filesystem::exists(modPath, errCode))
         {
             auto message = fmt::format(L"The directory '{}' does not exist, RED4ext will not be loaded.\r\n\r\n"
                                        L"If this is intended please remove 'version.dll' from '{}' directory.",
