@@ -30,6 +30,6 @@ project("RED4ext.Dll")
     links(
     {
         "version",
-        red4ext.project.includes("Detours"),
+        red4ext.project.links("Detours"),
         red4ext.project.links("spdlog")
     })
