@@ -31,6 +31,7 @@ workspace("RED4ext")
     filter({})
 
     group("Dependencies")
+        include(red4ext.paths.modules("Detours"))
         include(red4ext.paths.modules("fmt"))
         include(red4ext.paths.modules("spdlog"))
 
