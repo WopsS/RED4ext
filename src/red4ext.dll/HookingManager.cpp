@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 #include "HookingManager.hpp"
+#include "DetourThreadsUpdater.hpp"
 
 void HookingManager::Create(std::shared_ptr<PluginBase> aPlugin, void* aTarget, void* aDetour, void** aOriginal)
 {
@@ -84,10 +85,16 @@ bool HookingManager::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 void HookingManager::AttachAll()
 {
     std::scoped_lock<std::recursive_mutex> _(m_mutex);
+
+    DetourTransactionBegin();
+    DetourThreadsUpdater updater;
+
     for (const auto& [plugin, item] : m_hooks)
     {
         Attach(item);
     }
+
+    DetourTransactionCommit();
 }
 
 void HookingManager::DetachAll()
@@ -103,12 +110,17 @@ void HookingManager::DetachAll(std::shared_ptr<PluginBase> aPlugin)
 {
     std::scoped_lock<std::recursive_mutex> _(m_mutex);
 
+    DetourTransactionBegin();
+    DetourThreadsUpdater updater;
+
     auto range = m_hooks.equal_range(aPlugin);
     for (auto it = range.first; it != range.second; ++it)
     {
         const auto& item = it->second;
         Detach(item);
     }
+
+    DetourTransactionCommit();
 }
 
 bool HookingManager::Attach(const HookItem& aItem) const
@@ -118,10 +130,8 @@ bool HookingManager::Attach(const HookItem& aItem) const
 
     try
     {
-        aItem.hook->attach();
-        *aItem.original = aItem.hook->get_block_address();
-
-        return aItem.hook->is_attached();
+        aItem.hook->Attach(aItem.original);
+        return aItem.hook->IsAttached();
     }
     catch (const std::exception& ex)
     {
@@ -139,10 +149,8 @@ bool HookingManager::Detach(const HookItem& aItem) const
 
     try
     {
-        *aItem.original = nullptr;
-        aItem.hook->detach();
-
-        return !aItem.hook->is_attached();
+        aItem.hook->Detach(aItem.original);
+        return !aItem.hook->IsAttached();
     }
     catch (const std::exception& ex)
     {

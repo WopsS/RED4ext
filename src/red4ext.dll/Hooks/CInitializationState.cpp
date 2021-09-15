@@ -48,10 +48,15 @@ void CInitializationState::Attach()
                                                        0xCC, 0x4C, 0x8B, 0xC2, 0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
                                                       &_CInitializationState_Run, 1);
 
-    CInitializationState_Run.attach();
+    auto result = CInitializationState_Run.Attach();
+    if (result != NO_ERROR)
+    {
+        auto message = fmt::format(L"Could not attach hook for CInitializationState::Run, attach returned {}.", result);
+        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+    }
 }
 
 void CInitializationState::Detach()
 {
-    CInitializationState_Run.detach();
+    CInitializationState_Run.Detach();
 }

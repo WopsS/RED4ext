@@ -32,10 +32,19 @@ void Main::Attach()
                                    0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC, 0xE8, 0xCC, 0xCC, 0xCC, 0xCC},
                                   &_Main, 1);
 
-    Main_Func.attach();
+    auto result = Main_Func.Attach();
+    if (result != NO_ERROR)
+    {
+        auto message = fmt::format(L"Could not attach hook for main function, attach returned {}.\n\nProcess will exit "
+                                   L"to prevent further problems.",
+                                   result);
+        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+
+        ExitProcess(1);
+    }
 }
 
 void Main::Detach()
 {
-    Main_Func.detach();
+    Main_Func.Detach();
 }

@@ -16,6 +16,8 @@
 
 #include <Windows.h>
 #include <ShlObj_core.h>
+#include <TlHelp32.h>
+#include <detours.h>
 
 #include <RED4ext/RED4ext.hpp>
 #include <renhook/renhook.hpp>
