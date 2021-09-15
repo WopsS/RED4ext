@@ -16,6 +16,7 @@ project("RED4ext.Dll")
     includedirs(
     {
         ".",
+        red4ext.project.includes("Detours"),
         red4ext.project.includes("spdlog"),
         red4ext.paths.deps("red4ext.sdk", "include")
     })
@@ -29,5 +30,6 @@ project("RED4ext.Dll")
     links(
     {
         "version",
+        red4ext.project.includes("Detours"),
         red4ext.project.links("spdlog")
     })

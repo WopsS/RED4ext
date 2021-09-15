@@ -1,6 +1,7 @@
 #include "stdafx.hpp"
 
 #include "App.hpp"
+#include "DetourThreadsUpdater.hpp"
 #include "Hooks/CInitializationState.hpp"
 #include "Hooks/CShutdownState.hpp"
 #include "Hooks/Main.hpp"
@@ -40,17 +41,27 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 
         App::Construct();
 
+        DetourTransactionBegin();
+        DetourThreadsUpdater _;
+
         Main::Attach();
         CInitializationState::Attach();
         CShutdownState::Attach();
+
+        DetourTransactionCommit();
 
         break;
     }
     case DLL_PROCESS_DETACH:
     {
+        DetourTransactionBegin();
+        DetourThreadsUpdater _;
+
         CShutdownState::Detach();
         CInitializationState::Detach();
         Main::Detach();
+
+        DetourTransactionCommit();
 
         if (s_mutex)
         {
