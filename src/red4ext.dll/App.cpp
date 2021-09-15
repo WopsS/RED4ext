@@ -119,12 +119,13 @@ std::filesystem::path App::GetExecutablePath()
 
 void App::CreateLogger()
 {
+    std::error_code errCode;
     auto logsPath = GetLogsDirectory();
-    if (!std::filesystem::exists(logsPath) && !std::filesystem::create_directories(logsPath))
+    if (!std::filesystem::exists(logsPath, errCode) && !std::filesystem::create_directories(logsPath, errCode))
     {
         auto err = GetLastError();
-        auto message = fmt::format(L"{}\nCould not create '{}' directory, error 0x{:X}.",
-                                   Utils::FormatErrorMessage(err), logsPath.c_str(), err);
+        auto message = fmt::format(L"{}\nCould not create '{}' directory, last error 0x{:X}, error code {}.",
+                                   Utils::FormatErrorMessage(err), logsPath.c_str(), err, errCode.value());
         MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
         return;
     }

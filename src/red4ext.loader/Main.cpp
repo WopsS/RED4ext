@@ -35,6 +35,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
             return TRUE;
         }
 
+        std::error_code fsErr;
         std::filesystem::path exePath = fileName;
         auto rootPath = exePath
                             .parent_path()  // Resolve to "x64" directory.
@@ -42,7 +43,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                             .parent_path(); // Resolve to game root directory.
 
         auto modPath = rootPath / dir;
-        if (std::filesystem::exists(modPath))
+        if (std::filesystem::exists(modPath, fsErr))
         {
             auto dllPath = modPath / dll;
             if (!LoadLibrary(dllPath.c_str()))
@@ -58,6 +59,11 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                 auto message = fmt::format(L"{}\n{}\n\nRED4ext could not be loaded.", buffer.get(), dllPath.c_str());
                 MessageBox(nullptr, message.c_str(), caption.c_str(), MB_ICONERROR | MB_OK);
             }
+        }
+        else
+        {
+            auto message = fmt::format(L"RED4ext could not be loaded because of a filesystem error ({}).", fsErr.value());
+            MessageBox(nullptr, message.c_str(), msgCaption, MB_ICONERROR | MB_OK);
         }
 
         break;

@@ -37,17 +37,29 @@ void PluginsManager::PreloadAll(const std::filesystem::path& aPluginsDir)
 {
     m_logger = spdlog::default_logger();
 
-    if (!std::filesystem::exists(aPluginsDir))
+    try
     {
-        std::filesystem::create_directories(aPluginsDir);
-    }
-
-    for (const auto& path : std::filesystem::recursive_directory_iterator(aPluginsDir))
-    {
-        if (path.path().extension() == L".dll")
+        if (!std::filesystem::exists(aPluginsDir))
         {
-            Preload(path);
+            std::filesystem::create_directories(aPluginsDir);
         }
+
+        for (const auto& path : std::filesystem::recursive_directory_iterator(aPluginsDir))
+        {
+            if (path.path().extension() == L".dll")
+            {
+                Preload(path);
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        spdlog::error(L"An exception occured while scanning the plugins directory, dir is '{}'", aPluginsDir.c_str());
+        spdlog::error(ex.what());
+    }
+    catch (...)
+    {
+        spdlog::error(L"An unknown error occured while scanning the plugins directory, dir is '{}'", aPluginsDir.c_str());
     }
 }
 
