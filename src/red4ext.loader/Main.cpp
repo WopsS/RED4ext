@@ -60,7 +60,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
                 MessageBox(nullptr, message.c_str(), caption.c_str(), MB_ICONERROR | MB_OK);
             }
         }
-        else
+        else if (fsErr)
         {
             auto message = fmt::format(L"RED4ext could not be loaded because of a filesystem error ({}).", fsErr.value());
             MessageBox(nullptr, message.c_str(), msgCaption, MB_ICONERROR | MB_OK);
