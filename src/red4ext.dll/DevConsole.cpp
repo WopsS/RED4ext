@@ -4,7 +4,7 @@
 
 DevConsole::DevConsole(const Config& aConfig)
     : m_isCreated(false)
-    , m_isOpen(false)
+    , m_isRedirected(false)
 {
     if (aConfig.HasDevConsole())
     {
@@ -25,20 +25,22 @@ DevConsole::DevConsole(const Config& aConfig)
                 }
             }
 
-            // Now open the streams.
+            // Now redirect the output.
             if (!freopen("CONOUT$", "w", stdout))
             {
                 SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONWARNING | MB_OK,
                                            L"Could not redirect the standard output to console.");
             }
-            else if (!freopen("CONOUT$", "w", stderr))
-            {
-                SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONWARNING | MB_OK,
-                                           L"Could not redirect the standard error output to console.");
-            }
             else
             {
-                m_isOpen = true;
+                m_isRedirected = true;
+
+                // This is not mandatory to be open, but is nice to have.
+                if (!freopen("CONOUT$", "w", stderr))
+                {
+                    SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONWARNING | MB_OK,
+                                               L"Could not redirect the standard error output to console.");
+                }
             }
         }
         else
@@ -56,7 +58,7 @@ DevConsole::~DevConsole()
     }
 }
 
-bool DevConsole::IsOpen() const
+bool DevConsole::IsOutputRedirected() const
 {
-    return m_isOpen;
+    return m_isRedirected;
 }

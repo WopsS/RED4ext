@@ -8,10 +8,10 @@ public:
     DevConsole(const Config& aConfig);
     ~DevConsole();
 
-    bool IsOpen() const;
+    bool IsOutputRedirected() const;
 
 private:
 
     bool m_isCreated;
-    bool m_isOpen;
+    bool m_isRedirected;
 };

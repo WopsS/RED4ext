@@ -53,7 +53,7 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
         logger->set_level(aConfig.GetLogLevel());
         logger->flush_on(aConfig.GetFlushLevel());
 
-        if (aConfig.HasDevConsole() && aDevConsole.IsOpen())
+        if (aConfig.HasDevConsole() && aDevConsole.IsOutputRedirected())
         {
             auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
             logger->sinks().push_back(consoleSink);
