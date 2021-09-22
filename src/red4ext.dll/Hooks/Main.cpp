@@ -14,9 +14,9 @@ int64_t _Main()
 
     app->Init();
 
-    auto pluginsDir = app->GetPluginsDirectory();
+    /*auto pluginsDir = app->GetPluginsDirectory();
     auto pluginsManager = app->GetPluginsManager();
-    pluginsManager->PreloadAll(pluginsDir);
+    pluginsManager->PreloadAll(pluginsDir);*/
 
     auto result = Main_Func();
     app->Shutdown();

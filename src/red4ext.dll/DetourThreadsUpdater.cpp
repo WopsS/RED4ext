@@ -1,6 +1,8 @@
 #include "stdafx.hpp"
 #include "DetourThreadsUpdater.hpp"
 
+#include <tlhelp32.h>
+
 DetourThreadsUpdater::DetourThreadsUpdater()
 {
     Update();

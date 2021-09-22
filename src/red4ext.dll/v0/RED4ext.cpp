@@ -2,6 +2,7 @@
 #include "RED4ext.hpp"
 #include "App.hpp"
 #include "Utils.hpp"
+#include "PluginsManager.hpp"
 
 const RED4ext::v0::VersionInfo* v0::GetSDKVersion()
 {
@@ -12,8 +13,9 @@ const RED4ext::v0::VersionInfo* v0::GetSDKVersion()
 const RED4ext::v0::VersionInfo* v0::GetRuntimeVersion()
 {
     static const RED4ext::v0::VersionInfo version = []() {
-        const auto version = Utils::GetRuntimeVersion();
-        return RED4EXT_V0_SEMVER(version.major, version.minor, version.patch);
+        //const auto version = Utils::GetRuntimeVersion();
+        //return RED4EXT_V0_SEMVER(version.major, version.minor, version.patch);
+        return RED4EXT_V0_SEMVER(0, 0, 0);
     }();
 
     return &version;
@@ -22,7 +24,8 @@ const RED4ext::v0::VersionInfo* v0::GetRuntimeVersion()
 void v0::RegisterInterface(RED4ext::PluginHandle aHandle, void* aInterface)
 {
     auto app = App::Get();
-    auto manager = app->GetPluginsManager();
+    //auto manager = app->GetPluginsManager();
+    PluginsManager* manager = nullptr;
 
     auto plugin = manager->GetPlugin(aHandle);
     if (plugin)
@@ -34,7 +37,8 @@ void v0::RegisterInterface(RED4ext::PluginHandle aHandle, void* aInterface)
 void* v0::GetInterface(const wchar_t* aName)
 {
     auto app = App::Get();
-    auto manager = app->GetPluginsManager();
+    // auto manager = app->GetPluginsManager();
+    PluginsManager* manager = nullptr;
 
     auto plugin = manager->GetPlugin(aName);
     if (plugin)
@@ -48,13 +52,15 @@ void* v0::GetInterface(const wchar_t* aName)
 const RED4ext::v0::IHooking* v0::GetHookingInterface()
 {
     auto app = App::Get();
-    auto manager = app->GetPluginsManager();
+    // auto manager = app->GetPluginsManager();
+    PluginsManager* manager = nullptr;
     return manager->GetV0Hooking();
 }
 
 const RED4ext::v0::ITrampoline* v0::GetTrampolineInterface()
 {
     auto app = App::Get();
-    auto manager = app->GetPluginsManager();
+    // auto manager = app->GetPluginsManager();
+    PluginsManager* manager = nullptr;
     return manager->GetV0Trampoline();
 }

@@ -14,9 +14,9 @@ REDhook<decltype(&_CShutdownState_Run)> CShutdownState_Run;
 bool _CShutdownState_Run(RED4ext::CShutdownState* aThis, RED4ext::CGameApplication* aApp)
 {
     auto app = App::Get();
-    auto pluginsManager = app->GetPluginsManager();
+   /* auto pluginsManager = app->GetPluginsManager();
 
-    pluginsManager->UnloadAll();
+    pluginsManager->UnloadAll();*/
     return CShutdownState_Run(aThis, aApp);
 }
 } // namespace

@@ -131,9 +131,9 @@ void PluginsManager::Preload(const std::filesystem::path& aPath)
     if (!handle)
     {
         auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
+        //auto errMsg = Utils::FormatErrorMessage(err);
 
-        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename.c_str(), err, errMsg);
+        //spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename.c_str(), err, errMsg);
         return;
     }
 
@@ -167,9 +167,9 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
     if (!supports)
     {
         auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
+        //auto errMsg = Utils::FormatErrorMessage(err);
 
-        spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename, err, errMsg);
+        //spdlog::warn(L"'{}' could not be loaded, error: 0x{:X}, description: {}", filename, err, errMsg);
         FreeLibrary(aHandle);
 
         return;
@@ -231,10 +231,10 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
     if (!query)
     {
         auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
+        //auto errMsg = Utils::FormatErrorMessage(err);
 
-        spdlog::debug(L"Could not retrieve 'Query' function from '{}', error: 0x{:X}, description: {}",
-                      filename, err, errMsg);
+        //spdlog::debug(L"Could not retrieve 'Query' function from '{}', error: 0x{:X}, description: {}",
+        //              filename, err, errMsg);
         FreeLibrary(aHandle);
 
         return;
@@ -273,17 +273,17 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
 
     if (plugin->GetAuthor().empty())
     {
-        spdlog::warn(L"{} did not supply an author, the plugin will not be loaded", name);
+        //spdlog::warn(L"{} did not supply an author, the plugin will not be loaded", name);
         FreeLibrary(aHandle);
 
         return;
     }
 
     const auto version = plugin->GetVersion();
-    const auto runtime = Utils::GetRuntimeVersion();
-    const auto requestedRuntime = plugin->GetRuntime();
+    //const auto runtime = Utils::GetRuntimeVersion();
+    //const auto requestedRuntime = plugin->GetRuntime();
 
-    if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != runtime)
+    /*if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != runtime)
     {
         spdlog::warn(L"{} (version: {}) is not compatible with the current game version ({}.{}{}), the compatible "
                      L"version is {}.{}{}",
@@ -293,7 +293,7 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
         FreeLibrary(aHandle);
 
         return;
-    }
+    }*/
 
     const auto sdk = plugin->GetSdk();
     if (sdk < MINIMUM_SDK_VERSION || sdk > LATEST_SDK_VERSION)
@@ -309,9 +309,9 @@ void PluginsManager::Load(const RED4ext::PluginHandle aHandle)
     if (!load)
     {
         auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
+        //auto errMsg = Utils::FormatErrorMessage(err);
 
-        spdlog::debug(L"Could not retrieve 'Load' function from {}, error: 0x{:X}, description: {}", name, err, errMsg);
+        //spdlog::debug(L"Could not retrieve 'Load' function from {}, error: 0x{:X}, description: {}", name, err, errMsg);
         return;
     }
 

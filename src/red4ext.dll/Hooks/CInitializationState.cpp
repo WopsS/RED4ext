@@ -30,10 +30,10 @@ bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CG
         if (strcmp(name, "Running") == 0)
         {
             auto app = App::Get();
-            auto pluginsDir = app->GetPluginsDirectory();
+            /*auto pluginsDir = app->GetPluginsDirectory();
 
             auto pluginsManager = app->GetPluginsManager();
-            pluginsManager->LoadAll(pluginsDir);
+            pluginsManager->LoadAll(pluginsDir);*/
         }
     }
 
