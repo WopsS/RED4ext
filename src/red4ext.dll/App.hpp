@@ -1,40 +1,25 @@
 #pragma once
 
-#include "HookingManager.hpp"
-#include "PluginsManager.hpp"
-#include "TrampolinesManager.hpp"
+#include "Config.hpp"
+#include "DevConsole.hpp"
+#include "Paths.hpp"
 
 class App
 {
 public:
+    ~App() = default;
+
     static void Construct();
+    static void Destruct();
     static App* Get();
 
     void Init();
     void Shutdown();
 
-    HookingManager* GetHookingManager();
-    TrampolinesManager* GetTrampolinesManager();
-
-    PluginsManager* GetPluginsManager();
-
-    std::filesystem::path GetRootDirectory();
-    std::filesystem::path GetPluginsDirectory();
-    std::filesystem::path GetLogsDirectory();
-    std::filesystem::path GetExecutablePath();
-
 private:
-    friend struct std::unique_ptr<App>::deleter_type;
-
     App();
-    ~App() = default;
 
-    void CreateLogger();
-
-    static std::unique_ptr<App> m_instance;
-
-    HookingManager m_hookingManager;
-    TrampolinesManager m_trampolinesManager;
-
-    PluginsManager m_pluginsManager;
+    Paths m_paths;
+    Config m_config;
+    DevConsole m_devConsole;
 };

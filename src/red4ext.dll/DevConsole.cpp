@@ -1,25 +1,62 @@
 #include "stdafx.hpp"
 #include "DevConsole.hpp"
+#include "Utils.hpp"
 
-void DevConsole::Alloc()
+DevConsole::DevConsole(const Config& aConfig)
+    : m_isCreated(false)
+    , m_isOpen(false)
 {
-    if (AllocConsole())
+    if (aConfig.HasDevConsole())
     {
-        freopen("CONOUT$", "w", stdout);
-        SetConsoleTitle(L"RED4ext Console");
-    }
-    else
-    {
-        auto message = fmt::format(L"Could not allocate the debug console, error {:#x}.", GetLastError());
-        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_OK | MB_ICONERROR);
+        if (AllocConsole())
+        {
+            m_isCreated = true;
+
+            SetConsoleTitle(L"RED4ext Console");
+
+            // Disable the close button / context menu.
+            auto console = GetConsoleWindow();
+            if (console)
+            {
+                auto menu = GetSystemMenu(console, false);
+                if (menu)
+                {
+                    DeleteMenu(menu, SC_CLOSE, MF_BYCOMMAND);
+                }
+            }
+
+            // Now open the streams.
+            if (!freopen("CONOUT$", "w", stdout))
+            {
+                SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONWARNING | MB_OK,
+                                           L"Could not redirect the standard output to console.");
+            }
+            else if (!freopen("CONOUT$", "w", stderr))
+            {
+                SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONWARNING | MB_OK,
+                                           L"Could not redirect the standard error output to console.");
+            }
+            else
+            {
+                m_isOpen = true;
+            }
+        }
+        else
+        {
+            SHOW_LAST_ERROR_MESSAGE_FILE_LINE(L"Could not create the development console.");
+        }
     }
 }
 
-void DevConsole::Free()
+DevConsole::~DevConsole()
 {
-    if (!FreeConsole())
+    if (m_isCreated)
     {
-        auto message = fmt::format(L"Could not free the debug console, error {:#x}", GetLastError());
-        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_OK | MB_ICONERROR);
+        FreeConsole();
     }
+}
+
+bool DevConsole::IsOpen() const
+{
+    return m_isOpen;
 }

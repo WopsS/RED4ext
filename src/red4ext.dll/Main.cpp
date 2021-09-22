@@ -1,72 +1,42 @@
 #include "stdafx.hpp"
-
 #include "App.hpp"
-#include "DetourThreadsUpdater.hpp"
-#include "Hooks/CInitializationState.hpp"
-#include "Hooks/CShutdownState.hpp"
-#include "Hooks/Main.hpp"
+#include "Utils.hpp"
+#include "Image.hpp"
 
-HANDLE s_mutex = nullptr;
+static HANDLE g_instanceMutex = nullptr;
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
+    const auto image = Image::Get();
+
     switch (aReason)
     {
     case DLL_PROCESS_ATTACH:
     {
         DisableThreadLibraryCalls(aModule);
 
-        constexpr auto name = L"RED4ext";
-        s_mutex = CreateMutex(nullptr, true, name);
-
-        auto err = GetLastError();
-        if (err == ERROR_ALREADY_EXISTS)
+        if (!image->IsCyberpunk())
         {
-            return TRUE;
-        }
-        else if (err != ERROR_SUCCESS)
-        {
-            wchar_t* buffer = nullptr;
-            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                          nullptr, err, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
-
-            auto message = fmt::format(L"{}\n\n{} could not be loaded, error code 0x{:X}.", buffer, name, err);
-            MessageBox(nullptr, message.c_str(), name, MB_ICONERROR | MB_OK);
-
-            LocalFree(buffer);
-            buffer = nullptr;
-
-            return FALSE;
+            break;
         }
 
         App::Construct();
-
-        DetourTransactionBegin();
-        DetourThreadsUpdater _;
-
-        Main::Attach();
-        CInitializationState::Attach();
-        CShutdownState::Attach();
-
-        DetourTransactionCommit();
 
         break;
     }
     case DLL_PROCESS_DETACH:
     {
-        DetourTransactionBegin();
-        DetourThreadsUpdater _;
-
-        CShutdownState::Detach();
-        CInitializationState::Detach();
-        Main::Detach();
-
-        DetourTransactionCommit();
-
-        if (s_mutex)
+        if (!image->IsCyberpunk())
         {
-            ReleaseMutex(s_mutex);
-            CloseHandle(s_mutex);
+            break;
+        }
+
+        App::Destruct();
+
+        if (g_instanceMutex)
+        {
+            ReleaseMutex(g_instanceMutex);
+            CloseHandle(g_instanceMutex);
         }
 
         break;

@@ -1,80 +1,114 @@
 #include "stdafx.hpp"
 #include "Utils.hpp"
-#include "App.hpp"
+#include "Config.hpp"
+#include "DevConsole.hpp"
+#include "Paths.hpp"
 
-std::wstring Utils::FormatErrorMessage(uint32_t aErrorCode)
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
+void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole)
 {
-    wchar_t* buffer = nullptr;
-    auto errorCode = GetLastError();
+    try
+    {
+        auto dir = aPaths.GetLogsDir();
 
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
-                  errorCode, LANG_USER_DEFAULT, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
+        std::error_code err;
+        auto exists = std::filesystem::exists(dir, err);
+        if (err)
+        {
+            auto errVal = err.value();
+            const auto& category = err.category();
+            auto msg = category.message(errVal);
 
-    std::wstring result = buffer;
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
+                L"An error occured while checking logs directory existence:\n{}\n\nDirectory: {}", Utils::Widen(msg),
+                dir);
 
-    LocalFree(buffer);
-    buffer = nullptr;
+            return;
+        }
 
-    return result;
+        if (!exists)
+        {
+            std::filesystem::create_directories(dir, err);
+            if (err)
+            {
+                auto errVal = err.value();
+                const auto& category = err.category();
+                auto msg = category.message(errVal);
+
+                SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
+                    L"An error occured while creating the logs directory:\n{}\n\nDirectory: {}", Utils::Widen(msg),
+                    dir);
+
+                return;
+            }
+        }
+
+        constexpr size_t maxFileSize = -1;
+        constexpr size_t maxFiles = 5;
+
+        auto file = dir / L"game.log";
+        auto logger = spdlog::rotating_logger_mt("", file, maxFileSize, maxFiles, true);
+        logger->set_level(aConfig.GetLogLevel());
+        logger->flush_on(aConfig.GetFlushLevel());
+
+        if (aConfig.HasDevConsole() && aDevConsole.IsOpen())
+        {
+            auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            logger->sinks().push_back(consoleSink);
+        }
+
+        spdlog::set_default_logger(logger);
+    }
+    catch (const std::exception& e)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"An exception occured while creating the logger:\n{}",
+                                            Utils::Widen(e.what()));
+    }
 }
 
-const RED4ext::VersionInfo Utils::GetRuntimeVersion()
+std::wstring Utils::FormatSystemMessage(uint32_t aMessageId)
 {
-    auto app = App::Get();
-    auto filename = app->GetExecutablePath();
+    wil::unique_hlocal_ptr<wchar_t> buffer;
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
+                  aMessageId, LANG_USER_DEFAULT, wil::out_param_ptr<LPWSTR>(buffer), 0, nullptr);
 
-    auto size = GetFileVersionInfoSize(filename.c_str(), nullptr);
-    if (!size)
+    return buffer.get();
+}
+
+int32_t Utils::ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType)
+{
+    return MessageBox(nullptr, aText.data(), aCaption.data(), aType);
+}
+
+int32_t Utils::ShowMessageBox(const std::wstring_view aText, uint32_t aType)
+{
+    return ShowMessageBoxEx(L"RED4ext", aText, aType);
+}
+
+std::wstring Utils::Widen(const std::string_view aText)
+{
+    if (aText.empty())
     {
-        auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
-        spdlog::error(L"Could not retrive game's version size, error: 0x{:X}, description: {}", err, errMsg);
-
-        return RED4EXT_SEMVER(0, 0, 0);
+        return L"";
     }
 
-    auto data = new char[size];
-    if (!data)
+    std::wstring result;
+
+    auto len = MultiByteToWideChar(CP_UTF8, 0, aText.data(), static_cast<int32_t>(aText.size()), nullptr, 0);
+    if (len)
     {
-        spdlog::error(L"Could not allocate {} bytes on stack or heap", size);
-        return RED4EXT_SEMVER(0, 0, 0);
+        result.resize(len);
+        len = MultiByteToWideChar(CP_UTF8, 0, aText.data(), static_cast<int32_t>(aText.size()), result.data(),
+                                  static_cast<int32_t>(result.size()));
     }
 
-    if (!GetFileVersionInfo(filename.c_str(), 0, size, data))
+    // Second pass.
+    if (len <= 0)
     {
-        auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
-        spdlog::error(L"Could not retrive game's version info, error: 0x{:X}, description: {}", err, errMsg);
-
-        delete[] data;
-        return RED4EXT_SEMVER(0, 0, 0);
+        result = fmt::format(L"Failed to convert narrow to wide string, last error is {}", GetLastError());
     }
 
-    VS_FIXEDFILEINFO* buffer = nullptr;
-    uint32_t length = 0;
-
-    if (!VerQueryValue(data, L"\\", reinterpret_cast<LPVOID*>(&buffer), &length) || !length)
-    {
-        auto err = GetLastError();
-        auto errMsg = Utils::FormatErrorMessage(err);
-        spdlog::error(L"Could not query version info, error: 0x{:X}, description: {}", err, errMsg);
-
-        delete[] data;
-        return RED4EXT_SEMVER(0, 0, 0);
-    }
-
-    if (buffer->dwSignature != 0xFEEF04BD)
-    {
-        spdlog::error(L"Retrived version signature does not match");
-        delete[] data;
-
-        return RED4EXT_SEMVER(0, 0, 0);
-    }
-
-    uint8_t major = (buffer->dwProductVersionMS >> 16) & 0xFF;
-    uint16_t minor = buffer->dwProductVersionMS & 0xFFFF;
-    uint32_t patch = (buffer->dwProductVersionLS >> 16) & 0xFFFF;
-
-    delete[] data;
-    return RED4EXT_SEMVER(major, minor, patch);
+    return result;
 }

@@ -1,16 +1,20 @@
 #include "stdafx.hpp"
 #include "Hooking.hpp"
 #include "App.hpp"
+#include "PluginsManager.hpp"
+#include "HookingManager.hpp"
 
 void v0::Hooking::Create(RED4ext::PluginHandle aHandle, void* aTarget, void* aDetour, void** aOriginal)
 {
     auto app = App::Get();
-    auto pluginsManager = app->GetPluginsManager();
+    //auto pluginsManager = app->GetPluginsManager();
+    PluginsManager* pluginsManager;
 
     auto plugin = pluginsManager->GetPlugin(aHandle);
     if (plugin)
     {
-        auto hookingManager = app->GetHookingManager();
+        //auto hookingManager = app->GetHookingManager();
+        HookingManager* hookingManager;
         hookingManager->Create(plugin, aTarget, aDetour, aOriginal);
     }
 }
@@ -18,12 +22,14 @@ void v0::Hooking::Create(RED4ext::PluginHandle aHandle, void* aTarget, void* aDe
 void v0::Hooking::Remove(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
-    auto pluginsManager = app->GetPluginsManager();
+    // auto pluginsManager = app->GetPluginsManager();
+    PluginsManager* pluginsManager;
 
     auto plugin = pluginsManager->GetPlugin(aHandle);
     if (plugin)
     {
-        auto hookingManager = app->GetHookingManager();
+        // auto hookingManager = app->GetHookingManager();
+        HookingManager* hookingManager;
         hookingManager->Remove(plugin, aTarget);
     }
 }
@@ -31,12 +37,14 @@ void v0::Hooking::Remove(RED4ext::PluginHandle aHandle, void* aTarget)
 bool v0::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
-    auto pluginsManager = app->GetPluginsManager();
+    // auto pluginsManager = app->GetPluginsManager();
+    PluginsManager* pluginsManager;
 
     auto plugin = pluginsManager->GetPlugin(aHandle);
     if (plugin)
     {
-        auto hookingManager = app->GetHookingManager();
+        // auto hookingManager = app->GetHookingManager();
+        HookingManager* hookingManager;
         return hookingManager->Attach(plugin, aTarget);
     }
 
@@ -46,12 +54,14 @@ bool v0::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget)
 bool v0::Hooking::Detach(RED4ext::PluginHandle aHandle, void* aTarget)
 {
     auto app = App::Get();
-    auto pluginsManager = app->GetPluginsManager();
+    // auto pluginsManager = app->GetPluginsManager();
+    PluginsManager* pluginsManager;
 
     auto plugin = pluginsManager->GetPlugin(aHandle);
     if (plugin)
     {
-        auto hookingManager = app->GetHookingManager();
+        // auto hookingManager = app->GetHookingManager();
+        HookingManager* hookingManager;
         return hookingManager->Detach(plugin, aTarget);
     }
 

@@ -1,23 +1,25 @@
 #pragma once
 
-#include <cassert>
 #include <filesystem>
-#include <functional>
+#include <fstream>
 #include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <tuple>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 #include <Windows.h>
-#include <ShlObj_core.h>
-#include <TlHelp32.h>
 #include <detours.h>
 
-#include <RED4ext/RED4ext.hpp>
+#include <wil/resource.h>
+#include <wil/stl.h>
+#include <wil/win32_helpers.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
+
 #include <spdlog/spdlog.h>
+#include <toml++/toml.h>
+
+#include <RED4ext/RED4ext.hpp>

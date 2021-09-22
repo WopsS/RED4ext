@@ -1,6 +1,7 @@
 require("premake", ">=5.0.0-alpha16")
 
 red4ext = require("extensions/red4ext")
+red4ext.version.gen();
 
 workspace("RED4ext")
     location("projects")
