@@ -13,3 +13,6 @@
 [submodule "deps/wil"]
 	path = deps/wil
 	url = https://github.com/microsoft/wil.git
+[submodule "deps/toml++"]
+	path = deps/toml++
+	url = https://github.com/marzer/tomlplusplus.git

@@ -18,7 +18,8 @@ project("RED4ext.Dll")
         ".",
         red4ext.project.includes("Detours"),
         red4ext.project.includes("spdlog"),
-        red4ext.paths.deps("red4ext.sdk", "include")
+        red4ext.paths.deps("red4ext.sdk", "include"),
+        red4ext.paths.deps("toml++", "include")
     })
 
     files(
