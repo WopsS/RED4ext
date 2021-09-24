@@ -3,8 +3,6 @@
 #include "Utils.hpp"
 #include "Image.hpp"
 
-static HANDLE g_instanceMutex = nullptr;
-
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
     const auto image = Image::Get();
@@ -21,7 +19,6 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
         }
 
         App::Construct();
-
         break;
     }
     case DLL_PROCESS_DETACH:
@@ -32,13 +29,6 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
         }
 
         App::Destruct();
-
-        if (g_instanceMutex)
-        {
-            ReleaseMutex(g_instanceMutex);
-            CloseHandle(g_instanceMutex);
-        }
-
         break;
     }
     }
