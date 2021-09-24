@@ -29,9 +29,23 @@ App::App()
 
     if (!image->IsSupported())
     {
+        spdlog::error("This game version ({}.{}{}) is not supported.", ver.major, ver.minor, ver.patch);
+
         const auto supportedVer = image->GetSupportedVersion();
-        spdlog::error("This game version is not supported. The supported version is {}.{}{}, try updating the mod",
-                      supportedVer.major, supportedVer.minor, supportedVer.patch);
+        fmt::memory_buffer out;
+        fmt::format_to(std::back_inserter(out), "The current version of the mod supports only version {}.{}{}, ",
+                       supportedVer.major, supportedVer.minor, supportedVer.patch);
+
+        if (ver < supportedVer)
+        {
+            fmt::format_to(std::back_inserter(out), "try downgrading the mod or updating the game.");
+        }
+        else
+        {
+            fmt::format_to(std::back_inserter(out), "try updating the mod or downgrading the game.");
+        }
+
+        spdlog::error(fmt::to_string(out));
         return;
     }
 }
