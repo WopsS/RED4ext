@@ -45,7 +45,11 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
             }
         }
 
-        constexpr size_t maxFileSize = -1;
+        constexpr auto oneKbInB = 1024;
+        constexpr auto oneMbInKb = oneKbInB * oneKbInB;
+        constexpr auto tenMb = oneMbInKb * 10;
+
+        constexpr size_t maxFileSize = tenMb;
         constexpr size_t maxFiles = 5;
 
         auto file = dir / L"game.log";
