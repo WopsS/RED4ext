@@ -1,7 +1,5 @@
 #pragma once
 
-#include "REDhook.hpp"
-
 class PluginBase
 {
 public:
