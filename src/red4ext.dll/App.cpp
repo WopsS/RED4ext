@@ -23,11 +23,16 @@ App::App()
 
     spdlog::info("RED4ext ({}) is initializing...", RED4EXT_GIT_TAG);
 
-    spdlog::info("Using the following paths:");
-    spdlog::info(L"  Root: {}", m_paths.GetRootDir());
-    spdlog::info(L"  RED4ext: {}", m_paths.GetRED4extDir());
-    spdlog::info(L"  Logs: {}", m_paths.GetLogsDir());
-    spdlog::info(L"  Config: {}", m_paths.GetConfigFile());
+    spdlog::debug("Using the following paths:");
+    spdlog::debug(L"  Root: {}", m_paths.GetRootDir());
+    spdlog::debug(L"  RED4ext: {}", m_paths.GetRED4extDir());
+    spdlog::debug(L"  Logs: {}", m_paths.GetLogsDir());
+    spdlog::debug(L"  Config: {}", m_paths.GetConfigFile());
+
+    spdlog::debug("Using the following configuration:");
+    spdlog::debug("  console: {}", m_config.HasDevConsole());
+    spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(m_config.GetLogLevel()));
+    spdlog::debug("  logging.flush_on: {}", spdlog::level::to_string_view(m_config.GetFlushLevel()));
 
     const auto image = Image::Get();
     const auto& ver = image->GetVersion();
