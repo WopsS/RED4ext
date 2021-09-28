@@ -73,7 +73,9 @@ void* v0::Hooking::FindPattern(uint8_t* aPattern, size_t aPatternSize, uint8_t a
 {
     assert(aIndex < aExpectedMatches);
 
-    auto patterns = Patterns::Get();
-    auto address = patterns->Find(aPattern, aPatternSize, aExpectedMatches, aIndex, aWildcard, false);
-    return reinterpret_cast<void*>(address);
+    //auto patterns = Patterns::Get();
+    //auto address = patterns->Find(aPattern, aPatternSize, aExpectedMatches, aIndex, aWildcard, false);
+    //return reinterpret_cast<void*>(address);
+
+    return nullptr;
 }
