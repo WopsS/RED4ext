@@ -6,6 +6,7 @@
 #include "Version.hpp"
 
 #include "Hooks/CInitializationState.hpp"
+#include "Hooks/CRunningState.hpp"
 #include "Hooks/CShutdownState.hpp"
 #include "Hooks/Main_Hooks.hpp"
 
@@ -83,8 +84,8 @@ void App::Destruct()
         DetourTransaction transaction;
         if (transaction.IsValid())
         {
-            auto success =
-                Hooks::CShutdownState::Detach() && Hooks::CInitializationState::Detach() && Hooks::Main::Detach();
+            auto success = Hooks::CShutdownState::Detach() && Hooks::CRunningState::Detach() &&
+                           Hooks::CInitializationState::Detach() && Hooks::Main::Detach();
 
             if (success)
             {
@@ -123,7 +124,9 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() && Hooks::CInitializationState::Attach() && Hooks::CShutdownState::Attach();
+    auto success = Hooks::Main::Attach() && Hooks::CInitializationState::Attach() && Hooks::CRunningState::Attach() &&
+                   Hooks::CShutdownState::Attach();
+
     if (success)
     {
         return transaction.Commit();

@@ -34,6 +34,10 @@ def get_groups() -> List[Group]:
             Item(name='Run', pattern='48 83 EC 28 48 8B 05 ? ? ? ? 4C 8B C2 8B 88 F8 00 00 00', expected=1, index=0)
         ]),
 
+        Group(name='CRunningState', functions=[
+            Item(name='Run', pattern='40 53 48 83 EC 20 48 8B 0D ? ? ? ? 48 8B DA E8 ? ? ? ? 84 C0', expected=1, index=0)
+        ]),
+
         Group(name='CShutdownState', functions=[
             Item(name='Run', pattern='48 89 6C 24 18 56 48 83 EC 30 48 8B 0D ? ? ? ?', expected=1, index=0)
         ])
