@@ -1,7 +1,7 @@
 #pragma once
 
-namespace CShutdownState
+namespace Hooks::CShutdownState
 {
-void Attach();
-void Detach();
-} // namespace CShutdownState
+bool Attach();
+bool Detach();
+} // namespace Hooks::CShutdownState

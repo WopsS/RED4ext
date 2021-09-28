@@ -1,62 +1,62 @@
 #include "stdafx.hpp"
-#include "Hooks/CInitializationState.hpp"
-#include "App.hpp"
-#include "Patterns.hpp"
-#include "REDhook.hpp"
+#include "CInitializationState.hpp"
+#include "Addresses.hpp"
+#include "Hook.hpp"
 
 #include <RED4ext/GameApplication.hpp>
 #include <RED4ext/GameStates.hpp>
 
 namespace
 {
+bool isAttached = false;
+
 bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp);
-REDhook<decltype(&_CInitializationState_Run)> CInitializationState_Run;
+Hook<decltype(&_CInitializationState_Run)> CInitializationState_Run(Addresses::CInitializationState_Run,
+                                                                    &_CInitializationState_Run);
 
 bool _CInitializationState_Run(RED4ext::CInitializationState* aThis, RED4ext::CGameApplication* aApp)
 {
-    auto result = CInitializationState_Run(aThis, aApp);
-
-    /*
-     * This is called multiple times, maybe it is doing some internal initalization while showing the intro. It returns
-     * true when the state is finished and it should call `Done`, false if it is not and will be run again.
-     *
-     * The engine is doing some game checks to see if it should set the state to "CRunningState" or not. We are going to
-     * copy this behavior here, but not as the game does it.
-     */
-    auto nextState = aApp->nextState;
-    if (result && nextState)
-    {
-        auto name = nextState->GetName();
-        if (strcmp(name, "Running") == 0)
-        {
-            auto app = App::Get();
-            /*auto pluginsDir = app->GetPluginsDirectory();
-
-            auto pluginsManager = app->GetPluginsManager();
-            pluginsManager->LoadAll(pluginsDir);*/
-        }
-    }
-
-    return result;
+    return CInitializationState_Run(aThis, aApp);
 }
 } // namespace
 
-void CInitializationState::Attach()
+bool Hooks::CInitializationState::Attach()
 {
-    new (&CInitializationState_Run)
-        REDhook<decltype(&_CInitializationState_Run)>({0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05, 0xCC, 0xCC, 0xCC,
-                                                       0xCC, 0x4C, 0x8B, 0xC2, 0x8B, 0x88, 0xF8, 0x00, 0x00, 0x00},
-                                                      &_CInitializationState_Run, 1);
+    spdlog::trace("Trying to attach the hook for the initialization state...");
 
     auto result = CInitializationState_Run.Attach();
     if (result != NO_ERROR)
     {
-        auto message = fmt::format(L"Could not attach hook for CInitializationState::Run, attach returned {}.", result);
-        MessageBox(nullptr, message.c_str(), L"RED4ext", MB_ICONERROR | MB_OK);
+        spdlog::error("Could not attach the hook for the initialization state. Detour error code: {}", result);
     }
+    else
+    {
+        spdlog::trace("The hook for the initialization state was attached");
+    }
+
+    isAttached = result == NO_ERROR;
+    return isAttached;
 }
 
-void CInitializationState::Detach()
+bool Hooks::CInitializationState::Detach()
 {
-    CInitializationState_Run.Detach();
+    if (!isAttached)
+    {
+        return false;
+    }
+
+    spdlog::trace("Trying to detach the hook for the initialization state...");
+
+    auto result = CInitializationState_Run.Detach();
+    if (result != NO_ERROR)
+    {
+        spdlog::error("Could not detach the hook for the initialization state. Detour error code: {}", result);
+    }
+    else
+    {
+        spdlog::trace("The hook for the initialization state was detached");
+    }
+
+    isAttached = result != NO_ERROR;
+    return isAttached;
 }

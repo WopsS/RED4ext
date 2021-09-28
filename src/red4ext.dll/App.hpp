@@ -13,11 +13,13 @@ public:
     static void Destruct();
     static App* Get();
 
-    void Init();
+    void Startup();
     void Shutdown();
 
 private:
     App();
+
+    bool AttachHooks() const;
 
     Paths m_paths;
     Config m_config;

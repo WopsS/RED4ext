@@ -75,11 +75,38 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
 
 std::wstring Utils::FormatSystemMessage(uint32_t aMessageId)
 {
+    wil::last_error_context last_error;
     wil::unique_hlocal_ptr<wchar_t> buffer;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
-                  aMessageId, LANG_USER_DEFAULT, wil::out_param_ptr<LPWSTR>(buffer), 0, nullptr);
 
-    return buffer.get();
+    auto len =
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                      nullptr, aMessageId, LANG_USER_DEFAULT, wil::out_param_ptr<LPWSTR>(buffer), 0, nullptr);
+    if (!len)
+    {
+        return fmt::format(L"Could not format the system message for the specified message id ({}), error code: {}",
+                           aMessageId, GetLastError());
+    }
+
+    std::wstring_view res = buffer.get();
+
+    // Remove the new lines at the end of the message, they are annoying.
+    if (res.ends_with(L'\n'))
+    {
+        res.remove_suffix(1);
+    }
+
+    if (res.ends_with(L'\r'))
+    {
+        res.remove_suffix(1);
+    }
+
+    return std::wstring(res);
+}
+
+std::wstring Utils::FormatLastError()
+{
+    auto err = GetLastError();
+    return FormatSystemMessage(err);
 }
 
 int32_t Utils::ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType)

@@ -1,7 +1,7 @@
 #pragma once
 
-namespace CInitializationState
+namespace Hooks::CInitializationState
 {
-void Attach();
-void Detach();
-} // namespace CInitializationState
+bool Attach();
+bool Detach();
+} // namespace Hooks::CInitializationState

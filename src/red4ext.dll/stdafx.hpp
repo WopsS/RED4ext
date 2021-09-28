@@ -1,15 +1,18 @@
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <source_location>
 #include <string>
 #include <string_view>
 #include <system_error>
 
 #include <Windows.h>
 #include <detours.h>
+#include <tlhelp32.h>
 
 #include <wil/resource.h>
 #include <wil/stl.h>

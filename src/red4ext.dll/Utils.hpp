@@ -9,6 +9,7 @@ namespace Utils
 void CreateLogger(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole);
 
 std::wstring FormatSystemMessage(uint32_t aMessageId);
+std::wstring FormatLastError();
 
 int32_t ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType = MB_OK);
 int32_t ShowMessageBox(const std::wstring_view aText, uint32_t aType = MB_OK);
@@ -24,13 +25,10 @@ int32_t ShowMessageBox(uint32_t aType, const std::wstring_view aText, Args&&... 
 template<typename... Args>
 void ShowLastErrorMessage(uint32_t aType, const std::wstring_view aAdditionalText = "", Args&&... aArgs)
 {
-    auto errorCode = GetLastError();
-    auto caption = fmt::format(L"RED4ext (error {})", errorCode);
-    auto msg = FormatSystemMessage(errorCode);
-
+    auto msg = FormatLastError();
     if (!aAdditionalText.empty())
     {
-        msg += L"\n";
+        msg += L"\n\n";
         msg += aAdditionalText;
 
         if constexpr (sizeof...(Args) > 0)
@@ -39,6 +37,8 @@ void ShowLastErrorMessage(uint32_t aType, const std::wstring_view aAdditionalTex
         }
     }
 
+    auto error = GetLastError();
+    auto caption = fmt::format(L"RED4ext (error {})", error);
     ShowMessageBoxEx(caption.c_str(), msg.c_str(), aType);
 }
 } // namespace Utils
