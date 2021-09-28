@@ -11,7 +11,7 @@ namespace
 bool isAttached = false;
 
 bool _CRunningState_Run(RED4ext::CRunningState* aThis, RED4ext::CGameApplication* aApp);
-Hook<decltype(&_CRunningState_Run)> CRunningState_Run(0, &_CRunningState_Run);
+Hook<decltype(&_CRunningState_Run)> CRunningState_Run(Addresses::CRunningState_Run, &_CRunningState_Run);
 
 bool _CRunningState_Run(RED4ext::CRunningState* aThis, RED4ext::CGameApplication* aApp)
 {
