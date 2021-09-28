@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PluginBase.hpp"
-#include "REDhook.hpp"
 
 class HookingManager
 {
@@ -30,7 +29,7 @@ private:
         void* target;
         void** original;
 
-        std::unique_ptr<REDhook<>> hook;
+        //std::unique_ptr<REDhook<>> hook;
     };
 
     bool Attach(const HookItem& aItem) const;
