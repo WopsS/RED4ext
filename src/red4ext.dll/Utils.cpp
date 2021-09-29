@@ -48,10 +48,9 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
         constexpr auto oneByte = 1;
         constexpr auto oneKbInB = 1024 * oneByte;
         constexpr auto oneMbInB = 1024 * oneKbInB;
-        constexpr auto tenMbInB = 10 * oneMbInB;
 
-        constexpr size_t maxFileSize = tenMbInB;
-        constexpr size_t maxFiles = 5;
+        size_t maxFileSize = static_cast<size_t>(aConfig.GetMaxLogFileSize()) * oneMbInB;
+        size_t maxFiles = aConfig.GetMaxLogFiles();
 
         auto file = dir / L"game.log";
         auto logger = spdlog::rotating_logger_mt("", file, maxFileSize, maxFiles, true);

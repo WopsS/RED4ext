@@ -8,6 +8,8 @@ Config::Config(const Paths& aPaths)
     : m_devConsole(false)
     , m_logLevel(spdlog::level::info)
     , m_flushOn(spdlog::level::err)
+    , m_maxLogFiles(5)
+    , m_maxLogFileSize(10)
 {
     const auto file = aPaths.GetConfigFile();
 
@@ -44,6 +46,16 @@ const spdlog::level::level_enum Config::GetLogLevel() const
 const spdlog::level::level_enum Config::GetFlushLevel() const
 {
     return m_flushOn;
+}
+
+const uint32_t Config::GetMaxLogFiles() const
+{
+    return m_maxLogFiles;
+}
+
+const uint32_t Config::GetMaxLogFileSize() const
+{
+    return m_maxLogFileSize;
 }
 
 void Config::Load(const std::filesystem::path& aFile)
@@ -86,6 +98,18 @@ void Config::Load(const std::filesystem::path& aFile)
 
             m_flushOn = level;
         }
+
+        m_maxLogFiles = config["logging"]["max_files"].value_or(m_maxLogFiles);
+        if (m_maxLogFiles < 1)
+        {
+            m_maxLogFiles = 1;
+        }
+
+        m_maxLogFileSize = config["logging"]["max_file_size"].value_or(m_maxLogFileSize);
+        if (m_maxLogFileSize < 1)
+        {
+            m_maxLogFileSize = 1;
+        }
     }
     catch (const toml::parse_error& e)
     {
@@ -110,8 +134,11 @@ void Config::Save(const std::filesystem::path& aFile)
         auto logLevel = spdlog::level::to_string_view(m_logLevel).data();
         auto flushOn = spdlog::level::to_string_view(m_flushOn).data();
 
-        toml::table config{
-            {{"console", m_devConsole}, {"logging", toml::table{{{"level", logLevel}, {"flush_on", flushOn}}}}}};
+        toml::table config{{{"console", m_devConsole},
+                            {"logging", toml::table{{{"level", logLevel},
+                                                     {"flush_on", flushOn},
+                                                     {"max_files", m_maxLogFiles},
+                                                     {"max_file_size", m_maxLogFileSize}}}}}};
 
         std::ofstream file(aFile, std::ios::out);
         file.exceptions(std::ostream::badbit | std::ostream::failbit);
