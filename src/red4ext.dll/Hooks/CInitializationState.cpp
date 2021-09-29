@@ -58,5 +58,5 @@ bool Hooks::CInitializationState::Detach()
     }
 
     isAttached = result != NO_ERROR;
-    return isAttached;
+    return !isAttached;
 }

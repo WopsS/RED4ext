@@ -61,5 +61,5 @@ bool Hooks::Main::Detach()
     }
 
     isAttached = result != NO_ERROR;
-    return isAttached;
+    return !isAttached;
 }

@@ -57,5 +57,5 @@ bool Hooks::CShutdownState::Detach()
     }
 
     isAttached = result != NO_ERROR;
-    return isAttached;
+    return !isAttached;
 }
