@@ -1,5 +1,5 @@
 project("RED4ext.Loader")
-    targetname("version")
+    targetname("powrprof")
     targetdir(red4ext.paths.build("bin"))
 
     kind("SharedLib")
@@ -7,6 +7,12 @@ project("RED4ext.Loader")
     pchheader("stdafx.hpp")
     pchsource("stdafx.cpp")
     dependson({ "RED4ext.Dll" })
+
+    defines(
+    {
+        "WINVER=0x0A00",
+        "_WIN32_WINNT=0x0A00"
+    })
 
     includedirs(
     {

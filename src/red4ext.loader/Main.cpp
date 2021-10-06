@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "VersionDll.hpp"
+#include "pwrprof.hpp"
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
@@ -9,7 +9,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
     {
         DisableThreadLibraryCalls(aModule);
 
-        if (!LoadOriginalDll())
+        if (!LoadOriginal())
         {
             return FALSE;
         }

@@ -1,18 +1,127 @@
 EXPORTS
-    GetFileVersionInfoA         @1
-    GetFileVersionInfoByHandle  @2
-    GetFileVersionInfoExA       @3
-    GetFileVersionInfoExW       @4
-    GetFileVersionInfoSizeA     @5
-    GetFileVersionInfoSizeExA   @6
-    GetFileVersionInfoSizeExW   @7
-    GetFileVersionInfoSizeW     @8
-    GetFileVersionInfoW         @9
-    VerFindFileA                @10
-    VerFindFileW                @11
-    VerInstallFileA             @12
-    VerInstallFileW             @13
-    VerLanguageNameA            @14
-    VerLanguageNameW            @15
-    VerQueryValueA              @16
-    VerQueryValueW              @17
+    CallNtPowerInformation
+    CanUserWritePwrScheme
+    DeletePwrScheme
+    DevicePowerClose
+    DevicePowerEnumDevices
+    DevicePowerOpen
+    DevicePowerSetDeviceState
+    EnumPwrSchemes
+    GUIDFormatToGlobalPowerPolicy
+    GUIDFormatToPowerPolicy
+    GetActivePwrScheme
+    GetCurrentPowerPolicies
+    GetPwrCapabilities
+    GetPwrDiskSpindownRange
+    IsAdminOverrideActive
+    IsPwrHibernateAllowed
+    IsPwrShutdownAllowed
+    IsPwrSuspendAllowed
+    LoadCurrentPwrScheme
+    MergeLegacyPwrScheme
+    PowerApplyPowerRequestOverride
+    PowerApplySettingChanges
+    PowerCanRestoreIndividualDefaultPowerScheme
+    PowerClearUserAwayPrediction
+    PowerCloseEnvironmentalMonitor
+    PowerCloseLimitsMitigation
+    PowerCloseLimitsPolicy
+    PowerCreatePossibleSetting
+    PowerCreateSetting
+    PowerDebugDifPowerPolicies
+    PowerDebugDifSystemPowerPolicies
+    PowerDebugDumpPowerPolicy
+    PowerDebugDumpPowerScheme
+    PowerDebugDumpSystemPowerCapabilities
+    PowerDebugDumpSystemPowerPolicy
+    PowerDeleteScheme
+    PowerDeterminePlatformRole
+    PowerDeterminePlatformRoleEx
+    PowerDuplicateScheme
+    PowerEnumerate
+    PowerGetActiveScheme
+    PowerGetActualOverlayScheme
+    PowerGetAdaptiveStandbyDiagnostics
+    PowerGetEffectiveOverlayScheme
+    PowerGetOverlaySchemes
+    PowerGetUserAwayMinPredictionConfidence
+    PowerImportPowerScheme
+    PowerInformationWithPrivileges
+    PowerIsSettingRangeDefined
+    PowerOpenSystemPowerKey
+    PowerOpenUserPowerKey
+    PowerPolicyToGUIDFormat
+    PowerReadACDefaultIndex
+    PowerReadACValue
+    PowerReadACValueIndex
+    PowerReadACValueIndexEx
+    PowerReadDCDefaultIndex
+    PowerReadDCValue
+    PowerReadDCValueIndex
+    PowerReadDCValueIndexEx
+    PowerReadDescription
+    PowerReadFriendlyName
+    PowerReadIconResourceSpecifier
+    PowerReadPossibleDescription
+    PowerReadPossibleFriendlyName
+    PowerReadPossibleValue
+    PowerReadSecurityDescriptor
+    PowerReadSettingAttributes
+    PowerReadValueIncrement
+    PowerReadValueMax
+    PowerReadValueMin
+    PowerReadValueUnitsSpecifier
+    PowerReapplyActiveScheme
+    PowerRegisterEnvironmentalMonitor
+    PowerRegisterForEffectivePowerModeNotifications
+    PowerRegisterLimitsMitigation
+    PowerRegisterLimitsPolicy
+    PowerRegisterSuspendResumeNotification
+    PowerRemovePowerSetting
+    PowerReplaceDefaultPowerSchemes
+    PowerReportLimitsEvent
+    PowerReportThermalEvent
+    PowerRestoreACDefaultIndex
+    PowerRestoreDCDefaultIndex
+    PowerRestoreDefaultPowerSchemes
+    PowerRestoreIndividualDefaultPowerScheme
+    PowerSetActiveOverlayScheme
+    PowerSetActiveScheme
+    PowerSetAlsBrightnessOffset
+    PowerSetBrightnessAndTransitionTimes
+    PowerSetUserAwayPrediction
+    PowerSettingAccessCheck
+    PowerSettingAccessCheckEx
+    PowerSettingRegisterNotification
+    PowerSettingRegisterNotificationEx
+    PowerSettingUnregisterNotification
+    PowerUnregisterFromEffectivePowerModeNotifications
+    PowerUnregisterSuspendResumeNotification
+    PowerUpdateEnvironmentalMonitorState
+    PowerUpdateEnvironmentalMonitorThresholds
+    PowerUpdateLimitsMitigation
+    PowerWriteACDefaultIndex
+    PowerWriteACValueIndex
+    PowerWriteDCDefaultIndex
+    PowerWriteDCValueIndex
+    PowerWriteDescription
+    PowerWriteFriendlyName
+    PowerWriteIconResourceSpecifier
+    PowerWritePossibleDescription
+    PowerWritePossibleFriendlyName
+    PowerWritePossibleValue
+    PowerWriteSecurityDescriptor
+    PowerWriteSettingAttributes
+    PowerWriteValueIncrement
+    PowerWriteValueMax
+    PowerWriteValueMin
+    PowerWriteValueUnitsSpecifier
+    ReadGlobalPwrPolicy
+    ReadProcessorPwrScheme
+    ReadPwrScheme
+    SetActivePwrScheme
+    SetSuspendState
+    ValidatePowerPolicies
+    WriteGlobalPwrPolicy
+    WriteProcessorPwrScheme
+    WritePwrScheme
