@@ -61,28 +61,6 @@ jobs:
           # Generate hash.
           Get-FileHash -Algorithm SHA256 -Path red4ext_${env:VERSION}.zip | Format-List
 
-      - name: Prepare files (CET compatibility)
-        run: |
-          # Create the necessary directories.
-          New-Item -ItemType directory -Path release_cet_compatibility | Out-Null
-          New-Item -ItemType directory -Path release_cet_compatibility/red4ext | Out-Null
-          New-Item -ItemType directory -Path release_cet_compatibility/red4ext/plugins | Out-Null
-          New-Item -ItemType directory -Path release_cet_compatibility/bin/x64/plugins | Out-Null
-
-          # Copy build artifacts.
-          Copy-Item -Path build/release/bin/RED4ext.dll -Destination release_cet_compatibility/bin/x64/plugins
-          Rename-Item -Path release_cet_compatibility/bin/x64/plugins/RED4ext.dll -NewName RED4ext.asi
-
-          # Copy third party licenses.
-          Copy-Item -Path release/red4ext/LICENSE.txt -Destination release_cet_compatibility/bin/x64/plugins
-          Rename-Item -Path release_cet_compatibility/bin/x64/plugins/LICENSE.txt -NewName RED4EXT_LICENSE.txt
-
-          # Create a zip file.
-          Compress-Archive -Path release_cet_compatibility/* -DestinationPath red4ext_${env:VERSION}_compatible_with_cet.zip
-
-          # Generate hash.
-          Get-FileHash -Algorithm SHA256 -Path red4ext_${env:VERSION}_compatible_with_cet.zip | Format-List
-
       - name: Prepare PDBs
         run: |
           # Create the necessary directories.
@@ -107,5 +85,4 @@ jobs:
         with:
           files: |
             red4ext_${{ env.VERSION }}.zip
-            red4ext_${{ env.VERSION }}_compatible_with_cet.zip
             red4ext_${{ env.VERSION }}_pdbs.zip
