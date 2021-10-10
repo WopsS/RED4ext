@@ -102,13 +102,13 @@ void Config::Load(const std::filesystem::path& aFile)
         m_maxLogFiles = config["logging"]["max_files"].value_or(m_maxLogFiles);
         if (m_maxLogFiles < 1)
         {
-            m_maxLogFiles = 1;
+            m_maxLogFiles = 5;
         }
 
         m_maxLogFileSize = config["logging"]["max_file_size"].value_or(m_maxLogFileSize);
         if (m_maxLogFileSize < 1)
         {
-            m_maxLogFileSize = 1;
+            m_maxLogFileSize = 10;
         }
     }
     catch (const toml::parse_error& e)

@@ -34,7 +34,7 @@ App::App()
     spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(m_config.GetLogLevel()));
     spdlog::debug("  logging.flush_on: {}", spdlog::level::to_string_view(m_config.GetFlushLevel()));
     spdlog::debug("  logging.max_files: {}", m_config.GetMaxLogFiles());
-    spdlog::debug("  logging.max_file_size: {}", m_config.GetMaxLogFileSize());
+    spdlog::debug("  logging.max_file_size: {} MB", m_config.GetMaxLogFileSize());
 
     const auto image = Image::Get();
     const auto& ver = image->GetVersion();
