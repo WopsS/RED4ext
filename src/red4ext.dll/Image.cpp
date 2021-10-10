@@ -26,7 +26,7 @@ Image::Image()
         return;
     }
 
-    auto data = std::make_unique<uint8_t[]>(size);
+    std::unique_ptr<uint8_t[]> data(new (std::nothrow) uint8_t[size]());
     if (!data)
     {
         SHOW_MESSAGE_BOX_FILE_LINE(MB_ICONERROR | MB_OK, L"Could not allocate {} byte(s).\n\nFile name: {}", size,
