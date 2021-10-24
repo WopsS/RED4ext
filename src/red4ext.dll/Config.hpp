@@ -5,9 +5,12 @@
 class Config
 {
 public:
+    static constexpr size_t LatestVersion = 1;
+
     Config(const Paths& aPaths);
     ~Config() = default;
 
+    const size_t GetVersion() const;
     const bool HasDevConsole() const;
 
     const spdlog::level::level_enum GetLogLevel() const;
@@ -19,6 +22,9 @@ private:
     void Load(const std::filesystem::path& aFile);
     void Save(const std::filesystem::path& aFile);
 
+    void LoadV1(const toml::value& aConfig);
+
+    size_t m_version;
     bool m_devConsole;
 
     spdlog::level::level_enum m_logLevel;

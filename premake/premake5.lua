@@ -28,6 +28,7 @@ workspace("RED4ext")
 
     filter({ "language:C++" })
         cppdialect("C++20")
+        buildoptions({ "/Zc:__cplusplus" }) -- Enable correct reporting of C++ version, see https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus.
 
     filter({})
 

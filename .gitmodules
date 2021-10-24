@@ -13,6 +13,9 @@
 [submodule "deps/wil"]
 	path = deps/wil
 	url = https://github.com/microsoft/wil.git
-[submodule "deps/toml++"]
-	path = deps/toml++
-	url = https://github.com/marzer/tomlplusplus.git
+[submodule "deps/toml11"]
+	path = deps/toml11
+	url = https://github.com/ToruNiina/toml11.git
+[submodule "deps/ordered-map"]
+	path = deps/ordered-map
+	url = https://github.com/Tessil/ordered-map.git

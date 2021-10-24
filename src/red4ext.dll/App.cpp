@@ -30,6 +30,7 @@ App::App()
     spdlog::debug(L"  Config: {}", m_paths.GetConfigFile());
 
     spdlog::debug("Using the following configuration:");
+    spdlog::debug("  version: {}", m_config.GetVersion());
     spdlog::debug("  console: {}", m_config.HasDevConsole());
     spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(m_config.GetLogLevel()));
     spdlog::debug("  logging.flush_on: {}", spdlog::level::to_string_view(m_config.GetFlushLevel()));

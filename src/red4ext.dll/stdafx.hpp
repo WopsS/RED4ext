@@ -23,6 +23,7 @@
 #include <fmt/xchar.h>
 
 #include <spdlog/spdlog.h>
-#include <toml++/toml.h>
+#include <toml.hpp>
+#include <tsl/ordered_map.h>
 
 #include <RED4ext/RED4ext.hpp>
