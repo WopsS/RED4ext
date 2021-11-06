@@ -33,6 +33,11 @@ std::filesystem::path Paths::GetLogsDir() const
     return GetRED4extDir() / L"logs";
 }
 
+std::filesystem::path Paths::GetPluginsDir() const
+{
+    return GetRED4extDir() / L"plugins";
+}
+
 const std::filesystem::path Paths::GetConfigFile() const
 {
     return GetRED4extDir() / L"config.ini";

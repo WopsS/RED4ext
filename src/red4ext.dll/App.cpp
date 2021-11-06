@@ -18,6 +18,7 @@ std::unique_ptr<App> g_app;
 App::App()
     : m_config(m_paths)
     , m_devConsole(m_config)
+    , m_pluginSystem(m_config.GetPlugins(), m_paths)
 {
     Utils::CreateLogger(m_paths, m_config, m_devConsole);
 
@@ -28,14 +29,20 @@ App::App()
     spdlog::debug(L"  RED4ext: {}", m_paths.GetRED4extDir());
     spdlog::debug(L"  Logs: {}", m_paths.GetLogsDir());
     spdlog::debug(L"  Config: {}", m_paths.GetConfigFile());
+    spdlog::debug(L"  Plugins: {}", m_paths.GetPluginsDir());
 
     spdlog::debug("Using the following configuration:");
     spdlog::debug("  version: {}", m_config.GetVersion());
     spdlog::debug("  console: {}", m_config.HasDevConsole());
-    spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(m_config.GetLogLevel()));
-    spdlog::debug("  logging.flush_on: {}", spdlog::level::to_string_view(m_config.GetFlushLevel()));
-    spdlog::debug("  logging.max_files: {}", m_config.GetMaxLogFiles());
-    spdlog::debug("  logging.max_file_size: {} MB", m_config.GetMaxLogFileSize());
+
+    const auto& loggingConfig = m_config.GetLogging();
+    spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(loggingConfig.level));
+    spdlog::debug("  logging.flush_on: {}", spdlog::level::to_string_view(loggingConfig.flushOn));
+    spdlog::debug("  logging.max_files: {}", loggingConfig.maxFiles);
+    spdlog::debug("  logging.max_file_size: {} MB", loggingConfig.maxFileSize);
+
+    const auto& pluginsConfig = m_config.GetPlugins();
+    spdlog::debug("  plugins.enabled: {}", pluginsConfig.isEnabled);
 
     const auto image = Image::Get();
     const auto& ver = image->GetVersion();
@@ -116,10 +123,23 @@ App* App::Get()
 
 void App::Startup()
 {
+    spdlog::info("RED4ext is starting up...");
+
+    m_pluginSystem.Startup();
+
+    spdlog::info("RED4ext has been started");
 }
 
 void App::Shutdown()
 {
+    spdlog::info("RED4ext is shutting down...");
+
+    m_pluginSystem.Shutdown();
+
+    spdlog::info("RED4ext has been shut down");
+
+    // Flushing the log here, since it is called in the main function, not when DLL is unloaded.
+    spdlog::details::registry::instance().flush_all();
 }
 
 bool App::AttachHooks() const

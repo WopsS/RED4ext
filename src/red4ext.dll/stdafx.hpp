@@ -5,6 +5,7 @@
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <unordered_set>
 #include <source_location>
 #include <string>
 #include <string_view>

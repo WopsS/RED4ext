@@ -7,18 +7,20 @@ namespace v0
 class Plugin : public PluginBase
 {
 public:
-    Plugin(RED4ext::PluginHandle aHandle);
+    Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModule);
 
-    virtual void* GetInfoHolder() final;
+    const uint32_t GetApiVersion() const final;
+    void* GetPluginInfo() final;
+    const void* GetRedStruct() final;
 
-    const std::wstring_view GetName() const final;
-    const std::wstring_view GetAuthor() const final;
-
-    const RED4ext::VersionInfo GetVersion() const final;
-    const RED4ext::VersionInfo GetRuntime() const final;
-    const RED4ext::VersionInfo GetSdk() const final;
+    virtual const std::wstring_view GetName() const final;
+    virtual const std::wstring_view GetAuthor() const final;
+    virtual const RED4ext::VersionInfo& GetVersion() const final;
+    virtual const RED4ext::VersionInfo& GetRuntimeVersion() const final;
+    virtual const RED4ext::VersionInfo& GetSdkVersion() const final;
 
 private:
     RED4ext::v0::PluginInfo m_info;
+    RED4ext::v0::RED4ext m_red;
 };
-} // namespace v1
+} // namespace v0

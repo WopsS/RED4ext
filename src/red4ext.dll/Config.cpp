@@ -7,10 +7,8 @@
 Config::Config(const Paths& aPaths)
     : m_version(0)
     , m_devConsole(false)
-    , m_logLevel(spdlog::level::info)
-    , m_flushOn(spdlog::level::err)
-    , m_maxLogFiles(5)
-    , m_maxLogFileSize(10)
+    , m_logging()
+    , m_plugins()
 {
     const auto file = aPaths.GetConfigFile();
 
@@ -44,24 +42,14 @@ const bool Config::HasDevConsole() const
     return m_devConsole;
 }
 
-const spdlog::level::level_enum Config::GetLogLevel() const
+const Config::LoggingConfig& Config::GetLogging() const
 {
-    return m_logLevel;
+    return m_logging;
 }
 
-const spdlog::level::level_enum Config::GetFlushLevel() const
+const Config::PluginsConfig& Config::GetPlugins() const
 {
-    return m_flushOn;
-}
-
-const uint32_t Config::GetMaxLogFiles() const
-{
-    return m_maxLogFiles;
-}
-
-const uint32_t Config::GetMaxLogFileSize() const
-{
-    return m_maxLogFileSize;
+    return m_plugins;
 }
 
 void Config::Load(const std::filesystem::path& aFile)
@@ -104,16 +92,16 @@ void Config::Save(const std::filesystem::path& aFile)
     {
         using ordered_value = toml::basic_value<toml::preserve_comments, tsl::ordered_map>;
 
-        auto logLevel = spdlog::level::to_string_view(m_logLevel).data();
-        auto flushOn = spdlog::level::to_string_view(m_flushOn).data();
+        auto logLevel = spdlog::level::to_string_view(m_logging.level).data();
+        auto flushOn = spdlog::level::to_string_view(m_logging.flushOn).data();
 
         ordered_value config{{"version", LatestVersion},
                              {"console", m_devConsole},
 
                              {"logging", ordered_value{{"level", logLevel},
                                                        {"flush_on", flushOn},
-                                                       {"max_files", m_maxLogFiles},
-                                                       {"max_file_size", m_maxLogFileSize}}}};
+                                                       {"max_files", m_logging.maxFiles},
+                                                       {"max_file_size", m_logging.maxFileSize}}}};
 
         config.comments().push_back(
             " See https://wiki.redmodding.org/red4ext/getting-started/configuration for more options.");
@@ -137,45 +125,63 @@ void Config::LoadV1(const toml::value& aConfig)
     m_version = 1;
     m_devConsole = toml::find_or(aConfig, "console", m_devConsole);
 
-    // Logging
+    m_logging.LoadV1(aConfig);
+    m_plugins.LoadV1(aConfig);
+}
+
+void Config::LoggingConfig::LoadV1(const toml::value& aConfig)
+{
     auto levelName = toml::find_or(aConfig, "logging", "level", "");
     if (!levelName.empty())
     {
-        auto level = spdlog::level::from_str(levelName);
+        auto requestedLevel = spdlog::level::from_str(levelName);
 
         // If the level is set to off, but the requested level is not "off" then the user might mistyped the levels.
         // spdlog return "level::off" if there is no match.
-        if (level == spdlog::level::off && levelName != "off")
+        if (requestedLevel == spdlog::level::off && levelName != "off")
         {
-            level = m_logLevel;
+            requestedLevel = level;
         }
 
-        m_logLevel = level;
+        level = requestedLevel;
     }
 
     levelName = toml::find_or(aConfig, "logging", "flush_on", "");
     if (!levelName.empty())
     {
-        auto level = spdlog::level::from_str(levelName.data());
+        auto requestedLevel = spdlog::level::from_str(levelName.data());
 
         // Do not allow flushing to be off.
-        if (level == spdlog::level::off)
+        if (requestedLevel == spdlog::level::off)
         {
-            level = m_flushOn;
+            requestedLevel = flushOn;
         }
 
-        m_flushOn = level;
+        flushOn = requestedLevel;
     }
 
-    m_maxLogFiles = toml::find_or(aConfig, "logging", "max_files", m_maxLogFiles);
-    if (m_maxLogFiles < 1)
+    maxFiles = toml::find_or(aConfig, "logging", "max_files", maxFiles);
+    if (maxFiles < 1)
     {
-        m_maxLogFiles = 5;
+        maxFiles = 5;
     }
 
-    m_maxLogFileSize = toml::find_or(aConfig, "logging", "max_file_size", m_maxLogFileSize);
-    if (m_maxLogFileSize < 1)
+    maxFileSize = toml::find_or(aConfig, "logging", "max_file_size", maxFileSize);
+    if (maxFileSize < 1)
     {
-        m_maxLogFileSize = 10;
+        maxFileSize = 10;
+    }
+}
+
+void Config::PluginsConfig::LoadV1(const toml::value& aConfig)
+{
+    isEnabled = toml::find_or(aConfig, "plugins", "enabled", isEnabled);
+
+    std::vector<std::string> blacklistedPlugins;
+    blacklistedPlugins = toml::find_or(aConfig, "plugins", "blacklist", blacklistedPlugins);
+
+    for (const auto& plugin : blacklistedPlugins)
+    {
+        blacklist.emplace(Utils::Widen(plugin));
     }
 }

@@ -1,12 +1,20 @@
 #include "stdafx.hpp"
 
-RED4EXT_C_EXPORT bool RED4EXT_CALL Load(RED4ext::PluginHandle aHandle, const RED4ext::IRED4ext* aInterface)
+RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::PluginHandle aHandle, RED4ext::EMainReason aReason, const RED4ext::RED4ext* aRED4ext)
 {
-    return true;
-}
+    switch (aReason)
+     {
+    case RED4ext::EMainReason::Load:
+    {
+        break;
+    }
+    case RED4ext::EMainReason::Unload:
+    {
+        break;
+    }
+    }
 
-RED4EXT_C_EXPORT void RED4EXT_CALL Unload()
-{
+    return true;
 }
 
 RED4EXT_C_EXPORT void RED4EXT_CALL Query(RED4ext::PluginInfo* aInfo)

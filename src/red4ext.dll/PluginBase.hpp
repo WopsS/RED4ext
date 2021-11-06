@@ -3,24 +3,26 @@
 class PluginBase
 {
 public:
-    PluginBase(RED4ext::PluginHandle aHandle);
+    PluginBase(const std::filesystem::path& aPath, wil::unique_hmodule aModule);
     virtual ~PluginBase() = default;
 
-    RED4ext::PluginHandle GetHandle() const;
-
-    virtual void* GetInfoHolder() = 0;
+    virtual const uint32_t GetApiVersion() const = 0;
+    virtual void* GetPluginInfo() = 0;
+    virtual const void* GetRedStruct() = 0;
 
     virtual const std::wstring_view GetName() const = 0;
     virtual const std::wstring_view GetAuthor() const = 0;
+    virtual const RED4ext::VersionInfo& GetVersion() const = 0;
+    virtual const RED4ext::VersionInfo& GetRuntimeVersion() const = 0;
+    virtual const RED4ext::VersionInfo& GetSdkVersion() const = 0;
 
-    virtual const RED4ext::VersionInfo GetVersion() const = 0;
-    virtual const RED4ext::VersionInfo GetRuntime() const = 0;
-    virtual const RED4ext::VersionInfo GetSdk() const = 0;
+    const std::filesystem::path& GetPath() const;
+    HMODULE GetModule() const;
 
-    void SetInterface(void* aInterface);
-    void* GetInterface() const;
+    bool Query();
+    bool Main(RED4ext::EMainReason aReason);
 
 private:
-    RED4ext::PluginHandle m_handle;
-    void* m_interface;
+    std::filesystem::path m_path;
+    wil::unique_hmodule m_module;
 };

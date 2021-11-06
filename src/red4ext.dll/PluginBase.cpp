@@ -1,23 +1,117 @@
 #include "stdafx.hpp"
 #include "PluginBase.hpp"
+#include "Utils.hpp"
 
-PluginBase::PluginBase(RED4ext::PluginHandle aHandle)
-    : m_handle(aHandle)
-    , m_interface(nullptr)
+PluginBase::PluginBase(const std::filesystem::path& aPath, wil::unique_hmodule aModule)
+    : m_path(aPath)
+    , m_module(std::move(aModule))
 {
 }
 
-void PluginBase::SetInterface(void* aInterface)
+const std::filesystem::path& PluginBase::GetPath() const
 {
-    m_interface = aInterface;
+    return m_path;
 }
 
-void* PluginBase::GetInterface() const
+HMODULE PluginBase::GetModule() const
 {
-    return m_interface;
+    return m_module.get();
 }
 
-RED4ext::PluginHandle PluginBase::GetHandle() const
+bool PluginBase::Query()
 {
-    return m_handle;
+    const auto& path = GetPath();
+    const auto stem = path.stem();
+    const auto module = GetModule();
+
+    spdlog::trace(L"Calling 'Query' function exported by '{}'...", stem);
+
+    using Query_t = void (*)(void*);
+    auto queryFn = reinterpret_cast<Query_t>(GetProcAddress(module, "Query"));
+    if (!queryFn)
+    {
+        auto msg = Utils::FormatLastError();
+        spdlog::warn(L"Could not retrieve 'Query' function from '{}'. Error code: {}, msg: '{}', path: '{}'", stem,
+                     GetLastError(), msg, path);
+        return false;
+    }
+
+    try
+    {
+        queryFn(GetPluginInfo());
+    }
+    catch (const std::exception& e)
+    {
+        spdlog::warn(L"An exception occured while calling 'Query' function exported by '{}'. Path: '{}'", stem, path);
+        spdlog::warn(e.what());
+        return false;
+    }
+    catch (...)
+    {
+        spdlog::warn(L"An unknown exception occured while calling 'Query' function exported by '{}'. Path: '{}'", stem,
+                     path);
+        return false;
+    }
+
+    auto name = GetName();
+    if (name.empty())
+    {
+        spdlog::warn(L"'{}' does not have a name; one is required. Path: '{}'", stem, path);
+        return false;
+    }
+
+    auto author = GetAuthor();
+    if (author.empty())
+    {
+        spdlog::warn(L"'{}' does not have any author(s); an author is required. Path: '{}'", stem, path);
+        return false;
+    }
+
+    spdlog::trace(L"'Query' function called successfully");
+    return true;
+}
+
+bool PluginBase::Main(RED4ext::EMainReason aReason)
+{
+    const auto module = GetModule();
+    const auto name = GetName();
+    const auto reasonStr = aReason == RED4ext::EMainReason::Load ? L"Load" : L"Unload";
+
+    spdlog::trace(L"Calling 'Main' function exported by {} with reason '{}'...", name, reasonStr);
+
+    using Main_t = bool (*)(RED4ext::PluginHandle, RED4ext::EMainReason, const void*);
+    auto mainFn = reinterpret_cast<Main_t>(GetProcAddress(module, "Main"));
+    if (mainFn)
+    {
+        try
+        {
+            auto success = mainFn(module, aReason, GetRedStruct());
+            if (!success)
+            {
+                spdlog::trace(L"'Main' function returned 'false'");
+                return false;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            spdlog::warn(L"An exception occured while calling 'Main' function with reason '{}', exported by {}",
+                         reasonStr, name);
+            spdlog::warn(e.what());
+            return false;
+        }
+        catch (...)
+        {
+            spdlog::warn(L"An unknown exception occured while calling 'Main' function with reason '{}', exported by {}",
+                         reasonStr, name);
+            return false;
+        }
+    }
+    else
+    {
+        spdlog::trace(L"{} does not export a 'Main' function, skipping the call", name);
+        return true;
+    }
+
+    spdlog::trace(L"'Main' function called successfully");
+    return true;
 }

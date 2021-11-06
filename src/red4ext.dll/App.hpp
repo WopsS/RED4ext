@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "DevConsole.hpp"
 #include "Paths.hpp"
+#include "Systems/PluginSystem.hpp"
 
 class App
 {
@@ -24,4 +25,5 @@ private:
     Paths m_paths;
     Config m_config;
     DevConsole m_devConsole;
+    PluginSystem m_pluginSystem;
 };

@@ -1,15 +1,28 @@
 #include "stdafx.hpp"
-#include "Plugin.hpp"
+#include "v0/Plugin.hpp"
+#include "Image.hpp"
 
-v0::Plugin::Plugin(RED4ext::PluginHandle aHandle)
-    : PluginBase(aHandle)
+v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModule)
+    : PluginBase(aPath, std::move(aModule))
     , m_info{}
+    , m_red{}
 {
+    m_red.runtime = Image::Get()->GetVersion();
 }
 
-void* v0::Plugin::GetInfoHolder()
+const uint32_t v0::Plugin::GetApiVersion() const
+{
+    return RED4EXT_API_VERSION_0;
+}
+
+void* v0::Plugin::GetPluginInfo()
 {
     return &m_info;
+}
+
+const void* v0::Plugin::GetRedStruct()
+{
+    return &m_red;
 }
 
 const std::wstring_view v0::Plugin::GetName() const
@@ -22,17 +35,17 @@ const std::wstring_view v0::Plugin::GetAuthor() const
     return m_info.author;
 }
 
-const RED4ext::VersionInfo v0::Plugin::GetVersion() const
+const RED4ext::VersionInfo& v0::Plugin::GetVersion() const
 {
     return m_info.version;
 }
 
-const RED4ext::VersionInfo v0::Plugin::GetRuntime() const
+const RED4ext::VersionInfo& v0::Plugin::GetRuntimeVersion() const
 {
     return m_info.runtime;
 }
 
-const RED4ext::VersionInfo v0::Plugin::GetSdk() const
+const RED4ext::VersionInfo& v0::Plugin::GetSdkVersion() const
 {
     return m_info.sdk;
 }

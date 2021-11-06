@@ -1,6 +1,6 @@
 #include <RED4ext/RED4ext.hpp>
 
-RED4EXT_C_EXPORT bool RED4EXT_CALL Load(RED4ext::PluginHandle aHandle, const RED4ext::IRED4ext* aInterface)
+RED4EXT_C_EXPORT bool RED4EXT_CALL Load(RED4ext::PluginHandle aHandle, const RED4ext::RED4ext* aInterface)
 {
     /*
      * Here you can register your custom functions, initalize variable, create hooks and so on. All hooks created here
