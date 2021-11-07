@@ -56,15 +56,16 @@ jobs:
           $thirdparty = Get-Content -Path THIRD_PARTY_LICENSES.md
           Add-Content -Path artifacts/red4ext/LICENSE.txt -Value $thirdparty
 
+          # The code below is commented, see https://github.com/actions/upload-artifact/issues/39#issuecomment-598825674.
           # Create a zip file.
-          $fileName = "red4ext_${env:CONFIG_LOWERCASE}_${env:SHA_SHORT}.zip"
-          Compress-Archive -Path artifacts/* -DestinationPath $fileName
+          #$fileName = "red4ext_${env:CONFIG_LOWERCASE}_${env:SHA_SHORT}.zip"
+          #Compress-Archive -Path artifacts/* -DestinationPath $fileName
 
           # Generate hash.
-          Get-FileHash -Algorithm SHA256 -Path $fileName | Format-List
+          #Get-FileHash -Algorithm SHA256 -Path $fileName | Format-List
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: red4ext_${{ env.CONFIG_LOWERCASE }}_${{ env.SHA_SHORT }}.zip
-          path: red4ext_${{ env.CONFIG_LOWERCASE }}_${{ env.SHA_SHORT }}.zip
+          name: red4ext_${{ env.CONFIG_LOWERCASE }}_${{ env.SHA_SHORT }}
+          path: artifacts/
