@@ -50,7 +50,7 @@ jobs:
           $shaShort = (git rev-parse --short $env:GITHUB_SHA)
 
           $fileName = red4ext_${{ matrix.config }}_$shaShort.zip
-          Compress-Archive -Path artifacts/* -DestinationPath "fileName
+          Compress-Archive -Path artifacts/* -DestinationPath $fileName
 
           # Generate hash.
           Get-FileHash -Algorithm SHA256 -Path $fileName | Format-List
