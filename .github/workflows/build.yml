@@ -49,7 +49,7 @@ jobs:
           # Create a zip file.
           $shaShort = (git rev-parse --short $env:GITHUB_SHA)
 
-          $fileName = red4ext_${{ matrix.config }}_$shaShort.zip
+          $fileName = "red4ext_${{ matrix.config }}_$shaShort.zip".ToLower()
           Compress-Archive -Path artifacts/* -DestinationPath $fileName
 
           # Generate hash.
