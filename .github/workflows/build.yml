@@ -38,13 +38,13 @@ jobs:
           New-Item -ItemType directory -Path artifacts/bin/x64 | Out-Null
 
           # Copy build artifacts.
-          Copy-Item -Path build/release/bin/RED4ext.* -Destination artifacts/red4ext
-          Copy-Item -Path build/release/bin/powrprof.* -Destination artifacts/bin/x64
-          Copy-Item -Path build/release/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
+          Copy-Item -Path build/${{ matrix.config }}/bin/RED4ext.* -Destination artifacts/red4ext
+          Copy-Item -Path build/${{ matrix.config }}/bin/powrprof.* -Destination artifacts/bin/x64
+          Copy-Item -Path build/${{ matrix.config }}/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
 
           # Copy the license.
           $thirdparty = Get-Content -Path THIRD_PARTY_LICENSES.md
-          Add-Content -Path release/red4ext/LICENSE.txt -Value $thirdparty
+          Add-Content -Path artifacts/red4ext/LICENSE.txt -Value $thirdparty
 
           # Create a zip file.
           $shaShort = (git rev-parse --short $env:GITHUB_SHA)
