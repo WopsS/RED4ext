@@ -42,12 +42,14 @@ jobs:
           # Create the necessary directories.
           New-Item -ItemType directory -Path artifacts | Out-Null
           New-Item -ItemType directory -Path artifacts/red4ext | Out-Null
+          New-Item -ItemType directory -Path artifacts/red4ext/libs | Out-Null
           New-Item -ItemType directory -Path artifacts/red4ext/plugins | Out-Null
           New-Item -ItemType directory -Path artifacts/bin/x64 | Out-Null
 
           # Copy build artifacts.
           Copy-Item -Path build/${{ matrix.config }}/bin/RED4ext.* -Destination artifacts/red4ext
           Copy-Item -Path build/${{ matrix.config }}/bin/powrprof.* -Destination artifacts/bin/x64
+          Copy-Item -Path build/${{ matrix.config }}/bin/libs/* -Destination artifacts/red4ext/libs -Recurse
           Copy-Item -Path build/${{ matrix.config }}/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
 
           # Copy the license.
@@ -55,7 +57,7 @@ jobs:
           Add-Content -Path artifacts/red4ext/LICENSE.txt -Value $thirdparty
 
           # Create a zip file.
-          $fileName = red4ext_${env:CONFIG_LOWERCASE}_${env:SHA_SHORT}.zip
+          $fileName = "red4ext_${env:CONFIG_LOWERCASE}_${env:SHA_SHORT}.zip"
           Compress-Archive -Path artifacts/* -DestinationPath $fileName
 
           # Generate hash.
