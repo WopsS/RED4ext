@@ -16,6 +16,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Create environment variables
+        run: |
+          $shaShort = (git rev-parse --short $env:GITHUB_SHA)
+          echo "SHA_SHORT=${shaShort}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
 
@@ -47,9 +52,7 @@ jobs:
           Add-Content -Path artifacts/red4ext/LICENSE.txt -Value $thirdparty
 
           # Create a zip file.
-          $shaShort = (git rev-parse --short $env:GITHUB_SHA)
-
-          $fileName = "red4ext_${{ matrix.config }}_$shaShort.zip".ToLower()
+          $fileName = "red4ext_${{ matrix.config }}_${env:SHA_SHORT}.zip".ToLower()
           Compress-Archive -Path artifacts/* -DestinationPath $fileName
 
           # Generate hash.
@@ -58,4 +61,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: red4ext_${{ matrix.config }}_*.zip
+          name: red4ext_${{ matrix.config }}_${{ env.SHA_SHORT }}.zip
+          path: red4ext_${{ matrix.config }}_${{ env.SHA_SHORT }}.zip
