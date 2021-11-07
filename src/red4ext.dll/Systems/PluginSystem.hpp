@@ -13,9 +13,11 @@ public:
     void Startup();
     void Shutdown();
 
+    std::shared_ptr<PluginBase> GetPlugin(HMODULE aModule) const;
+
 private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;
-    using MapIter_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>::iterator;
+    using MapIter_t = Map_t::iterator;
 
     void Load(const std::filesystem::path& aPath, bool aSearchLoadDir);
     MapIter_t Unload(std::shared_ptr<PluginBase> aPlugin);

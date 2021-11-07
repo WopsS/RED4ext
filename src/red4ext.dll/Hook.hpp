@@ -4,16 +4,26 @@ template<typename T>
 class Hook
 {
 public:
-    Hook(uintptr_t aOffset, T aDetour)
+    Hook(T aAddress, T aDetour)
         : m_isAttached(false)
-        , m_address(reinterpret_cast<T>(reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)) + aOffset))
+        , m_address(aAddress)
         , m_detour(aDetour)
+    {
+    }
+
+    Hook(uintptr_t aOffset, T aDetour)
+        : Hook(reinterpret_cast<T>(reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)) + aOffset), aDetour)
     {
     }
 
     operator T() const
     {
         return m_address;
+    }
+
+    uintptr_t Get() const
+    {
+        return reinterpret_cast<uintptr_t>(m_address);
     }
 
     int32_t Attach()

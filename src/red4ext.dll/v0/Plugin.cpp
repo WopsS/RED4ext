@@ -1,6 +1,7 @@
 #include "stdafx.hpp"
 #include "v0/Plugin.hpp"
 #include "Image.hpp"
+#include "v0/Funcs.hpp"
 
 v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModule)
     : PluginBase(aPath, std::move(aModule))
@@ -8,6 +9,8 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     , m_red{}
 {
     m_red.runtime = Image::Get()->GetVersion();
+    m_red.hooking.Attach = v0::Hooking::Attach;
+    m_red.hooking.Detach = v0::Hooking::Detach;
 }
 
 const uint32_t v0::Plugin::GetApiVersion() const

@@ -135,11 +135,22 @@ void App::Shutdown()
     spdlog::info("RED4ext is shutting down...");
 
     m_pluginSystem.Shutdown();
+    m_hookingSystem.Shutdown();
 
     spdlog::info("RED4ext has been shut down");
 
     // Flushing the log here, since it is called in the main function, not when DLL is unloaded.
     spdlog::details::registry::instance().flush_all();
+}
+
+PluginSystem* App::GetPluginSystem()
+{
+    return &m_pluginSystem;
+}
+
+HookingSystem* App::GetHookingSystem()
+{
+    return &m_hookingSystem;
 }
 
 bool App::AttachHooks() const

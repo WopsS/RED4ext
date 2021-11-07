@@ -140,12 +140,26 @@ void PluginSystem::Shutdown()
         return;
     }
 
-    spdlog::info("Unloading {} plugin(s)...", m_plugins.size());
+    auto size = m_plugins.size();
+    spdlog::trace("Unloading {} plugin(s)...", size);
 
     for (auto it = m_plugins.begin(); it != m_plugins.end();)
     {
         it = Unload(it->second);
     }
+
+    spdlog::info("{} plugin(s) unloaded", size);
+}
+
+std::shared_ptr<PluginBase> PluginSystem::GetPlugin(HMODULE aModule) const
+{
+    auto iter = m_plugins.find(aModule);
+    if (iter != m_plugins.end())
+    {
+        return iter->second;
+    }
+
+    return nullptr;
 }
 
 void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
@@ -168,6 +182,8 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
                      aPath);
         return;
     }
+
+    spdlog::trace(L"'{}' has loaded into the address space at {}", stem, fmt::ptr(handle.get()));
 
     auto plugin = CreatePlugin(aPath, std::move(handle));
     if (!plugin)

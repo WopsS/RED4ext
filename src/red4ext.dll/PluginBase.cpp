@@ -91,6 +91,8 @@ bool PluginBase::Main(RED4ext::EMainReason aReason)
                 spdlog::trace(L"'Main' function returned 'false'");
                 return false;
             }
+
+            spdlog::trace(L"'Main' function called successfully");
         }
         catch (const std::exception& e)
         {
@@ -109,9 +111,7 @@ bool PluginBase::Main(RED4ext::EMainReason aReason)
     else
     {
         spdlog::trace(L"{} does not export a 'Main' function, skipping the call", name);
-        return true;
     }
 
-    spdlog::trace(L"'Main' function called successfully");
     return true;
 }

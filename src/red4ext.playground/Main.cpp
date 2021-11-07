@@ -1,9 +1,11 @@
 #include "stdafx.hpp"
+#include <RED4ext/GameStates.hpp>
 
-RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::PluginHandle aHandle, RED4ext::EMainReason aReason, const RED4ext::RED4ext* aRED4ext)
+RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::PluginHandle aHandle, RED4ext::EMainReason aReason,
+                                        const RED4ext::RED4ext* aRED4ext)
 {
     switch (aReason)
-     {
+    {
     case RED4ext::EMainReason::Load:
     {
         break;
