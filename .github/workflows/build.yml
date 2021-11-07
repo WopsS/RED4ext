@@ -29,8 +29,33 @@ jobs:
           cd premake/projects
           MSBuild.exe RED4ext.sln -v:minimal -m -property:Configuration=${{ matrix.config }}
 
+      - name: Prepare files
+        run: |
+          # Create the necessary directories.
+          New-Item -ItemType directory -Path artifacts | Out-Null
+          New-Item -ItemType directory -Path artifacts/red4ext | Out-Null
+          New-Item -ItemType directory -Path artifacts/red4ext/plugins | Out-Null
+          New-Item -ItemType directory -Path artifacts/bin/x64 | Out-Null
+
+          # Copy build artifacts.
+          Copy-Item -Path build/release/bin/RED4ext.* -Destination artifacts/red4ext
+          Copy-Item -Path build/release/bin/powrprof.* -Destination artifacts/bin/x64
+          Copy-Item -Path build/release/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
+
+          # Copy the license.
+          $thirdparty = Get-Content -Path THIRD_PARTY_LICENSES.md
+          Add-Content -Path release/red4ext/LICENSE.txt -Value $thirdparty
+
+          # Create a zip file.
+          $shaShort = (git rev-parse --short $env:GITHUB_SHA)
+
+          $fileName = red4ext_${{ matrix.config }}_$shaShort.zip
+          Compress-Archive -Path artifacts/* -DestinationPath "fileName
+
+          # Generate hash.
+          Get-FileHash -Algorithm SHA256 -Path $fileName | Format-List
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: RED4ext-${{ matrix.config }}
-          path: build/${{ matrix.config }}/
+          name: red4ext_${{ matrix.config }}_*.zip
