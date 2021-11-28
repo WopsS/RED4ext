@@ -6,7 +6,7 @@
 
 Config::Config(const Paths& aPaths)
     : m_version(0)
-    , m_devConsole(false)
+    , m_dev()
     , m_logging()
     , m_plugins()
 {
@@ -37,9 +37,9 @@ const size_t Config::GetVersion() const
     return m_version;
 }
 
-const bool Config::HasDevConsole() const
+const Config::DevConfig& Config::GetDev() const
 {
-    return m_devConsole;
+    return m_dev;
 }
 
 const Config::LoggingConfig& Config::GetLogging() const
@@ -96,12 +96,7 @@ void Config::Save(const std::filesystem::path& aFile)
         auto flushOn = spdlog::level::to_string_view(m_logging.flushOn).data();
 
         ordered_value config{{"version", LatestVersion},
-                             {"console", m_devConsole},
-
-                             {"logging", ordered_value{{"level", logLevel},
-                                                       {"flush_on", flushOn},
-                                                       {"max_files", m_logging.maxFiles},
-                                                       {"max_file_size", m_logging.maxFileSize}}}};
+                             {"logging", ordered_value{{"level", logLevel}, {"flush_on", flushOn}}}};
 
         config.comments().push_back(
             " See https://wiki.redmodding.org/red4ext/getting-started/configuration for more options.");
@@ -121,12 +116,16 @@ void Config::Save(const std::filesystem::path& aFile)
 
 void Config::LoadV1(const toml::value& aConfig)
 {
-    // General
     m_version = 1;
-    m_devConsole = toml::find_or(aConfig, "console", m_devConsole);
 
+    m_dev.LoadV1(aConfig);
     m_logging.LoadV1(aConfig);
     m_plugins.LoadV1(aConfig);
+}
+
+void Config::DevConfig::LoadV1(const toml::value& aConfig)
+{
+    hasConsole = toml::find_or(aConfig, "dev", "console", hasConsole);
 }
 
 void Config::LoggingConfig::LoadV1(const toml::value& aConfig)

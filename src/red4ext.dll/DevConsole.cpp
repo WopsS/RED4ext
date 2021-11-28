@@ -2,11 +2,11 @@
 #include "DevConsole.hpp"
 #include "Utils.hpp"
 
-DevConsole::DevConsole(const Config& aConfig)
+DevConsole::DevConsole(const Config::DevConfig& aConfig)
     : m_isCreated(false)
     , m_isRedirected(false)
 {
-    if (aConfig.HasDevConsole())
+    if (aConfig.hasConsole)
     {
         if (AllocConsole())
         {

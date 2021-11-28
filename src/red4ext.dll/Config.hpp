@@ -7,6 +7,13 @@ class Config
 public:
     static constexpr size_t LatestVersion = 1;
 
+    struct DevConfig
+    {
+        void LoadV1(const toml::value& aConfig);
+
+        bool hasConsole = false;
+    };
+
     struct LoggingConfig
     {
         void LoadV1(const toml::value& aConfig);
@@ -29,8 +36,8 @@ public:
     ~Config() = default;
 
     const size_t GetVersion() const;
-    const bool HasDevConsole() const;
 
+    const DevConfig& GetDev() const;
     const LoggingConfig& GetLogging() const;
     const PluginsConfig& GetPlugins() const;
 
@@ -41,8 +48,8 @@ private:
     void LoadV1(const toml::value& aConfig);
 
     size_t m_version;
-    bool m_devConsole;
 
+    DevConfig m_dev;
     LoggingConfig m_logging;
     PluginsConfig m_plugins;
 };

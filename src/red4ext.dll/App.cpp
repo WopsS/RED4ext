@@ -17,7 +17,7 @@ std::unique_ptr<App> g_app;
 
 App::App()
     : m_config(m_paths)
-    , m_devConsole(m_config)
+    , m_devConsole(m_config.GetDev())
     , m_pluginSystem(m_config.GetPlugins(), m_paths)
 {
     Utils::CreateLogger(m_paths, m_config, m_devConsole);
@@ -33,7 +33,9 @@ App::App()
 
     spdlog::debug("Using the following configuration:");
     spdlog::debug("  version: {}", m_config.GetVersion());
-    spdlog::debug("  console: {}", m_config.HasDevConsole());
+
+    const auto& dev = m_config.GetDev();
+    spdlog::debug("  dev.console: {}", dev.hasConsole);
 
     const auto& loggingConfig = m_config.GetLogging();
     spdlog::debug("  logging.level: {}", spdlog::level::to_string_view(loggingConfig.level));
@@ -43,6 +45,16 @@ App::App()
 
     const auto& pluginsConfig = m_config.GetPlugins();
     spdlog::debug("  plugins.enabled: {}", pluginsConfig.isEnabled);
+
+    const auto& blacklist = pluginsConfig.blacklist;
+    if (blacklist.empty())
+    {
+        spdlog::debug(L"  plugins.blacklist: []");
+    }
+    else
+    {
+        spdlog::debug(L"  plugins.blacklist: [ {} ]", fmt::join(blacklist, L", "));
+    }
 
     const auto image = Image::Get();
     const auto& ver = image->GetVersion();

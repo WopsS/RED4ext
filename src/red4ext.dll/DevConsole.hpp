@@ -5,7 +5,7 @@
 class DevConsole
 {
 public:
-    DevConsole(const Config& aConfig);
+    DevConsole(const Config::DevConfig& aConfig);
     ~DevConsole();
 
     bool IsOutputRedirected() const;
