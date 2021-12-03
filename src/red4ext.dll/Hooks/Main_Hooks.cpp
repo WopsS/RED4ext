@@ -25,7 +25,8 @@ int32_t _Main()
 
 bool Hooks::Main::Attach()
 {
-    spdlog::trace("Trying to attach the hook for the main function...");
+    spdlog::trace("Trying to attach the hook for the main function at {}...",
+                  RED4EXT_OFFSET_TO_ADDR(Addresses::Global_Main));
 
     auto result = Main_fnc.Attach();
     if (result != NO_ERROR)
@@ -48,7 +49,7 @@ bool Hooks::Main::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for the main function...");
+    spdlog::trace("Trying to detach the hook for the main function at {}...", RED4EXT_OFFSET_TO_ADDR(Addresses::Global_Main));
 
     auto result = Main_fnc.Detach();
     if (result != NO_ERROR)

@@ -74,6 +74,35 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
     }
 }
 
+std::wstring Utils::GetStateName(RED4ext::EGameStateType aStateType)
+{
+    using enum RED4ext::EGameStateType;
+    switch (aStateType)
+    {
+    case BaseInitialization:
+    {
+        return L"BaseInitialization";
+    }
+    case Initialization:
+    {
+        return L"Initialization";
+    }
+    case Running:
+    {
+        return L"Running";
+    }
+    case Shutdown:
+    {
+        return L"Shutdown";
+    }
+    default:
+    {
+        return L"unknown";
+    }
+    }
+}
+
+
 std::wstring Utils::FormatSystemMessage(uint32_t aMessageId)
 {
     wil::last_error_context last_error;

@@ -9,6 +9,7 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     , m_red{}
 {
     m_red.runtime = Image::Get()->GetVersion();
+    m_red.AddState = v0::AddState;
     m_red.hooking.Attach = v0::Hooking::Attach;
     m_red.hooking.Detach = v0::Hooking::Detach;
 }

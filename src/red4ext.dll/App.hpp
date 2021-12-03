@@ -3,8 +3,9 @@
 #include "Config.hpp"
 #include "DevConsole.hpp"
 #include "Paths.hpp"
-#include "Systems/PluginSystem.hpp"
 #include "Systems/HookingSystem.hpp"
+#include "Systems/PluginSystem.hpp"
+#include "Systems/StateSystem.hpp"
 
 class App
 {
@@ -19,6 +20,7 @@ public:
     void Shutdown();
 
     HookingSystem* GetHookingSystem();
+    StateSystem* GetStateSystem();
     PluginSystem* GetPluginSystem();
 
 private:
@@ -29,6 +31,8 @@ private:
     Paths m_paths;
     Config m_config;
     DevConsole m_devConsole;
+
     HookingSystem m_hookingSystem;
+    StateSystem m_stateSystem;
     PluginSystem m_pluginSystem;
 };

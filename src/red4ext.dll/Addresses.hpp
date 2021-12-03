@@ -13,6 +13,10 @@ namespace Addresses
 {
 constexpr uintptr_t ImageBase = 0x140000000;
 
+#pragma region CGameApplication
+constexpr uintptr_t CGameApplication_Run = 0x140AD4510 - ImageBase; // 48 89 5C 24 08 57 48 83 EC 20 48 8B D9 33 FF 90, expected: 3, index: 0
+#pragma endregion
+
 #pragma region CInitializationState
 constexpr uintptr_t CInitializationState_Run = 0x140AD61A0 - ImageBase; // 48 83 EC 28 48 8B 05 ? ? ? ? 4C 8B C2 8B 88 F8 00 00 00, expected: 1, index: 0
 #pragma endregion

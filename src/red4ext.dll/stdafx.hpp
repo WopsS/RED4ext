@@ -3,13 +3,14 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <unordered_set>
 #include <source_location>
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <unordered_set>
 
 #include <Windows.h>
 #include <detours.h>

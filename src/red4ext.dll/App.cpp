@@ -5,9 +5,7 @@
 #include "Utils.hpp"
 #include "Version.hpp"
 
-#include "Hooks/CInitializationState.hpp"
-#include "Hooks/CRunningState.hpp"
-#include "Hooks/CShutdownState.hpp"
+#include "Hooks/CGameApplication.hpp"
 #include "Hooks/Main_Hooks.hpp"
 
 namespace
@@ -55,6 +53,8 @@ App::App()
     {
         spdlog::debug(L"  plugins.blacklist: [ {} ]", fmt::join(blacklist, L", "));
     }
+
+    spdlog::debug("Base address is {}", reinterpret_cast<void*>(GetModuleHandle(nullptr)));
 
     const auto image = Image::Get();
     const auto& ver = image->GetVersion();
@@ -111,9 +111,7 @@ void App::Destruct()
         DetourTransaction transaction;
         if (transaction.IsValid())
         {
-            auto success = Hooks::CShutdownState::Detach() && Hooks::CRunningState::Detach() &&
-                           Hooks::CInitializationState::Detach() && Hooks::Main::Detach();
-
+            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach();
             if (success)
             {
                 transaction.Commit();
@@ -147,6 +145,7 @@ void App::Shutdown()
     spdlog::info("RED4ext is shutting down...");
 
     m_pluginSystem.Shutdown();
+    m_stateSystem.Shutdown();
     m_hookingSystem.Shutdown();
 
     spdlog::info("RED4ext has been shut down");
@@ -165,6 +164,11 @@ HookingSystem* App::GetHookingSystem()
     return &m_hookingSystem;
 }
 
+StateSystem* App::GetStateSystem()
+{
+    return &m_stateSystem;
+}
+
 bool App::AttachHooks() const
 {
     spdlog::trace("Attaching hooks...");
@@ -175,9 +179,7 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() && Hooks::CInitializationState::Attach() && Hooks::CRunningState::Attach() &&
-                   Hooks::CShutdownState::Attach();
-
+    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach();
     if (success)
     {
         return transaction.Commit();

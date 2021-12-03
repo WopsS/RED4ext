@@ -7,6 +7,7 @@ class Paths;
 namespace Utils
 {
 void CreateLogger(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole);
+std::wstring GetStateName(RED4ext::EGameStateType aStateType);
 
 std::wstring FormatSystemMessage(uint32_t aMessageId);
 std::wstring FormatLastError();
