@@ -10,7 +10,7 @@ env:
 jobs:
   upload_release_assets:
     name: Upload Release Assets
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Checkout

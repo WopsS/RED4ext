@@ -1,4 +1,4 @@
-require("premake", ">=5.0.0-alpha16")
+require("premake", ">=5.0.0-beta1")
 
 red4ext = require("extensions/red4ext")
 red4ext.version.gen();
