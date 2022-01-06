@@ -1,6 +1,9 @@
 name: Build Workflow
 on: [ push, pull_request ]
 
+env:
+  premake: 5.0.0-beta1
+
 jobs:
   build:
     name: Build (${{ matrix.config }})
@@ -26,6 +29,14 @@ jobs:
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Download Premake
+        shell: powershell
+        run: Invoke-WebRequest https://github.com/premake/premake-core/releases/download/v${{ env.premake }}/premake-${{ env.premake }}-windows.zip -OutFile ./premake/premake.zip
+
+      - name: Extract Premake
+        shell: powershell
+        run: Expand-Archive -Path ./premake/premake.zip -DestinationPath ./premake
 
       - name: Generate projects
         run: |
