@@ -11,7 +11,8 @@ public:
     bool IsOutputRedirected() const;
 
 private:
-
     bool m_isCreated;
-    bool m_isRedirected;
+
+    FILE* m_stdoutStream;
+    FILE* m_stderrStream;
 };
