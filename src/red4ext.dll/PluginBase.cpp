@@ -85,7 +85,7 @@ bool PluginBase::Main(RED4ext::EMainReason aReason)
     {
         try
         {
-            auto success = mainFn(module, aReason, GetRedStruct());
+            auto success = mainFn(module, aReason, GetSdkStruct());
             if (!success)
             {
                 spdlog::trace(L"'Main' function returned 'false'");

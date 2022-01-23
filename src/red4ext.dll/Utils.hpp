@@ -6,7 +6,9 @@ class Paths;
 
 namespace Utils
 {
-void CreateLogger(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole);
+std::shared_ptr<spdlog::logger> CreateLogger(const std::wstring_view aLogName, const std::wstring_view aFilename,
+                                             const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole);
+
 std::wstring GetStateName(RED4ext::EGameStateType aStateType);
 
 std::wstring FormatSystemMessage(uint32_t aMessageId);
@@ -15,6 +17,7 @@ std::wstring FormatLastError();
 int32_t ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType = MB_OK);
 int32_t ShowMessageBox(const std::wstring_view aText, uint32_t aType = MB_OK);
 
+std::string Narrow(const std::wstring_view aText);
 std::wstring Widen(const std::string_view aText);
 
 template<typename... Args>

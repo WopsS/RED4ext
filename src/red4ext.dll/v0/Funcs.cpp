@@ -3,20 +3,14 @@
 #include "App.hpp"
 #include "Utils.hpp"
 
-bool v0::AddState(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType aType, RED4ext::GameState* aState)
+namespace
 {
-    spdlog::trace("Request to add a game state has been received from plugin with handle {}", fmt::ptr(aHandle));
-
-    if (!aState)
-    {
-        spdlog::warn("The state's address is NULL");
-        return false;
-    }
-
+std::shared_ptr<PluginBase> GetPluginByHandle(RED4ext::PluginHandle aHandle)
+{
     auto app = App::Get();
     if (!app)
     {
-        return false;
+        return nullptr;
     }
 
     auto pluginSystem = app->GetPluginSystem();
@@ -24,20 +18,12 @@ bool v0::AddState(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType aType, 
     if (!plugin)
     {
         spdlog::warn("Could not find a plugin with handle {}", fmt::ptr(aHandle));
-        return false;
+        return nullptr;
     }
 
-    auto stateSystem = app->GetStateSystem();
-    if (stateSystem->Add(plugin, aType, aState->OnEnter, aState->OnUpdate, aState->OnExit))
-    {
-        spdlog::trace(L"The request to add a '{}' state for '{}' has been successfully completed",
-                      Utils::GetStateName(aType), plugin->GetName());
-        return true;
-    }
-
-    spdlog::warn(L"The request to add a '{}' state for '{}' has failed", Utils::GetStateName(aType), plugin->GetName());
-    return false;
+    return plugin;
 }
+} // namespace
 
 bool v0::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget, void* aDetour, void** aOriginal)
 {
@@ -55,11 +41,9 @@ bool v0::Hooking::Attach(RED4ext::PluginHandle aHandle, void* aTarget, void* aDe
         return false;
     }
 
-    auto pluginSystem = app->GetPluginSystem();
-    auto plugin = pluginSystem->GetPlugin(aHandle);
+    auto plugin = GetPluginByHandle(aHandle);
     if (!plugin)
     {
-        spdlog::warn("Could not find a plugin with handle {}", fmt::ptr(aHandle));
         return false;
     }
 
@@ -83,14 +67,46 @@ bool v0::Hooking::Detach(RED4ext::PluginHandle aHandle, void* aTarget)
         return false;
     }
 
-    auto pluginSystem = app->GetPluginSystem();
-    auto plugin = pluginSystem->GetPlugin(aHandle);
+    auto plugin = GetPluginByHandle(aHandle);
     if (!plugin)
     {
-        spdlog::warn("Could not find a plugin with handle {}", fmt::ptr(aHandle));
         return false;
     }
 
     auto hookingSystem = app->GetHookingSystem();
     return hookingSystem->Detach(plugin, aTarget);
+}
+
+bool v0::GameStates::Add(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType aType, RED4ext::GameState* aState)
+{
+    spdlog::trace("Request to add a game state has been received from plugin with handle {}", fmt::ptr(aHandle));
+
+    if (!aState)
+    {
+        spdlog::warn("The state's address is NULL");
+        return false;
+    }
+
+    auto app = App::Get();
+    if (!app)
+    {
+        return false;
+    }
+
+    auto plugin = GetPluginByHandle(aHandle);
+    if (!plugin)
+    {
+        return false;
+    }
+
+    auto stateSystem = app->GetStateSystem();
+    if (stateSystem->Add(plugin, aType, aState->OnEnter, aState->OnUpdate, aState->OnExit))
+    {
+        spdlog::trace(L"The request to add a '{}' state for '{}' has been successfully completed",
+                      Utils::GetStateName(aType), plugin->GetName());
+        return true;
+    }
+
+    spdlog::warn(L"The request to add a '{}' state for '{}' has failed", Utils::GetStateName(aType), plugin->GetName());
+    return false;
 }

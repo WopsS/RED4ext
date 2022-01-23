@@ -8,7 +8,7 @@ public:
 
     virtual const uint32_t GetApiVersion() const = 0;
     virtual void* GetPluginInfo() = 0;
-    virtual const void* GetRedStruct() = 0;
+    virtual const void* GetSdkStruct() const = 0;
 
     virtual const std::wstring_view GetName() const = 0;
     virtual const std::wstring_view GetAuthor() const = 0;

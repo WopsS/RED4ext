@@ -7,7 +7,9 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole)
+std::shared_ptr<spdlog::logger> Utils::CreateLogger(const std::wstring_view aLogName, const std::wstring_view aFilename,
+                                                    const Paths& aPaths, const Config& aConfig,
+                                                    const DevConsole& aDevConsole)
 {
     try
     {
@@ -25,7 +27,7 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
                 L"An error occured while checking logs directory existence:\n{}\n\nDirectory: {}", Utils::Widen(msg),
                 dir);
 
-            return;
+            return nullptr;
         }
 
         if (!exists)
@@ -41,7 +43,7 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
                     L"An error occured while creating the logs directory:\n{}\n\nDirectory: {}", Utils::Widen(msg),
                     dir);
 
-                return;
+                return nullptr;
             }
         }
 
@@ -53,8 +55,8 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
         size_t maxFiles = loggingConfig.maxFiles;
         size_t maxFileSize = static_cast<size_t>(loggingConfig.maxFileSize) * oneMbInB;
 
-        auto file = dir / L"game.log";
-        auto logger = spdlog::rotating_logger_mt("", file, maxFileSize, maxFiles, true);
+        auto file = dir / aFilename;
+        auto logger = spdlog::rotating_logger_mt(Narrow(aLogName), file, maxFileSize, maxFiles, true);
         logger->set_level(loggingConfig.level);
         logger->flush_on(loggingConfig.flushOn);
 
@@ -65,13 +67,15 @@ void Utils::CreateLogger(const Paths& aPaths, const Config& aConfig, const DevCo
             logger->sinks().push_back(consoleSink);
         }
 
-        spdlog::set_default_logger(logger);
+        return logger;
     }
     catch (const std::exception& e)
     {
         SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"An exception occured while creating the logger:\n{}",
                                             Utils::Widen(e.what()));
     }
+
+    return nullptr;
 }
 
 std::wstring Utils::GetStateName(RED4ext::EGameStateType aStateType)
@@ -101,7 +105,6 @@ std::wstring Utils::GetStateName(RED4ext::EGameStateType aStateType)
     }
     }
 }
-
 
 std::wstring Utils::FormatSystemMessage(uint32_t aMessageId)
 {
@@ -147,6 +150,33 @@ int32_t Utils::ShowMessageBoxEx(const std::wstring_view aCaption, const std::wst
 int32_t Utils::ShowMessageBox(const std::wstring_view aText, uint32_t aType)
 {
     return ShowMessageBoxEx(L"RED4ext", aText, aType);
+}
+
+std::string Utils::Narrow(const std::wstring_view aText)
+{
+    if (aText.empty())
+    {
+        return "";
+    }
+
+    std::string result;
+
+    auto len =
+        WideCharToMultiByte(CP_UTF8, 0, aText.data(), static_cast<int32_t>(aText.size()), nullptr, 0, NULL, NULL);
+    if (len)
+    {
+        result.resize(len);
+        len = WideCharToMultiByte(CP_UTF8, 0, aText.data(), static_cast<int32_t>(aText.size()), result.data(),
+                                  static_cast<int32_t>(result.size()), NULL, NULL);
+    }
+
+    // Second pass.
+    if (len <= 0)
+    {
+        result = fmt::format("Failed to convert wide to narrow string, last error is {}", GetLastError());
+    }
+
+    return result;
 }
 
 std::wstring Utils::Widen(const std::string_view aText)

@@ -11,7 +11,7 @@ public:
 
     const uint32_t GetApiVersion() const final;
     void* GetPluginInfo() final;
-    const void* GetRedStruct() final;
+    const void* GetSdkStruct() const final;
 
     virtual const std::wstring_view GetName() const final;
     virtual const std::wstring_view GetAuthor() const final;
@@ -21,6 +21,11 @@ public:
 
 private:
     RED4ext::v0::PluginInfo m_info;
-    RED4ext::v0::RED4ext m_red;
+
+    RED4ext::v0::Sdk m_sdk;
+    RED4ext::v0::VersionInfo m_runtime;
+    RED4ext::v0::Logger m_logger;
+    RED4ext::v0::Hooking m_hooking;
+    RED4ext::v0::GameStates m_gameStates;
 };
 } // namespace v0

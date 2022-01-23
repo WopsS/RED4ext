@@ -4,6 +4,7 @@
 #include "DevConsole.hpp"
 #include "Paths.hpp"
 #include "Systems/HookingSystem.hpp"
+#include "Systems/LoggerSystem.hpp"
 #include "Systems/PluginSystem.hpp"
 #include "Systems/StateSystem.hpp"
 
@@ -19,6 +20,7 @@ public:
     void Startup();
     void Shutdown();
 
+    LoggerSystem* GetLoggerSystem();
     HookingSystem* GetHookingSystem();
     StateSystem* GetStateSystem();
     PluginSystem* GetPluginSystem();
@@ -32,6 +34,7 @@ private:
     Config m_config;
     DevConsole m_devConsole;
 
+    LoggerSystem m_loggerSystem;
     HookingSystem m_hookingSystem;
     StateSystem m_stateSystem;
     PluginSystem m_pluginSystem;

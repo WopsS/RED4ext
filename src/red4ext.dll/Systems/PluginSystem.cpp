@@ -159,6 +159,7 @@ std::shared_ptr<PluginBase> PluginSystem::GetPlugin(HMODULE aModule) const
         return iter->second;
     }
 
+    spdlog::warn("Could not find a plugin with handle {}", fmt::ptr(aModule));
     return nullptr;
 }
 

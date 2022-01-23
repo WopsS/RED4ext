@@ -2,16 +2,48 @@
 #include "v0/Plugin.hpp"
 #include "Image.hpp"
 #include "v0/Funcs.hpp"
+#include "v0/Logger.hpp"
 
 v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModule)
     : PluginBase(aPath, std::move(aModule))
     , m_info{}
-    , m_red{}
+    , m_sdk{}
+    , m_runtime(Image::Get()->GetVersion())
+    , m_logger{}
+    , m_hooking{}
+    , m_gameStates{}
 {
-    m_red.runtime = Image::Get()->GetVersion();
-    m_red.AddState = v0::AddState;
-    m_red.hooking.Attach = v0::Hooking::Attach;
-    m_red.hooking.Detach = v0::Hooking::Detach;
+    m_sdk.runtime = &m_runtime;
+    m_sdk.logger = &m_logger;
+    m_sdk.hooking = &m_hooking;
+    m_sdk.gameStates = &m_gameStates;
+
+    m_logger.Trace = v0::Logger::Trace;
+    m_logger.TraceF = v0::Logger::TraceF;
+    m_logger.TraceW = v0::Logger::TraceW;
+    m_logger.TraceWF = v0::Logger::TraceWF;
+    m_logger.Debug = v0::Logger::Debug;
+    m_logger.DebugF = v0::Logger::DebugF;
+    m_logger.DebugWF = v0::Logger::DebugWF;
+    m_logger.InfoF = v0::Logger::InfoF;
+    m_logger.InfoWF = v0::Logger::InfoWF;
+    m_logger.Warn = v0::Logger::Warn;
+    m_logger.WarnF = v0::Logger::WarnF;
+    m_logger.WarnWF = v0::Logger::WarnWF;
+    m_logger.WarnW = v0::Logger::WarnW;
+    m_logger.Error = v0::Logger::Error;
+    m_logger.ErrorF = v0::Logger::ErrorF;
+    m_logger.ErrorW = v0::Logger::ErrorW;
+    m_logger.ErrorWF = v0::Logger::ErrorWF;
+    m_logger.Critical = v0::Logger::Critical;
+    m_logger.CriticalF = v0::Logger::CriticalF;
+    m_logger.CriticalW = v0::Logger::CriticalW;
+    m_logger.CriticalWF = v0::Logger::CriticalWF;
+
+    m_hooking.Attach = v0::Hooking::Attach;
+    m_hooking.Detach = v0::Hooking::Detach;
+
+    m_gameStates.Add = v0::GameStates::Add;
 }
 
 const uint32_t v0::Plugin::GetApiVersion() const
@@ -24,9 +56,9 @@ void* v0::Plugin::GetPluginInfo()
     return &m_info;
 }
 
-const void* v0::Plugin::GetRedStruct()
+const void* v0::Plugin::GetSdkStruct() const
 {
-    return &m_red;
+    return &m_sdk;
 }
 
 const std::wstring_view v0::Plugin::GetName() const

@@ -16,9 +16,11 @@ std::unique_ptr<App> g_app;
 App::App()
     : m_config(m_paths)
     , m_devConsole(m_config.GetDev())
+    , m_loggerSystem(m_paths, m_config, m_devConsole)
     , m_pluginSystem(m_config.GetPlugins(), m_paths)
 {
-    Utils::CreateLogger(m_paths, m_config, m_devConsole);
+    auto logger = Utils::CreateLogger(L"RED4ext", L"red4ext.log", m_paths, m_config, m_devConsole);
+    spdlog::set_default_logger(logger);
 
     spdlog::info("RED4ext ({}) is initializing...", RED4EXT_GIT_TAG);
 
@@ -147,6 +149,7 @@ void App::Shutdown()
     m_pluginSystem.Shutdown();
     m_stateSystem.Shutdown();
     m_hookingSystem.Shutdown();
+    m_loggerSystem.Shutdown();
 
     spdlog::info("RED4ext has been shut down");
 
@@ -154,9 +157,9 @@ void App::Shutdown()
     spdlog::details::registry::instance().flush_all();
 }
 
-PluginSystem* App::GetPluginSystem()
+LoggerSystem* App::GetLoggerSystem()
 {
-    return &m_pluginSystem;
+    return &m_loggerSystem;
 }
 
 HookingSystem* App::GetHookingSystem()
@@ -167,6 +170,11 @@ HookingSystem* App::GetHookingSystem()
 StateSystem* App::GetStateSystem()
 {
     return &m_stateSystem;
+}
+
+PluginSystem* App::GetPluginSystem()
+{
+    return &m_pluginSystem;
 }
 
 bool App::AttachHooks() const
