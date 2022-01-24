@@ -33,29 +33,34 @@ private:
     inline void Log(std::shared_ptr<PluginBase> aPlugin, spdlog::level::level_enum aLevel,
                     std::basic_string_view<T> aText)
     {
-        if (!aPlugin /*|| aText.empty()*/)
+        if (!aPlugin)
         {
             return;
         }
 
         std::shared_ptr<spdlog::logger> logger;
 
-        auto it = m_loggers.find(aPlugin);
-        if (it != m_loggers.end())
         {
-            logger = it->second;
-        }
-        else
-        {
-            const auto logName = aPlugin->GetName();
+            std::scoped_lock _(m_loggersMutex);
 
-            const auto& path = aPlugin->GetPath();
-            auto fileName = path.stem().wstring();
-            std::transform(fileName.begin(), fileName.end(), fileName.begin(),
-                           [](wchar_t aC) { return std::tolower(aC); });
+            auto it = m_loggers.find(aPlugin);
+            if (it != m_loggers.end())
+            {
+                logger = it->second;
+            }
+            else
+            {
+                const auto logName = aPlugin->GetName();
 
-            logger = Utils::CreateLogger(logName, fmt::format(L"{}.log", fileName), m_paths, m_config, m_devConsole);
-            m_loggers.emplace(aPlugin, logger);
+                const auto& path = aPlugin->GetPath();
+                auto fileName = path.stem().wstring();
+                std::transform(fileName.begin(), fileName.end(), fileName.begin(),
+                               [](wchar_t aC) { return std::tolower(aC); });
+
+                logger =
+                    Utils::CreateLogger(logName, fmt::format(L"{}.log", fileName), m_paths, m_config, m_devConsole);
+                m_loggers.emplace(aPlugin, logger);
+            }
         }
 
         logger->log(aLevel, aText);
@@ -65,5 +70,6 @@ private:
     const Config& m_config;
     const DevConsole& m_devConsole;
 
+    std::mutex m_loggersMutex;
     std::unordered_map<std::shared_ptr<PluginBase>, std::shared_ptr<spdlog::logger>> m_loggers;
 };
