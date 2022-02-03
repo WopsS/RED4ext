@@ -8,6 +8,15 @@ LoggerSystem::LoggerSystem(const Paths& aPaths, const Config& aConfig, const Dev
 {
 }
 
+ESystemType LoggerSystem::GetType()
+{
+    return ESystemType::Logger;
+}
+
+void LoggerSystem::Startup()
+{
+}
+
 void LoggerSystem::Shutdown()
 {
     auto count = m_loggers.size();

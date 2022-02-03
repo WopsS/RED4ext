@@ -29,6 +29,11 @@ PluginSystem::PluginSystem(const Config::PluginsConfig& aConfig, const Paths& aP
 {
 }
 
+ESystemType PluginSystem::GetType()
+{
+    return ESystemType::Plugin;
+}
+
 void PluginSystem::Startup()
 {
     if (!m_config.isEnabled)

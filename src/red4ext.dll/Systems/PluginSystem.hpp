@@ -1,17 +1,20 @@
 #pragma once
 
 #include "Config.hpp"
+#include "ISystem.hpp"
 #include "Paths.hpp"
 #include "PluginBase.hpp"
 
-class PluginSystem
+class PluginSystem : public ISystem
 {
 public:
     PluginSystem(const Config::PluginsConfig& aConfig, const Paths& aPaths);
     ~PluginSystem() = default;
 
-    void Startup();
-    void Shutdown();
+    ESystemType GetType() final;
+
+    void Startup() final;
+    void Shutdown() final;
 
     std::shared_ptr<PluginBase> GetPlugin(HMODULE aModule) const;
 

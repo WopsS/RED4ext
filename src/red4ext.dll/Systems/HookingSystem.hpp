@@ -1,12 +1,16 @@
 #pragma once
 
-#include "PluginBase.hpp"
 #include "Hook.hpp"
+#include "ISystem.hpp"
+#include "PluginBase.hpp"
 
-class HookingSystem
+class HookingSystem : public ISystem
 {
 public:
-    void Shutdown();
+    ESystemType GetType() final;
+
+    void Startup() final;
+    void Shutdown() final;
 
     bool Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, void* aDetour, void** aOriginal);
     bool Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget);
@@ -25,7 +29,7 @@ private:
         void** original;
         Hook<void*> hook;
     };
-    
+
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, Item>;
     using MapIter_t = Map_t::iterator;
 

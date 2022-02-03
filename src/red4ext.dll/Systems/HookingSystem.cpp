@@ -2,6 +2,15 @@
 #include "HookingSystem.hpp"
 #include "DetourTransaction.hpp"
 
+ESystemType HookingSystem::GetType()
+{
+    return ESystemType::Hooking;
+}
+
+void HookingSystem::Startup()
+{
+}
+
 void HookingSystem::Shutdown()
 {
     std::scoped_lock _(m_mutex);

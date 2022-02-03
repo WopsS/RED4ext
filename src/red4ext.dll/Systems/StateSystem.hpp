@@ -1,13 +1,17 @@
 #pragma once
 
+#include "ISystem.hpp"
 #include "PluginBase.hpp"
 
-class StateSystem
+class StateSystem : public ISystem
 {
 public:
     using Func_t = bool (*)(RED4ext::CGameApplication*);
 
-    void Shutdown();
+    ESystemType GetType() final;
+
+    void Startup() final;
+    void Shutdown() final;
 
     bool Add(std::shared_ptr<PluginBase> aPlugin, RED4ext::EGameStateType aStateType, Func_t aOnEnter, Func_t aOnUpdate,
              Func_t aOnExit);

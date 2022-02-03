@@ -16,9 +16,15 @@ std::unique_ptr<App> g_app;
 App::App()
     : m_config(m_paths)
     , m_devConsole(m_config.GetDev())
-    , m_loggerSystem(m_paths, m_config, m_devConsole)
-    , m_pluginSystem(m_config.GetPlugins(), m_paths)
 {
+    Sleep(5000);
+    AddSystem<LoggerSystem>(m_paths, m_config, m_devConsole);
+    AddSystem<HookingSystem>();
+    AddSystem<StateSystem>();
+    AddSystem<PluginSystem>(m_config.GetPlugins(), m_paths);
+
+    m_systems.shrink_to_fit();
+
     auto logger = Utils::CreateLogger(L"RED4ext", L"red4ext.log", m_paths, m_config, m_devConsole);
     spdlog::set_default_logger(logger);
 
@@ -137,7 +143,10 @@ void App::Startup()
 {
     spdlog::info("RED4ext is starting up...");
 
-    m_pluginSystem.Startup();
+    for (auto& system : m_systems)
+    {
+        system->Startup();
+    }
 
     spdlog::info("RED4ext has been started");
 }
@@ -146,11 +155,12 @@ void App::Shutdown()
 {
     spdlog::info("RED4ext is shutting down...");
 
-    m_pluginSystem.Shutdown();
-    m_stateSystem.Shutdown();
-    m_hookingSystem.Shutdown();
-    m_loggerSystem.Shutdown();
+    for (auto& system : m_systems | std::ranges::views::reverse)
+    {
+        system->Shutdown();
+    }
 
+    m_systems.clear();
     spdlog::info("RED4ext has been shut down");
 
     // Flushing the log here, since it is called in the main function, not when DLL is unloaded.
@@ -159,22 +169,26 @@ void App::Shutdown()
 
 LoggerSystem* App::GetLoggerSystem()
 {
-    return &m_loggerSystem;
+    auto& system = m_systems.at(static_cast<size_t>(ESystemType::Logger));
+    return static_cast<LoggerSystem*>(system.get());
 }
 
 HookingSystem* App::GetHookingSystem()
 {
-    return &m_hookingSystem;
+    auto& system = m_systems.at(static_cast<size_t>(ESystemType::Hooking));
+    return static_cast<HookingSystem*>(system.get());
 }
 
 StateSystem* App::GetStateSystem()
 {
-    return &m_stateSystem;
+    auto& system = m_systems.at(static_cast<size_t>(ESystemType::State));
+    return static_cast<StateSystem*>(system.get());
 }
 
 PluginSystem* App::GetPluginSystem()
 {
-    return &m_pluginSystem;
+    auto& system = m_systems.at(static_cast<size_t>(ESystemType::Plugin));
+    return static_cast<PluginSystem*>(system.get());
 }
 
 bool App::AttachHooks() const

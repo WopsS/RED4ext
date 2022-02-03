@@ -5,8 +5,10 @@
 #include <filesystem>
 #include <fstream>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <ranges>
 #include <source_location>
 #include <string>
 #include <string_view>

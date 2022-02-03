@@ -1,14 +1,18 @@
 #pragma once
 
+#include "ISystem.hpp"
 #include "PluginBase.hpp"
 #include "Utils.hpp"
 
-class LoggerSystem
+class LoggerSystem : public ISystem
 {
 public:
     LoggerSystem(const Paths& aPaths, const Config& aConfig, const DevConsole& aDevConsole);
 
-    void Shutdown();
+    ESystemType GetType() final;
+
+    void Startup() final;
+    void Shutdown() final;
 
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::string_view aText);
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::wstring_view aText);

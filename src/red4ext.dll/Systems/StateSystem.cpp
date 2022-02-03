@@ -2,6 +2,15 @@
 #include "StateSystem.hpp"
 #include "Utils.hpp"
 
+ESystemType StateSystem::GetType()
+{
+    return ESystemType::State;
+}
+
+void StateSystem::Startup()
+{
+}
+
 void StateSystem::Shutdown()
 {
     spdlog::trace("Removing all game states...");
