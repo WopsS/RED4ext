@@ -31,8 +31,16 @@ void HookingSystem::Shutdown()
         }
     }
 
+    if (transaction.Commit())
+    {
+        spdlog::trace("{} dangling hook(s) detached", count);
+    }
+    else
+    {
+        spdlog::trace("Could not detach {} dangling hook(s)", count);
+    }
+
     m_hooks.clear();
-    spdlog::trace("{} dangling hook(s) detached", count);
 }
 
 bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, void* aDetour, void** aOriginal)
@@ -53,12 +61,12 @@ bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, v
 
     if (transaction.Commit())
     {
-        m_hooks.emplace(aPlugin, std::move(item));
-
         if (aOriginal)
         {
             *aOriginal = reinterpret_cast<void*>(item.hook.Get());
         }
+
+        m_hooks.emplace(aPlugin, std::move(item));
 
         spdlog::trace(L"The hook requested by {} at {} has been successfully attached", aPlugin->GetName(), aTarget);
         return true;
