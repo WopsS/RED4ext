@@ -17,7 +17,14 @@ App::App()
     : m_config(m_paths)
     , m_devConsole(m_config.GetDev())
 {
-    Sleep(5000);
+    if (m_config.GetDev().waitForDebugger)
+    {
+        while (!IsDebuggerPresent())
+        {
+            std::this_thread::yield();
+        }
+    }
+
     AddSystem<LoggerSystem>(m_paths, m_config, m_devConsole);
     AddSystem<HookingSystem>();
     AddSystem<StateSystem>();

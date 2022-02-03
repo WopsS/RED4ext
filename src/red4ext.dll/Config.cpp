@@ -126,6 +126,7 @@ void Config::LoadV1(const toml::value& aConfig)
 void Config::DevConfig::LoadV1(const toml::value& aConfig)
 {
     hasConsole = toml::find_or(aConfig, "dev", "console", hasConsole);
+    waitForDebugger = toml::find_or(aConfig, "dev", "wait_for_debugger", waitForDebugger);
 }
 
 void Config::LoggingConfig::LoadV1(const toml::value& aConfig)

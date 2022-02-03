@@ -12,6 +12,7 @@ public:
         void LoadV1(const toml::value& aConfig);
 
         bool hasConsole = false;
+        bool waitForDebugger = false;
     };
 
     struct LoggingConfig
