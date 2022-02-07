@@ -5,11 +5,13 @@
 class Config
 {
 public:
-    static constexpr size_t LatestVersion = 1;
+    static constexpr size_t LatestVersion = 0;
+    static constexpr size_t MinSupportedVersion = 0;
+    static constexpr size_t MaxSupportedVersion = 0;
 
     struct DevConfig
     {
-        void LoadV1(const toml::value& aConfig);
+        void LoadV0(const toml::value& aConfig);
 
         bool hasConsole = false;
         bool waitForDebugger = false;
@@ -17,7 +19,7 @@ public:
 
     struct LoggingConfig
     {
-        void LoadV1(const toml::value& aConfig);
+        void LoadV0(const toml::value& aConfig);
 
         spdlog::level::level_enum level = spdlog::level::info;
         spdlog::level::level_enum flushOn = spdlog::level::err;
@@ -27,7 +29,7 @@ public:
 
     struct PluginsConfig
     {
-        void LoadV1(const toml::value& aConfig);
+        void LoadV0(const toml::value& aConfig);
 
         bool isEnabled = true;
         std::unordered_set<std::wstring> blacklist;
@@ -46,7 +48,7 @@ private:
     void Load(const std::filesystem::path& aFile);
     void Save(const std::filesystem::path& aFile);
 
-    void LoadV1(const toml::value& aConfig);
+    void LoadV0(const toml::value& aConfig);
 
     size_t m_version;
 

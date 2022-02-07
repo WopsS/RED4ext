@@ -62,15 +62,16 @@ void Config::Load(const std::filesystem::path& aFile)
             auto version = toml::find<size_t>(config, "version");
             switch (version)
             {
-            case 1:
+            case 0:
             {
-                LoadV1(config);
+                LoadV0(config);
                 break;
             }
             default:
             {
-                SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("The config file does not have a valid version.\n\nFile: {}",
-                                                    aFile);
+                SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
+                    "Config version '{}' is not supported (version < {} or version > {}).\n\nFile: {}", version,
+                    MinSupportedVersion, MaxSupportedVersion, aFile);
                 break;
             }
             }
@@ -95,8 +96,15 @@ void Config::Save(const std::filesystem::path& aFile)
         auto logLevel = spdlog::level::to_string_view(m_logging.level).data();
         auto flushOn = spdlog::level::to_string_view(m_logging.flushOn).data();
 
-        ordered_value config{{"version", LatestVersion},
-                             {"logging", ordered_value{{"level", logLevel}, {"flush_on", flushOn}}}};
+        ordered_value config{
+            {"version", LatestVersion},
+            {"logging", ordered_value{{"level", logLevel},
+                                      {"flush_on", flushOn},
+                                      {"max_files", m_logging.maxFiles},
+                                      {"max_file_size", m_logging.maxFileSize}}},
+
+            {"plugins", ordered_value{{"enabled", m_plugins.isEnabled}, {"blacklist", std::vector<std::string>{}}}},
+            {"dev", ordered_value{{"console", m_dev.hasConsole}, {"wait_for_debugger", m_dev.waitForDebugger}}}};
 
         config.comments().push_back(
             " See https://wiki.redmodding.org/red4ext/getting-started/configuration for more options.");
@@ -114,22 +122,22 @@ void Config::Save(const std::filesystem::path& aFile)
     }
 }
 
-void Config::LoadV1(const toml::value& aConfig)
+void Config::LoadV0(const toml::value& aConfig)
 {
-    m_version = 1;
+    m_version = 0;
 
-    m_dev.LoadV1(aConfig);
-    m_logging.LoadV1(aConfig);
-    m_plugins.LoadV1(aConfig);
+    m_dev.LoadV0(aConfig);
+    m_logging.LoadV0(aConfig);
+    m_plugins.LoadV0(aConfig);
 }
 
-void Config::DevConfig::LoadV1(const toml::value& aConfig)
+void Config::DevConfig::LoadV0(const toml::value& aConfig)
 {
     hasConsole = toml::find_or(aConfig, "dev", "console", hasConsole);
     waitForDebugger = toml::find_or(aConfig, "dev", "wait_for_debugger", waitForDebugger);
 }
 
-void Config::LoggingConfig::LoadV1(const toml::value& aConfig)
+void Config::LoggingConfig::LoadV0(const toml::value& aConfig)
 {
     auto levelName = toml::find_or(aConfig, "logging", "level", "");
     if (!levelName.empty())
@@ -173,7 +181,7 @@ void Config::LoggingConfig::LoadV1(const toml::value& aConfig)
     }
 }
 
-void Config::PluginsConfig::LoadV1(const toml::value& aConfig)
+void Config::PluginsConfig::LoadV0(const toml::value& aConfig)
 {
     isEnabled = toml::find_or(aConfig, "plugins", "enabled", isEnabled);
 
