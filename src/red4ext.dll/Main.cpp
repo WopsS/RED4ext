@@ -1,34 +1,60 @@
 #include "stdafx.hpp"
 #include "App.hpp"
-#include "Utils.hpp"
 #include "Image.hpp"
+#include "Utils.hpp"
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
-    const auto image = Image::Get();
-
     switch (aReason)
     {
     case DLL_PROCESS_ATTACH:
     {
         DisableThreadLibraryCalls(aModule);
 
-        if (!image->IsCyberpunk())
+        try
         {
-            break;
+            const auto image = Image::Get();
+            if (!image->IsCyberpunk())
+            {
+                break;
+            }
+
+            App::Construct();
+        }
+        catch (const std::exception& e)
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while loading RED4ext.\n\n{}",
+                                                Utils::Widen(e.what()));
+        }
+        catch (...)
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while loading RED4ext.");
         }
 
-        App::Construct();
         break;
     }
     case DLL_PROCESS_DETACH:
     {
-        if (!image->IsCyberpunk())
+        try
         {
-            break;
+            const auto image = Image::Get();
+            if (!image->IsCyberpunk())
+            {
+                break;
+            }
+
+            App::Destruct();
+        }
+        catch (const std::exception& e)
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while unloading RED4ext.\n\n{}",
+                                                Utils::Widen(e.what()));
+        }
+        catch (...)
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while unloading RED4ext.");
         }
 
-        App::Destruct();
         break;
     }
     }
