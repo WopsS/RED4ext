@@ -59,14 +59,14 @@ App::App()
     const auto& pluginsConfig = m_config.GetPlugins();
     spdlog::debug("  plugins.enabled: {}", pluginsConfig.isEnabled);
 
-    const auto& blacklist = pluginsConfig.blacklist;
-    if (blacklist.empty())
+    const auto& disabled = pluginsConfig.disabled;
+    if (disabled.empty())
     {
-        spdlog::debug(L"  plugins.blacklist: []");
+        spdlog::debug(L"  plugins.disabled: []");
     }
     else
     {
-        spdlog::debug(L"  plugins.blacklist: [ {} ]", fmt::join(blacklist, L", "));
+        spdlog::debug(L"  plugins.disabled: [ {} ]", fmt::join(disabled, L", "));
     }
 
     spdlog::debug("Base address is {}", reinterpret_cast<void*>(GetModuleHandle(nullptr)));

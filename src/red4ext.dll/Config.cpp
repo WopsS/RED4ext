@@ -103,7 +103,7 @@ void Config::Save(const std::filesystem::path& aFile)
                                       {"max_files", m_logging.maxFiles},
                                       {"max_file_size", m_logging.maxFileSize}}},
 
-            {"plugins", ordered_value{{"enabled", m_plugins.isEnabled}, {"blacklist", std::vector<std::string>{}}}},
+            {"plugins", ordered_value{{"enabled", m_plugins.isEnabled}, {"disabled", std::vector<std::string>{}}}},
             {"dev", ordered_value{{"console", m_dev.hasConsole}, {"wait_for_debugger", m_dev.waitForDebugger}}}};
 
         config.comments().push_back(
@@ -185,11 +185,11 @@ void Config::PluginsConfig::LoadV0(const toml::value& aConfig)
 {
     isEnabled = toml::find_or(aConfig, "plugins", "enabled", isEnabled);
 
-    std::vector<std::string> blacklistedPlugins;
-    blacklistedPlugins = toml::find_or(aConfig, "plugins", "blacklist", blacklistedPlugins);
+    std::vector<std::string> disabledPlugins;
+    disabledPlugins = toml::find_or(aConfig, "plugins", "disabled", disabledPlugins);
 
-    for (const auto& plugin : blacklistedPlugins)
+    for (const auto& plugin : disabledPlugins)
     {
-        blacklist.emplace(Utils::Widen(plugin));
+        disabled.emplace(Utils::Widen(plugin));
     }
 }
