@@ -17,7 +17,7 @@ function m.gen()
         local minor = version[2]
         local patch = version[3]
 
-        local version_str = string.format("v%d.%d.%d", major, minor, patch)
+        local version_str = string.format("v%s.%s.%s", major, minor, patch)
 
         local branch = os.outputof("git rev-parse --abbrev-ref HEAD")
         local commit = os.outputof("git rev-parse --short HEAD")
