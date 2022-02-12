@@ -8,6 +8,12 @@ project("RED4ext.Loader")
     pchsource("stdafx.cpp")
     dependson({ "RED4ext.Dll" })
 
+    -- Remove these defines, else Resource Compiler will cry.
+    removedefines({
+        "WINVER=*",
+        "_WIN32_WINNT=*"
+    })
+
     defines(
     {
         "WINVER=0x0A00",
@@ -25,7 +31,8 @@ project("RED4ext.Loader")
     {
         "**.cpp",
         "**.hpp",
-        "**.def"
+        "**.def",
+        "**.rc"
     })
 
     links(

@@ -27,7 +27,8 @@ project("RED4ext.Dll")
     files(
     {
         "**.cpp",
-        "**.hpp"
+        "**.hpp",
+        "**.rc"
     })
 
     links(
