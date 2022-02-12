@@ -56,8 +56,7 @@ private:
             {
                 const auto logName = aPlugin->GetName();
 
-                const auto& path = aPlugin->GetPath();
-                auto fileName = path.stem().wstring();
+                std::wstring fileName(logName);
                 std::transform(fileName.begin(), fileName.end(), fileName.begin(),
                                [](wchar_t aC) { return std::tolower(aC); });
 
