@@ -107,7 +107,7 @@ void Config::Save(const std::filesystem::path& aFile)
             {"dev", ordered_value{{"console", m_dev.hasConsole}, {"wait_for_debugger", m_dev.waitForDebugger}}}};
 
         config.comments().push_back(
-            " See https://wiki.redmodding.org/red4ext/getting-started/configuration for more options.");
+            " See https://docs.red4ext.com/getting-started/configuration for more options.");
 
         std::ofstream file(aFile, std::ios::out);
         file.exceptions(std::ostream::badbit | std::ostream::failbit);
