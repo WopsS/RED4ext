@@ -26,20 +26,9 @@ bool States::RunningState::OnUpdate(RED4ext::CRunningState* aThis, RED4ext::CGam
     auto stateSystem = app->GetStateSystem();
 
     auto result = CRunningState.OnUpdate(aThis, aApp);
-    result = stateSystem->OnUpdate(RED4ext::EGameStateType::Running, aApp) && result;
+    stateSystem->OnUpdate(RED4ext::EGameStateType::Running, aApp);
 
-    /*
-     * Doing this because the game might call "SetState" which will also change the application status and will force
-     * the state to move on.
-     */
-    if (!result)
-    {
-        aApp->status = RED4ext::EGameStateStatus::Initialized;
-        return false;
-    }
-
-    aApp->status = RED4ext::EGameStateStatus::Ran;
-    return true;
+    return result;
 }
 
 bool States::RunningState::OnExit(RED4ext::CRunningState* aThis, RED4ext::CGameApplication* aApp)
