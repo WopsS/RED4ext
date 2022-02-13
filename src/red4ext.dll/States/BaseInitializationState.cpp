@@ -49,10 +49,8 @@ bool States::BaseInitializationState::OnExit(RED4ext::CBaseInitializationState* 
     auto app = App::Get();
     auto stateSystem = app->GetStateSystem();
 
-    auto result = CBaseInitializationState.OnExit(aThis, aApp);
     stateSystem->OnExit(RED4ext::EGameStateType::BaseInitialization, aApp);
-
-    return result;
+    return CBaseInitializationState.OnExit(aThis, aApp);
 }
 
 bool States::BaseInitializationState::Attach(RED4ext::CBaseInitializationState* aState)

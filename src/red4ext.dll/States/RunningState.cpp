@@ -36,10 +36,8 @@ bool States::RunningState::OnExit(RED4ext::CRunningState* aThis, RED4ext::CGameA
     auto app = App::Get();
     auto stateSystem = app->GetStateSystem();
 
-    auto result = CRunningState.OnExit(aThis, aApp);
     stateSystem->OnExit(RED4ext::EGameStateType::Running, aApp);
-
-    return result;
+    return CRunningState.OnExit(aThis, aApp);
 }
 
 bool States::RunningState::Attach(RED4ext::CRunningState* aState)

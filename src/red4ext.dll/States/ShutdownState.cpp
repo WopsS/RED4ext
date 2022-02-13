@@ -24,7 +24,7 @@ bool States::ShutdownState::OnUpdate(RED4ext::CShutdownState* aThis, RED4ext::CG
     auto stateSystem = app->GetStateSystem();
 
     auto result = stateSystem->OnUpdate(RED4ext::EGameStateType::Shutdown, aApp);
-    result = CShutdownState.OnUpdate(aThis, aApp) && result;
+    result = result && CShutdownState.OnUpdate(aThis, aApp);
 
     /*
      * Doing this because the game might call "SetState" which will also change the application status and will force
