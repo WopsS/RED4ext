@@ -32,7 +32,7 @@ public:
         void LoadV0(const toml::value& aConfig);
 
         bool isEnabled = true;
-        std::unordered_set<std::wstring> disabled;
+        std::unordered_set<std::wstring> ignored;
     };
 
     Config(const Paths& aPaths);

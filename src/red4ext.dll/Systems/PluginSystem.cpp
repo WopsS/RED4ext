@@ -120,9 +120,9 @@ void PluginSystem::Startup()
         if (entry.is_regular_file(ec) && path.extension() == L".dll")
         {
             const auto stem = path.stem();
-            if (m_config.disabled.contains(stem))
+            if (m_config.ignored.contains(stem))
             {
-                spdlog::debug(L"Ignoring plugin '{}' because it is disabled. Path: '{}'", stem, path);
+                spdlog::debug(L"Ignoring plugin '{}' because it is ignored. Path: '{}'", stem, path);
                 continue;
             }
 
