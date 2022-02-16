@@ -27,7 +27,7 @@ class Group:
 def get_groups() -> List[Group]:
     return [
         Group(name='Global', functions=[
-            Item(name='Main', pattern='40 53 48 81 EC C0 01 00 00 FF 15 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ?', expected=1, index=0)
+            Item(name='Main', pattern='40 53 48 81 EC ? ? ? ? FF 15 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ?', expected=1, index=0)
         ]),
 
         Group(name='CGameApplication', functions=[
