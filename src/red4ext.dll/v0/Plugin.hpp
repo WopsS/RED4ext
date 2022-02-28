@@ -15,15 +15,15 @@ public:
 
     virtual const std::wstring_view GetName() const final;
     virtual const std::wstring_view GetAuthor() const final;
-    virtual const RED4ext::VersionInfo& GetVersion() const final;
-    virtual const RED4ext::VersionInfo& GetRuntimeVersion() const final;
-    virtual const RED4ext::VersionInfo& GetSdkVersion() const final;
+    virtual const RED4ext::SemVer& GetVersion() const final;
+    virtual const RED4ext::FileVer& GetRuntimeVersion() const final;
+    virtual const RED4ext::SemVer& GetSdkVersion() const final;
 
 private:
     RED4ext::v0::PluginInfo m_info;
 
     RED4ext::v0::Sdk m_sdk;
-    RED4ext::v0::VersionInfo m_runtime;
+    RED4ext::v0::SemVer m_runtime;
     RED4ext::v0::Logger m_logger;
     RED4ext::v0::Hooking m_hooking;
     RED4ext::v0::GameStates m_gameStates;

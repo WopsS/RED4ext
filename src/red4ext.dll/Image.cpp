@@ -4,7 +4,8 @@
 
 Image::Image()
     : m_isCyberpunk(false)
-    , m_version(RED4EXT_V0_SEMVER(0, 0, 0))
+    , m_fileVersion(RED4EXT_V0_FILEVER(0, 0, 0, 0))
+    , m_productVersion(RED4EXT_V0_SEMVER(0, 0, 0))
 {
     std::wstring fileName;
     auto hr = wil::GetModuleFileNameW(nullptr, fileName);
@@ -21,7 +22,7 @@ Image::Image()
         {
             SHOW_LAST_ERROR_MESSAGE_FILE_LINE(L"Could not retrieve version info size.\n\nFile name: {}", fileName);
         }
-        
+
         // Else, fail silently, executables might not have the version information.
         return;
     }
@@ -73,7 +74,7 @@ Image::Image()
 
     if (m_isCyberpunk)
     {
-        VS_FIXEDFILEINFO* fileInfo;
+        VS_FIXEDFILEINFO* fileInfo = nullptr;
         UINT fileInfoBytes;
 
         if (!VerQueryValue(data.get(), L"\\", reinterpret_cast<LPVOID*>(&fileInfo), &fileInfoBytes))
@@ -91,11 +92,22 @@ Image::Image()
             return;
         }
 
-        uint8_t major = (fileInfo->dwProductVersionMS >> 16) & 0xFF;
-        uint16_t minor = fileInfo->dwProductVersionMS & 0xFFFF;
-        uint32_t patch = (fileInfo->dwProductVersionLS >> 16) & 0xFFFF;
+        {
+            uint16_t major = (fileInfo->dwFileVersionMS >> 16) & 0xFF;
+            uint16_t minor = fileInfo->dwFileVersionMS & 0xFFFF;
+            uint16_t build = (fileInfo->dwFileVersionLS >> 16) & 0xFFFF;
+            uint16_t revision = fileInfo->dwFileVersionLS & 0xFFFF;
 
-        m_version = RED4EXT_SEMVER(major, minor, patch);
+            m_fileVersion = RED4EXT_FILEVER(major, minor, build, revision);
+        }
+
+        {
+            uint8_t major = (fileInfo->dwProductVersionMS >> 16) & 0xFF;
+            uint16_t minor = fileInfo->dwProductVersionMS & 0xFFFF;
+            uint32_t patch = (fileInfo->dwProductVersionLS >> 16) & 0xFFFF;
+
+            m_productVersion = RED4EXT_SEMVER(major, minor, patch);
+        }
     }
 }
 
@@ -112,15 +124,20 @@ bool Image::IsCyberpunk() const
 
 bool Image::IsSupported() const
 {
-    return m_version == GetSupportedVersion();
+    return m_fileVersion == GetSupportedVersion();
 }
 
-const RED4ext::VersionInfo& Image::GetVersion() const
+const RED4ext::FileVer& Image::GetFileVersion() const
 {
-    return m_version;
+    return m_fileVersion;
 }
 
-const RED4ext::VersionInfo Image::GetSupportedVersion() const
+const RED4ext::SemVer& Image::GetProductVersion() const
+{
+    return m_productVersion;
+}
+
+const RED4ext::FileVer Image::GetSupportedVersion() const
 {
     return RED4EXT_RUNTIME_LATEST;
 }

@@ -8,7 +8,7 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     : PluginBase(aPath, std::move(aModule))
     , m_info{}
     , m_sdk{}
-    , m_runtime(Image::Get()->GetVersion())
+    , m_runtime(Image::Get()->GetProductVersion())
     , m_logger{}
     , m_hooking{}
     , m_gameStates{}
@@ -71,17 +71,17 @@ const std::wstring_view v0::Plugin::GetAuthor() const
     return m_info.author;
 }
 
-const RED4ext::VersionInfo& v0::Plugin::GetVersion() const
+const RED4ext::SemVer& v0::Plugin::GetVersion() const
 {
     return m_info.version;
 }
 
-const RED4ext::VersionInfo& v0::Plugin::GetRuntimeVersion() const
+const RED4ext::FileVer& v0::Plugin::GetRuntimeVersion() const
 {
     return m_info.runtime;
 }
 
-const RED4ext::VersionInfo& v0::Plugin::GetSdkVersion() const
+const RED4ext::SemVer& v0::Plugin::GetSdkVersion() const
 {
     return m_info.sdk;
 }

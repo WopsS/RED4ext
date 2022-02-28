@@ -12,9 +12,9 @@ public:
 
     virtual const std::wstring_view GetName() const = 0;
     virtual const std::wstring_view GetAuthor() const = 0;
-    virtual const RED4ext::VersionInfo& GetVersion() const = 0;
-    virtual const RED4ext::VersionInfo& GetRuntimeVersion() const = 0;
-    virtual const RED4ext::VersionInfo& GetSdkVersion() const = 0;
+    virtual const RED4ext::SemVer& GetVersion() const = 0;
+    virtual const RED4ext::FileVer& GetRuntimeVersion() const = 0;
+    virtual const RED4ext::SemVer& GetSdkVersion() const = 0;
 
     const std::filesystem::path& GetPath() const;
     HMODULE GetModule() const;

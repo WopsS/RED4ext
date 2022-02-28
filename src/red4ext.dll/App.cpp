@@ -72,19 +72,25 @@ App::App()
     spdlog::debug("Base address is {}", reinterpret_cast<void*>(GetModuleHandle(nullptr)));
 
     const auto image = Image::Get();
-    const auto& ver = image->GetVersion();
-    spdlog::info("Game version is {}.{}{}", ver.major, ver.minor, ver.patch);
+
+    const auto& productVer = image->GetProductVersion();
+    spdlog::info("Game version is {}.{}{}", productVer.major, productVer.minor, productVer.patch);
+
+    const auto& fileVer = image->GetFileVersion();
+    spdlog::info("File version {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
 
     if (!image->IsSupported())
     {
-        spdlog::error("This game version ({}.{}{}) is not supported.", ver.major, ver.minor, ver.patch);
+        spdlog::error("This game version ({}.{}{}) is not supported.", productVer.major, productVer.minor,
+                      productVer.patch);
 
         const auto supportedVer = image->GetSupportedVersion();
         fmt::memory_buffer out;
-        fmt::format_to(std::back_inserter(out), "The current version of the mod supports only version {}.{}{}, ",
-                       supportedVer.major, supportedVer.minor, supportedVer.patch);
+        fmt::format_to(std::back_inserter(out),
+                       "The current version of RED4ext supports only file version {}.{}.{}.{}, ", supportedVer.major,
+                       supportedVer.minor, supportedVer.build, supportedVer.revision);
 
-        if (ver < supportedVer)
+        if (fileVer < supportedVer)
         {
             fmt::format_to(std::back_inserter(out), "try downgrading the mod or updating the game.");
         }

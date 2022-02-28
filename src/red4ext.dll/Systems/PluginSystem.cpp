@@ -8,7 +8,7 @@
 #define MINIMUM_API_VERSION RED4EXT_API_VERSION_0
 #define LATEST_API_VERSION RED4EXT_API_VERSION_LATEST
 
-#define MINIMUM_SDK_VERSION RED4EXT_SDK_0_2_0
+#define MINIMUM_SDK_VERSION RED4EXT_SDK_0_3_0
 #define LATEST_SDK_VERSION RED4EXT_SDK_LATEST
 
 #define LOG_FS_ERROR(text, ec)                                                                                         \
@@ -208,15 +208,16 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
     const auto& pluginVersion = plugin->GetVersion();
 
     const auto image = Image::Get();
-    const auto& runtime = image->GetVersion();
+    const auto& fileVer = image->GetFileVersion();
+    const auto& productVer = image->GetProductVersion();
 
     const auto& requestedRuntime = plugin->GetRuntimeVersion();
-    if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != runtime)
+    if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != fileVer)
     {
-        spdlog::warn(L"{} (version: {}) is not incompatible with the current game's version ({}.{}{}). This version of "
-                     L"the plugin supports only version {}.{}{}",
-                     pluginName, std::to_wstring(pluginVersion), runtime.major, runtime.minor, runtime.patch,
-                     requestedRuntime.major, requestedRuntime.minor, requestedRuntime.patch);
+        spdlog::warn(L"{} (version: {}) is not incompatible with the current game's version. This version of the "
+                     L"plugin supports only runtime version {}.{}.{}.{}",
+                     pluginName, std::to_wstring(pluginVersion), requestedRuntime.major, requestedRuntime.minor,
+                     requestedRuntime.build, requestedRuntime.revision);
         return;
     }
 
