@@ -35,7 +35,7 @@ App::App()
     auto logger = Utils::CreateLogger(L"RED4ext", L"red4ext.log", m_paths, m_config, m_devConsole);
     spdlog::set_default_logger(logger);
 
-    spdlog::info("RED4ext ({}) is initializing...", RED4EXT_VERSION_STR);
+    spdlog::info("RED4ext (v{}) is initializing...", RED4EXT_VERSION_STR);
 
     spdlog::debug("Using the following paths:");
     spdlog::debug(L"  Root: {}", m_paths.GetRootDir());
