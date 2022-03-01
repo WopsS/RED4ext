@@ -21,7 +21,7 @@ If you are developing a new plugin, add only [RED4ext.SDK](https://github.com/Wo
 
 ## How to install
 
-Instructions about how to install RED4ext can be found [here](/docs/how-to-install.md).
+Instructions about how to install RED4ext can be found [here](https://docs.red4ext.com/).
 
 ## Building from source
 
