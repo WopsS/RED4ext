@@ -214,7 +214,7 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
     const auto& requestedRuntime = plugin->GetRuntimeVersion();
     if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != fileVer)
     {
-        spdlog::warn(L"{} (version: {}) is not incompatible with the current game's version. This version of the "
+        spdlog::warn(L"{} (version: {}) is incompatible with the current game's version. This version of the "
                      L"plugin supports only runtime version {}.{}.{}.{}",
                      pluginName, std::to_wstring(pluginVersion), requestedRuntime.major, requestedRuntime.minor,
                      requestedRuntime.build, requestedRuntime.revision);
