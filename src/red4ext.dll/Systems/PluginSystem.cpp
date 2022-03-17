@@ -122,7 +122,7 @@ void PluginSystem::Startup()
             const auto stem = path.stem();
             if (m_config.ignored.contains(stem))
             {
-                spdlog::debug(L"Ignoring plugin '{}' because it is ignored. Path: '{}'", stem, path);
+                spdlog::debug(L"Skipping loading '{}', the plugin is ignored by the user. Path: '{}", stem, path);
                 continue;
             }
 
@@ -214,10 +214,12 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
     const auto& requestedRuntime = plugin->GetRuntimeVersion();
     if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != fileVer)
     {
-        spdlog::warn(L"{} (version: {}) is incompatible with the current game's version. This version of the "
-                     L"plugin supports only runtime version {}.{}.{}.{}",
-                     pluginName, std::to_wstring(pluginVersion), requestedRuntime.major, requestedRuntime.minor,
-                     requestedRuntime.build, requestedRuntime.revision);
+        spdlog::warn(
+            L"{} (version: {}) is incompatible with the current game's version ({}.{}{}, runtime {}.{}.{}.{}). "
+            L"This version of the plugin was compiled for runtime version {}.{}.{}.{}",
+            pluginName, std::to_wstring(pluginVersion), productVer.major, productVer.minor, productVer.patch,
+            fileVer.major, fileVer.minor, fileVer.build, fileVer.revision, requestedRuntime.major,
+            requestedRuntime.minor, requestedRuntime.build, requestedRuntime.revision);
         return;
     }
 
