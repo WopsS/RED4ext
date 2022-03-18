@@ -22,7 +22,7 @@ public:
         void LoadV0(const toml::value& aConfig);
 
         spdlog::level::level_enum level = spdlog::level::info;
-        spdlog::level::level_enum flushOn = spdlog::level::err;
+        spdlog::level::level_enum flushOn = spdlog::level::info;
         uint32_t maxFiles = 5;
         uint32_t maxFileSize = 10;
     };
