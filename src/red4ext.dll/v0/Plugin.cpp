@@ -24,8 +24,11 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     m_logger.TraceWF = v0::Logger::TraceWF;
     m_logger.Debug = v0::Logger::Debug;
     m_logger.DebugF = v0::Logger::DebugF;
+    m_logger.DebugW = v0::Logger::DebugW;
     m_logger.DebugWF = v0::Logger::DebugWF;
+    m_logger.Info = v0::Logger::Info;
     m_logger.InfoF = v0::Logger::InfoF;
+    m_logger.InfoW = v0::Logger::InfoW;
     m_logger.InfoWF = v0::Logger::InfoWF;
     m_logger.Warn = v0::Logger::Warn;
     m_logger.WarnF = v0::Logger::WarnF;
