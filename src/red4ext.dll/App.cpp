@@ -81,7 +81,7 @@ App::App()
 
     if (!image->IsSupported())
     {
-        spdlog::error("This game version ({}.{}{}) is not supported.", productVer.major, productVer.minor,
+        spdlog::error("This game version ({}.{}{}) is not supported", productVer.major, productVer.minor,
                       productVer.patch);
 
         const auto supportedVer = image->GetSupportedVersion();
@@ -92,11 +92,11 @@ App::App()
 
         if (fileVer < supportedVer)
         {
-            fmt::format_to(std::back_inserter(out), "try downgrading the mod or updating the game.");
+            fmt::format_to(std::back_inserter(out), "try downgrading the mod or updating the game");
         }
         else
         {
-            fmt::format_to(std::back_inserter(out), "try updating the mod or downgrading the game.");
+            fmt::format_to(std::back_inserter(out), "try updating the mod or downgrading the game");
         }
 
         spdlog::error(fmt::to_string(out));
