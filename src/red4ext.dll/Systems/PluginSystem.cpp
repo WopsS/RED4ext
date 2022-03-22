@@ -189,7 +189,7 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
         return;
     }
 
-    spdlog::trace(L"'{}' has loaded into the address space at {}", stem, fmt::ptr(handle.get()));
+    spdlog::trace(L"'{}' has been loaded into the address space at {}", stem, fmt::ptr(handle.get()));
 
     auto plugin = CreatePlugin(aPath, std::move(handle));
     if (!plugin)
