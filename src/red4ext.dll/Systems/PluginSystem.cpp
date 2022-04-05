@@ -208,19 +208,36 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
     const auto& pluginVersion = plugin->GetVersion();
 
     const auto image = Image::Get();
-    const auto& fileVer = image->GetFileVersion();
     const auto& productVer = image->GetProductVersion();
 
     const auto& requestedRuntime = plugin->GetRuntimeVersion();
-    if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT && requestedRuntime != fileVer)
+    if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT)
     {
-        spdlog::warn(
-            L"{} (version: {}) is incompatible with the current game's version ({}.{}{}, runtime {}.{}.{}.{}). "
-            L"This version of the plugin was compiled for runtime version {}.{}.{}.{}",
-            pluginName, std::to_wstring(pluginVersion), productVer.major, productVer.minor, productVer.patch,
-            fileVer.major, fileVer.minor, fileVer.build, fileVer.revision, requestedRuntime.major,
-            requestedRuntime.minor, requestedRuntime.build, requestedRuntime.revision);
-        return;
+        // Check if the plugins is compiled for a supported version.
+        bool isSupported = false;
+        const auto supportedVers = image->GetSupportedVersions();
+
+        for (const auto& supportedRuntime : supportedVers)
+        {
+            if (supportedRuntime == requestedRuntime)
+            {
+                isSupported = true;
+                break;
+            }
+        }
+
+        if (!isSupported)
+        {
+            const auto& fileVer = image->GetFileVersion();
+            spdlog::warn(
+                L"{} (version: {}) is incompatible with the current game's version ({}.{}{}, runtime {}.{}.{}.{}). "
+                L"This version of the plugin was compiled for runtime version {}.{}.{}.{}",
+                pluginName, std::to_wstring(pluginVersion), productVer.major, productVer.minor, productVer.patch,
+                fileVer.major, fileVer.minor, fileVer.build, fileVer.revision, requestedRuntime.major,
+                requestedRuntime.minor, requestedRuntime.build, requestedRuntime.revision);
+
+            return;
+        }
     }
 
     const auto& pluginSdk = plugin->GetSdkVersion();
