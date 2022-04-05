@@ -64,7 +64,7 @@ bool DetourTransaction::Commit()
         }
         default:
         {
-            spdlog::warn("Unknown transaction state. State: {}", m_state);
+            spdlog::warn("Unknown transaction state. State: {}", static_cast<int32_t>(m_state));
             break;
         }
         }
@@ -110,7 +110,7 @@ bool DetourTransaction::Abort()
         }
         default:
         {
-            spdlog::warn("Unknown transaction state. State: {}", m_state);
+            spdlog::warn("Unknown transaction state. State: {}", static_cast<int32_t>(m_state));
             break;
         }
         }

@@ -118,7 +118,7 @@ StateSystem::State* StateSystem::GetStateByType(RED4ext::EGameStateType aStateTy
     }
     default:
     {
-        spdlog::warn("State with type {} is not handled", aStateType);
+        spdlog::warn("State with type {} is not handled", static_cast<int32_t>(aStateType));
         break;
     }
     }

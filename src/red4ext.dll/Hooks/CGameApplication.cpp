@@ -53,7 +53,7 @@ bool _CGameApplication_Run(RED4ext::CGameApplication* aThis)
                 }
                 default:
                 {
-                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), state->GetType());
+                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), static_cast<int32_t>(state->GetType()));
                 }
                 }
             }
@@ -123,7 +123,7 @@ bool _CGameApplication_Run(RED4ext::CGameApplication* aThis)
                 }
                 default:
                 {
-                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), state->GetType());
+                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), static_cast<int32_t>(state->GetType()));
                 }
                 }
             }
