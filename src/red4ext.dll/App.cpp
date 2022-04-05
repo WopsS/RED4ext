@@ -84,22 +84,9 @@ App::App()
         spdlog::error("This game version ({}.{}{}) is not supported", productVer.major, productVer.minor,
                       productVer.patch);
 
-        const auto supportedVer = image->GetSupportedVersion();
-        fmt::memory_buffer out;
-        fmt::format_to(std::back_inserter(out),
-                       "The current version of RED4ext supports only file version {}.{}.{}.{}, ", supportedVer.major,
-                       supportedVer.minor, supportedVer.build, supportedVer.revision);
-
-        if (fileVer < supportedVer)
-        {
-            fmt::format_to(std::back_inserter(out), "try downgrading the mod or updating the game");
-        }
-        else
-        {
-            fmt::format_to(std::back_inserter(out), "try updating the mod or downgrading the game");
-        }
-
-        spdlog::error(fmt::to_string(out));
+        const auto supportedVers = image->GetSupportedVersions();
+        spdlog::error("The current version of RED4ext supports only the following file version(s): {}",
+                      fmt::join(supportedVers, ", "));
         return;
     }
 

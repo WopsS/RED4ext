@@ -57,6 +57,17 @@ struct fmt::formatter<std::filesystem::path, Char> : formatter<basic_string_view
     }
 };
 
+template<typename Char>
+struct fmt::formatter<RED4ext::FileVer, Char> : formatter<basic_string_view<Char>, Char>
+{
+    template<typename FormatContext>
+    auto format(const RED4ext::FileVer& aFileVersion, FormatContext& ctx)
+    {
+        return fmt::format_to(ctx.out(), "{}.{}.{}.{}", aFileVersion.major, aFileVersion.minor, aFileVersion.build,
+                              aFileVersion.revision);
+    }
+};
+
 #ifndef SHOW_LAST_ERROR_MESSAGE_FILE_LINE
 #define SHOW_LAST_ERROR_MESSAGE_FILE_LINE(additionalText, ...)                                                         \
     Utils::ShowLastErrorMessage(MB_ICONWARNING | MB_OK, additionalText L"\n\n{}:{}", __VA_ARGS__, TEXT(__FILE__),      \

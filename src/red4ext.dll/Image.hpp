@@ -10,7 +10,7 @@ public:
 
     const RED4ext::FileVer& GetFileVersion() const;
     const RED4ext::SemVer& GetProductVersion() const;
-    const RED4ext::FileVer GetSupportedVersion() const;
+    const std::vector<RED4ext::FileVer> GetSupportedVersions() const;
 
 private:
     Image();

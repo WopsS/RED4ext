@@ -124,7 +124,16 @@ bool Image::IsCyberpunk() const
 
 bool Image::IsSupported() const
 {
-    return m_fileVersion == GetSupportedVersion();
+    const auto supportedVersions = GetSupportedVersions();
+    for (const auto& version : supportedVersions)
+    {
+        if (version == m_fileVersion)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 const RED4ext::FileVer& Image::GetFileVersion() const
@@ -137,7 +146,7 @@ const RED4ext::SemVer& Image::GetProductVersion() const
     return m_productVersion;
 }
 
-const RED4ext::FileVer Image::GetSupportedVersion() const
+const std::vector<RED4ext::FileVer> Image::GetSupportedVersions() const
 {
-    return RED4EXT_RUNTIME_LATEST;
+    return {RED4EXT_RUNTIME_1_52, RED4EXT_RUNTIME_1_52_HOTFIX_1};
 }
