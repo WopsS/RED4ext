@@ -105,7 +105,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           append_body: true
-          body: |       
+          body: |
+            
             ### SHA256 Hashes of the release artifacts
 
             - red4ext_${{ env.RED4EXT_VERSION }}.zip
