@@ -77,7 +77,7 @@ App::App()
     spdlog::info("Game version is {}.{}{}", productVer.major, productVer.minor, productVer.patch);
 
     const auto& fileVer = image->GetFileVersion();
-    spdlog::info("File version {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
+    spdlog::info("File version is {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
 
     if (!image->IsSupported())
     {
