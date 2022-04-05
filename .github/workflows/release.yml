@@ -22,7 +22,7 @@ jobs:
         run: |
           $prefix = "refs/tags/v"
           $version = $env:GITHUB_REF.Substring($prefix.Length)
-          echo "VERSION=${version}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+          echo "RED4EXT_VERSION=${version}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
@@ -67,10 +67,7 @@ jobs:
           Add-Content -Path release/red4ext/LICENSE.txt -Value $third_party
 
           # Create a zip file.
-          Compress-Archive -Path release/* -DestinationPath red4ext_${env:VERSION}.zip
-
-          # Generate hash.
-          Get-FileHash -Algorithm SHA256 -Path red4ext_${env:VERSION}.zip | Format-List
+          Compress-Archive -Path release/* -DestinationPath red4ext_${env:RED4EXT_VERSION}.zip
 
       - name: Prepare PDBs
         run: |
@@ -84,16 +81,37 @@ jobs:
           Copy-Item build/release/libs/*.pdb release_pdbs/libs
 
           # Create a zip file.
-          Compress-Archive -Path release_pdbs/* -DestinationPath red4ext_${env:VERSION}_pdbs.zip
+          Compress-Archive -Path release_pdbs/* -DestinationPath red4ext_${env:RED4EXT_VERSION}_pdbs.zip
 
-          # Generate hash.
-          Get-FileHash -Algorithm SHA256 -Path red4ext_${env:VERSION}_pdbs.zip | Format-List
+      - name: Generate hashes
+        run: |
+          # Files zip.
+          $hash = Get-FileHash -Algorithm SHA256 -Path red4ext_${env:RED4EXT_VERSION}.zip
+          $hash | Format-List
+
+          $only_hash = $hash | ForEach-Object { $_.Hash }
+          echo "RED4EXT_SHA256=${only_hash}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+
+          # PDBs zip.
+          $hash = Get-FileHash -Algorithm SHA256 -Path red4ext_${env:RED4EXT_VERSION}_pdbs.zip
+          $hash | Format-List
+
+          $only_hash = $hash | ForEach-Object { $_.Hash }
+          echo "RED4EXT_SHA256_PDBS=${only_hash}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
       - name: Upload assets
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@fe9a9bd3295828558c7a3c004f23f3bf77d155b2 # Use commit hash instead of version, this commit introduce append_body option, which is not present in the release version.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          append_body: true
+          body: |       
+            ### SHA256 Hashes of the release artifacts
+
+            - red4ext_${{ env.RED4EXT_VERSION }}.zip
+              - ${{ env.RED4EXT_SHA256 }}
+            - red4ext_${{ env.RED4EXT_VERSION }}_pdbs.zip
+              - ${{ env.RED4EXT_SHA256_PDBS }}
           files: |
-            red4ext_${{ env.VERSION }}.zip
-            red4ext_${{ env.VERSION }}_pdbs.zip
+            red4ext_${{ env.RED4EXT_VERSION }}.zip
+            red4ext_${{ env.RED4EXT_VERSION }}_pdbs.zip
