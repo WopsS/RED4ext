@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "pwrprof.hpp"
+#include "d3d1x.hpp"
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {

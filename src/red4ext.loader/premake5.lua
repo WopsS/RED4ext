@@ -1,5 +1,5 @@
 project("RED4ext.Loader")
-    targetname("powrprof")
+    targetname("d3d11")
     targetdir(red4ext.paths.build("bin"))
 
     kind("SharedLib")
