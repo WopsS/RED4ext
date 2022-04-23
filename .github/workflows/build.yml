@@ -60,7 +60,7 @@ jobs:
 
           # Copy build artifacts.
           Copy-Item -Path build/${{ matrix.config }}/bin/RED4ext.* -Destination artifacts/red4ext
-          Copy-Item -Path build/${{ matrix.config }}/bin/powrprof.* -Destination artifacts/bin/x64
+          Copy-Item -Path build/${{ matrix.config }}/bin/d3d11.* -Destination artifacts/bin/x64
           Copy-Item -Path build/${{ matrix.config }}/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
           Copy-Item -Path build/${{ matrix.config }}/libs/* -Destination artifacts/red4ext/libs -Recurse
 
