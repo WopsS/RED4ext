@@ -69,13 +69,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "ProductName", "powrprof"
+            VALUE "ProductName", "d3d11"
             VALUE "ProductVersion", RED4EXT_VERSION_STR
             VALUE "FileDescription", "The loader for RED4ext."
             VALUE "FileVersion", RED4EXT_VERSION_STR
-            VALUE "InternalName", "powrprof.dll"
+            VALUE "InternalName", "d3d11.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020 - present RED4ext project"
-            VALUE "OriginalFilename", "powrprof.dll"
+            VALUE "OriginalFilename", "d3d11.dll"
             VALUE "CompanyName", ""
         END
     END

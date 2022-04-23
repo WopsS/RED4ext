@@ -55,7 +55,7 @@ jobs:
 
           # Copy build artifacts.
           Copy-Item -Path build/release/bin/RED4ext.dll -Destination release/red4ext
-          Copy-Item -Path build/release/bin/powrprof.dll -Destination release/bin/x64
+          Copy-Item -Path build/release/bin/d3d11.dll -Destination release/bin/x64
 
           # Concatenate the license and third party licenses.
           $license = Get-Content -Path LICENSE.md
@@ -106,7 +106,7 @@ jobs:
         with:
           append_body: true
           body: |
-            
+
             ### SHA256 Hashes of the release artifacts
 
             - red4ext_${{ env.RED4EXT_VERSION }}.zip
