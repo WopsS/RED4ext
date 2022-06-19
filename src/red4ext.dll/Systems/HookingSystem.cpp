@@ -45,7 +45,7 @@ void HookingSystem::Shutdown()
 
 bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, void* aDetour, void** aOriginal)
 {
-    spdlog::trace(L"Attaching a hook for {} at {} with detour at {}...", aPlugin->GetName(), aTarget, aDetour);
+    spdlog::trace(L"Attaching a hook for '{}' at {} with detour at {}...", aPlugin->GetName(), aTarget, aDetour);
     std::scoped_lock _(m_mutex);
 
     DetourTransaction transaction;
@@ -54,8 +54,8 @@ bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, v
     auto result = item.hook.Attach();
     if (result != NO_ERROR)
     {
-        spdlog::warn(L"The hook requested by {} at {} could not be attached. Detour error code: {}", aPlugin->GetName(),
-                     aTarget, result);
+        spdlog::warn(L"The hook requested by '{}' at {} could not be attached. Detour error code: {}",
+                     aPlugin->GetName(), aTarget, result);
         return false;
     }
 
@@ -68,17 +68,17 @@ bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, v
 
         m_hooks.emplace(aPlugin, std::move(item));
 
-        spdlog::trace(L"The hook requested by {} at {} has been successfully attached", aPlugin->GetName(), aTarget);
+        spdlog::trace(L"The hook requested by '{}' at {} has been successfully attached", aPlugin->GetName(), aTarget);
         return true;
     }
 
-    spdlog::warn(L"The hook requested by {} at {} was not attached", aPlugin->GetName(), aTarget);
+    spdlog::warn(L"The hook requested by '{}' at {} was not attached", aPlugin->GetName(), aTarget);
     return false;
 }
 
 bool HookingSystem::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 {
-    spdlog::trace(L"Detaching all hooks attached by {} at {}...", aPlugin->GetName(), aTarget);
+    spdlog::trace(L"Detaching all hooks attached by '{}' at {}...", aPlugin->GetName(), aTarget);
     std::scoped_lock _(m_mutex);
 
     DetourTransaction transaction;
@@ -102,15 +102,15 @@ bool HookingSystem::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
 
     if (!hasHook)
     {
-        spdlog::warn(L"No hooks attached by {} at {} were found", aPlugin->GetName(), aTarget);
+        spdlog::warn(L"No hooks attached by '{}' at {} were found", aPlugin->GetName(), aTarget);
     }
     else if (count == 0)
     {
-        spdlog::warn(L"No hooks attached by {} at {} were queued for detaching", aPlugin->GetName(), aTarget);
+        spdlog::warn(L"No hooks attached by '{}' at {} were queued for detaching", aPlugin->GetName(), aTarget);
     }
     else if (transaction.Commit())
     {
-        spdlog::trace(L"{} hook(s) attached by {} at {} have been successfully detached", count, aPlugin->GetName(),
+        spdlog::trace(L"{} hook(s) attached by '{}' at {} have been successfully detached", count, aPlugin->GetName(),
                       aTarget);
 
         for (auto it = range.first; it != range.second;)
@@ -135,17 +135,17 @@ bool HookingSystem::QueueForDetach(std::shared_ptr<PluginBase> aPlugin, Item& aI
 {
     auto target = aItem.target;
 
-    spdlog::trace(L"Queueing a hook attached by {} at {} for detaching...", aPlugin->GetName(), target);
+    spdlog::trace(L"Queueing a hook attached by '{}' at {} for detaching...", aPlugin->GetName(), target);
 
     auto result = aItem.hook.Detach();
     if (result != NO_ERROR)
     {
-        spdlog::warn(L"A hook attached by {} at {} could not be detached. Detour error code: {}", aPlugin->GetName(),
+        spdlog::warn(L"A hook attached by '{}' at {} could not be detached. Detour error code: {}", aPlugin->GetName(),
                      target, result);
         return false;
     }
 
-    spdlog::trace(L"A hook attached by {} at {} has been successfully queued for detaching", aPlugin->GetName(),
+    spdlog::trace(L"A hook attached by '{}' at {} has been successfully queued for detaching", aPlugin->GetName(),
                   target);
     return true;
 }

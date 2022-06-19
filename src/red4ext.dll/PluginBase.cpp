@@ -77,7 +77,7 @@ bool PluginBase::Main(RED4ext::EMainReason aReason)
     const auto name = GetName();
     const auto reasonStr = aReason == RED4ext::EMainReason::Load ? L"Load" : L"Unload";
 
-    spdlog::trace(L"Calling 'Main' function exported by {} with reason '{}'...", name, reasonStr);
+    spdlog::trace(L"Calling 'Main' function exported by '{}' with reason '{}'...", name, reasonStr);
 
     using Main_t = bool (*)(RED4ext::PluginHandle, RED4ext::EMainReason, const void*);
     auto mainFn = reinterpret_cast<Main_t>(GetProcAddress(module, "Main"));
@@ -96,21 +96,21 @@ bool PluginBase::Main(RED4ext::EMainReason aReason)
         }
         catch (const std::exception& e)
         {
-            spdlog::warn(L"An exception occured while calling 'Main' function with reason '{}', exported by {}",
+            spdlog::warn(L"An exception occured while calling 'Main' function with reason '{}', exported by '{}'",
                          reasonStr, name);
             spdlog::warn(e.what());
             return false;
         }
         catch (...)
         {
-            spdlog::warn(L"An unknown exception occured while calling 'Main' function with reason '{}', exported by {}",
+            spdlog::warn(L"An unknown exception occured while calling 'Main' function with reason '{}', exported by '{}'",
                          reasonStr, name);
             return false;
         }
     }
     else
     {
-        spdlog::trace(L"{} does not export a 'Main' function, skipping the call", name);
+        spdlog::trace(L"'{}' does not export a 'Main' function, skipping the call", name);
     }
 
     return true;
