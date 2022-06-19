@@ -36,5 +36,5 @@ private:
     bool QueueForDetach(std::shared_ptr<PluginBase> aPlugin, Item& aItem);
 
     std::mutex m_mutex;
-    std::unordered_multimap<std::shared_ptr<PluginBase>, Item> m_hooks;
+    Map_t m_hooks;
 };

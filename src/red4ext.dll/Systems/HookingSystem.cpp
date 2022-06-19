@@ -100,8 +100,6 @@ bool HookingSystem::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
         }
     }
 
-    m_hooks.erase(range.first, range.second);
-
     if (!hasHook)
     {
         spdlog::warn(L"No hooks attached by {} at {} were found", aPlugin->GetName(), aTarget);
@@ -114,6 +112,20 @@ bool HookingSystem::Detach(std::shared_ptr<PluginBase> aPlugin, void* aTarget)
     {
         spdlog::trace(L"{} hook(s) attached by {} at {} have been successfully detached", count, aPlugin->GetName(),
                       aTarget);
+
+        for (auto it = range.first; it != range.second;)
+        {
+            auto& item = it->second;
+            if (item.target == aTarget)
+            {
+                *item.original = nullptr;
+                it = m_hooks.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 
     return count > 0;
