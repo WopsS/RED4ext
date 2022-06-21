@@ -126,8 +126,8 @@ void PluginSystem::Startup()
                 continue;
             }
 
-            bool searchLoadDir = depth == 1;
-            Load(path, searchLoadDir);
+            bool useAlteredSearchPath = depth == 1;
+            Load(path, useAlteredSearchPath);
         }
         else if (ec)
         {
@@ -168,16 +168,16 @@ std::shared_ptr<PluginBase> PluginSystem::GetPlugin(HMODULE aModule) const
     return nullptr;
 }
 
-void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
+void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath)
 {
     spdlog::trace(L"Loading plugin from '{}'...", aPath);
 
-    uint32_t flags = LOAD_LIBRARY_SEARCH_DEFAULT_DIRS;
-    if (aSearchLoadDir)
+    uint32_t flags = 0;
+    if (aUseAlteredSearchPath)
     {
-        flags |= LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
+        flags = LOAD_WITH_ALTERED_SEARCH_PATH;
     }
-
+    
     const auto stem = aPath.stem();
 
     wil::unique_hmodule handle(LoadLibraryEx(aPath.c_str(), nullptr, flags));

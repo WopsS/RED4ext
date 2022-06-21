@@ -22,7 +22,7 @@ private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;
     using MapIter_t = Map_t::iterator;
 
-    void Load(const std::filesystem::path& aPath, bool aSearchLoadDir);
+    void Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath);
     MapIter_t Unload(std::shared_ptr<PluginBase> aPlugin);
 
     std::shared_ptr<PluginBase> CreatePlugin(const std::filesystem::path& aPath, wil::unique_hmodule aModule) const;
