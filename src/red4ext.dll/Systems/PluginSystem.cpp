@@ -172,15 +172,9 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aSearchLoadDir)
 {
     spdlog::trace(L"Loading plugin from '{}'...", aPath);
 
-    uint32_t flags = LOAD_LIBRARY_SEARCH_DEFAULT_DIRS;
-    if (aSearchLoadDir)
-    {
-        flags |= LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
-    }
-
     const auto stem = aPath.stem();
 
-    wil::unique_hmodule handle(LoadLibraryEx(aPath.c_str(), nullptr, flags));
+    wil::unique_hmodule handle(LoadLibrary(aPath.c_str()));
     if (!handle)
     {
         auto msg = Utils::FormatLastError();
