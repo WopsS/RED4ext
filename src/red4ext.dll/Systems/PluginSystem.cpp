@@ -177,7 +177,7 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
     {
         flags = LOAD_WITH_ALTERED_SEARCH_PATH;
     }
-    
+
     const auto stem = aPath.stem();
 
     wil::unique_hmodule handle(LoadLibraryEx(aPath.c_str(), nullptr, flags));
@@ -287,9 +287,15 @@ std::shared_ptr<PluginBase> PluginSystem::CreatePlugin(const std::filesystem::pa
     auto supportsFn = reinterpret_cast<Supports_t>(GetProcAddress(aModule.get(), "Supports"));
     if (!supportsFn)
     {
-        auto msg = Utils::FormatLastError();
-        spdlog::warn(L"Could not retrieve 'Supports' function from '{}'. Error code: {}, msg: '{}', path: '{}'", stem,
-                     GetLastError(), msg, aPath);
+        // If 'Supports' doesn't exists then the plugin might not be a RED4ext plugin. It might be a dependency.
+        auto err = GetLastError();
+        if (err != ERROR_PROC_NOT_FOUND)
+        {
+            auto msg = Utils::FormatLastError();
+            spdlog::warn(L"Could not retrieve 'Supports' function from '{}'. Error code: {}, msg: '{}', path: '{}'",
+                         stem, GetLastError(), msg, aPath);
+        }
+
         return nullptr;
     }
 
