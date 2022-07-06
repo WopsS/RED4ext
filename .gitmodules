@@ -1,7 +1,7 @@
 [submodule "deps/spdlog"]
 	path = deps/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "src/red4ext.sdk"]
+[submodule "deps/red4ext.sdk"]
 	path = deps/red4ext.sdk
 	url = https://github.com/WopsS/RED4ext.SDK
 [submodule "deps/detours"]

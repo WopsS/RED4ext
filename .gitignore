@@ -363,6 +363,4 @@ FodyWeavers.xsd
 
 ### Custom ###
 build
-premake/projects
-premake/premake5.exe
-src/red4ext.dll/Version.hpp
+src/dll/Version.hpp

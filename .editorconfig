@@ -10,8 +10,8 @@ trim_trailing_whitespace = true
 [*.{c,h,cpp,hpp}]
 indent_size = 4
 
-[*.md]
+[*.{md,yml}]
 indent_size = 2
 
-[*.yml]
+[{CMakeLists.txt,*.cmake}]
 indent_size = 2

@@ -1,83 +1,96 @@
 name: Build Workflow
 on: [ push, pull_request ]
 
-env:
-  premake: 5.0.0-beta1
-
 jobs:
   build:
     name: Build (${{ matrix.config }})
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        config: [ Debug, Release ]
+        config: [ Debug, RelWithDebInfo ]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 0
 
       - name: Create environment variables
         run: |
-          $shaShort = (git rev-parse --short $env:GITHUB_SHA)
-          echo "SHA_SHORT=${shaShort}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+          $commitSha = (git rev-parse --short $env:GITHUB_SHA)
+          echo "RED4EXT_COMMIT_SHA=${commitSha}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
-          $config = "${{ matrix.config }}".ToLower()
-          echo "CONFIG_LOWERCASE=${config}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
+          # CMake is building PDB files for release artifacts using "RelWithDebInfo" config.
+          # Create a "pretty" name for this to make it easier to refer users to this CI artifact in case a bug needs
+          # testing.
+          $config = "${{ matrix.config }}"
+          if ($config -eq "RelWithDebInfo") {
+            $config = "release"
+          }
+          else {
+            $config = $config.ToLower()
+          }
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.2
+          echo "RED4EXT_PRETTY_CONFIG=${config}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
-      - name: Download Premake
-        shell: powershell
-        run: Invoke-WebRequest https://github.com/premake/premake-core/releases/download/v${{ env.premake }}/premake-${{ env.premake }}-windows.zip -OutFile ./premake/premake.zip
+      - name: Create build directory
+        run: mkdir build
 
-      - name: Extract Premake
-        shell: powershell
-        run: Expand-Archive -Path ./premake/premake.zip -DestinationPath ./premake
-
-      - name: Generate projects
+      - name: Configure
+        working-directory: build
         run: |
-          cd premake
-          ./generate_projects.bat
+          cmake ${{ github.workspace }}
 
       - name: Build
+        working-directory: build
         run: |
-          cd premake/projects
-          MSBuild.exe RED4ext.sln -v:minimal -m -property:Configuration=${{ matrix.config }}
+          cmake `
+            --build . `
+            --config ${{ matrix.config }}
 
-      - name: Prepare files
+      - name: Prepare ZIP
+        working-directory: build
         run: |
+          $packagingDir = "./_packaging"
+
           # Create the necessary directories.
-          New-Item -ItemType directory -Path artifacts | Out-Null
-          New-Item -ItemType directory -Path artifacts/red4ext | Out-Null
-          New-Item -ItemType directory -Path artifacts/red4ext/libs | Out-Null
-          New-Item -ItemType directory -Path artifacts/red4ext/plugins | Out-Null
-          New-Item -ItemType directory -Path artifacts/bin/x64 | Out-Null
+          New-Item -ItemType directory -Path $packagingDir
+          New-Item -ItemType directory -Path $packagingDir/bin/x64
+          New-Item -ItemType directory -Path $packagingDir/red4ext
+          New-Item -ItemType directory -Path $packagingDir/red4ext/plugins
 
-          # Copy build artifacts.
-          Copy-Item -Path build/${{ matrix.config }}/bin/RED4ext.* -Destination artifacts/red4ext
-          Copy-Item -Path build/${{ matrix.config }}/bin/d3d11.* -Destination artifacts/bin/x64
-          Copy-Item -Path build/${{ matrix.config }}/bin/plugins/* -Destination artifacts/red4ext/plugins -Recurse
-          Copy-Item -Path build/${{ matrix.config }}/libs/* -Destination artifacts/red4ext/libs -Recurse
+          # Copy the build artifacts.
+          Copy-Item -Path ./${{ matrix.config }}/bin/d3d11.dll -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ matrix.config }}/bin/RED4ext.dll -Destination $packagingDir/red4ext
 
-          # Copy the license.
-          $thirdparty = Get-Content -Path THIRD_PARTY_LICENSES.md
-          Add-Content -Path artifacts/red4ext/LICENSE.txt -Value $thirdparty
+          # Copy the license and third-party licenses.
+          Copy-Item -Path ../LICENSE.md -Destination $packagingDir/red4ext/LICENSE.txt
+          Copy-Item -Path ../THIRD_PARTY_LICENSES.md -Destination $packagingDir/red4ext/THIRD_PARTY_LICENSES.txt
 
-          # The code below is commented, see https://github.com/actions/upload-artifact/issues/39#issuecomment-598825674.
-          # Create a zip file.
-          #$fileName = "red4ext_${env:CONFIG_LOWERCASE}_${env:SHA_SHORT}.zip"
-          #Compress-Archive -Path artifacts/* -DestinationPath $fileName
+      - name: Prepare ZIP (PDBs)
+        working-directory: build
+        run: |
+          $packagingDir = "./_packaging_pdbs"
 
-          # Generate hash.
-          #Get-FileHash -Algorithm SHA256 -Path $fileName | Format-List
+          # Create the necessary directories.
+          New-Item -ItemType directory -Path $packagingDir
+          New-Item -ItemType directory -Path $packagingDir/bin/x64
+          New-Item -ItemType directory -Path $packagingDir/red4ext
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+          # Copy the PDBs.
+          Copy-Item -Path ./${{ matrix.config }}/bin/d3d11.pdb -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ matrix.config }}/bin/RED4ext.pdb -Destination $packagingDir/red4ext
+
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v3
         with:
-          name: red4ext_${{ env.CONFIG_LOWERCASE }}_${{ env.SHA_SHORT }}
-          path: artifacts/
+          name: red4ext_${{ env.RED4EXT_PRETTY_CONFIG }}_${{ env.RED4EXT_COMMIT_SHA }}
+          path: build/_packaging/
+
+      - name: Upload ZIP (PDBs)
+        uses: actions/upload-artifact@v3
+        with:
+          name: red4ext_${{ env.RED4EXT_PRETTY_CONFIG }}_${{ env.RED4EXT_COMMIT_SHA }}_pdbs
+          path: build/_packaging_pdbs/

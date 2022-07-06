@@ -5,16 +5,16 @@ on:
       - v*.*.*
 
 env:
-  premake: 5.0.0-beta1
+  config: RelWithDebInfo
 
 jobs:
-  upload_release_assets:
-    name: Upload Release Assets
-    runs-on: windows-2022
+  release:
+    name: Release ${{ github.ref_name }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -24,75 +24,75 @@ jobs:
           $version = $env:GITHUB_REF.Substring($prefix.Length)
           echo "RED4EXT_VERSION=${version}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Create build directory
+        run: mkdir build
 
-      - name: Download Premake
-        shell: powershell
-        run: Invoke-WebRequest https://github.com/premake/premake-core/releases/download/v${{ env.premake }}/premake-${{ env.premake }}-windows.zip -OutFile ./premake/premake.zip
-
-      - name: Extract Premake
-        shell: powershell
-        run: Expand-Archive -Path ./premake/premake.zip -DestinationPath ./premake
-
-      - name: Generate projects
+      - name: Configure
+        working-directory: build
         run: |
-          cd premake
-          ./generate_projects.bat
+          cmake `
+            -DRED4EXT_IS_CI_RELEASE=YES `
+            ${{ github.workspace }}
 
       - name: Build
+        working-directory: build
         run: |
-          cd premake/projects
-          MSBuild.exe RED4ext.sln -v:minimal -m -property:Configuration=Release
+          cmake `
+            --build . `
+            --config ${{ env.config }}
 
-      - name: Prepare files
+      - name: Prepare ZIP
+        working-directory: build
         run: |
+          $packagingDir = "./_packaging"
+
           # Create the necessary directories.
-          New-Item -ItemType directory -Path release | Out-Null
-          New-Item -ItemType directory -Path release/red4ext | Out-Null
-          New-Item -ItemType directory -Path release/red4ext/plugins | Out-Null
-          New-Item -ItemType directory -Path release/bin/x64 | Out-Null
+          New-Item -ItemType directory -Path $packagingDir
+          New-Item -ItemType directory -Path $packagingDir/bin/x64
+          New-Item -ItemType directory -Path $packagingDir/red4ext
+          New-Item -ItemType directory -Path $packagingDir/red4ext/plugins
 
-          # Copy build artifacts.
-          Copy-Item -Path build/release/bin/RED4ext.dll -Destination release/red4ext
-          Copy-Item -Path build/release/bin/d3d11.dll -Destination release/bin/x64
+          # Copy the build artifacts.
+          Copy-Item -Path ./${{ env.config }}/bin/d3d11.dll -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ env.config }}/bin/RED4ext.dll -Destination $packagingDir/red4ext
 
-          # Concatenate the license and third party licenses.
-          $license = Get-Content -Path LICENSE.md
-          Add-Content -Path release/red4ext/LICENSE.txt -Value $license
+          # Copy the license and third-party licenses.
+          Copy-Item -Path ../LICENSE.md -Destination $packagingDir/red4ext/LICENSE.txt
+          Copy-Item -Path ../THIRD_PARTY_LICENSES.md -Destination $packagingDir/red4ext/THIRD_PARTY_LICENSES.txt
 
-          Add-Content -Path release/red4ext/LICENSE.txt -Value ""
+          # Create the ZIP file.
+          7z a red4ext_${env:RED4EXT_VERSION}.zip $packagingDir/*
 
-          $third_party = Get-Content -Path THIRD_PARTY_LICENSES.md
-          Add-Content -Path release/red4ext/LICENSE.txt -Value $third_party
-
-          # Create a zip file.
-          Compress-Archive -Path release/* -DestinationPath red4ext_${env:RED4EXT_VERSION}.zip
-
-      - name: Prepare PDBs
+      - name: Prepare ZIP (PDBs)
+        working-directory: build
         run: |
+          $packagingDir = "./_packaging_pdbs"
+
           # Create the necessary directories.
-          New-Item -ItemType directory -Path release_pdbs | Out-Null
-          New-Item -ItemType directory -Path release_pdbs/bin | Out-Null
-          New-Item -ItemType directory -Path release_pdbs/libs | Out-Null
+          New-Item -ItemType directory -Path $packagingDir
+          New-Item -ItemType directory -Path $packagingDir/bin/x64
+          New-Item -ItemType directory -Path $packagingDir/red4ext
 
           # Copy the PDBs.
-          Copy-Item build/release/bin/*.pdb release_pdbs/bin
-          Copy-Item build/release/libs/*.pdb release_pdbs/libs
+          Copy-Item -Path ./${{ env.config }}/bin/d3d11.pdb -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ env.config }}/bin/RED4ext.pdb -Destination $packagingDir/red4ext
 
-          # Create a zip file.
-          Compress-Archive -Path release_pdbs/* -DestinationPath red4ext_${env:RED4EXT_VERSION}_pdbs.zip
+          # Create the ZIP file.
+          7z a red4ext_${env:RED4EXT_VERSION}_pdbs.zip $packagingDir/*
 
       - name: Generate hashes
+        working-directory: build
         run: |
-          # Files zip.
+          # Generate the hash for the main ZIP and print it.
           $hash = Get-FileHash -Algorithm SHA256 -Path red4ext_${env:RED4EXT_VERSION}.zip
           $hash | Format-List
 
           $only_hash = $hash | ForEach-Object { $_.Hash }
           echo "RED4EXT_SHA256=${only_hash}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
-          # PDBs zip.
+          Write-Output "`n"
+
+          # Generate the hash for the PDBs ZIP and print it.
           $hash = Get-FileHash -Algorithm SHA256 -Path red4ext_${env:RED4EXT_VERSION}_pdbs.zip
           $hash | Format-List
 
@@ -100,7 +100,10 @@ jobs:
           echo "RED4EXT_SHA256_PDBS=${only_hash}" | Out-File -FilePath $env:GITHUB_ENV -Encoding UTF8 -Append
 
       - name: Upload assets
-        uses: softprops/action-gh-release@fe9a9bd3295828558c7a3c004f23f3bf77d155b2 # Use commit hash instead of version, this commit introduce append_body option, which is not present in the release version.
+        uses: softprops/action-gh-release@fe9a9bd3295828558c7a3c004f23f3bf77d155b2 # Use commit hash instead of version,
+                                                                                   # this commit introduce append_body
+                                                                                   # option, which is not present in
+                                                                                   # the release version.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -114,5 +117,5 @@ jobs:
             - red4ext_${{ env.RED4EXT_VERSION }}_pdbs.zip
               - ${{ env.RED4EXT_SHA256_PDBS }}
           files: |
-            red4ext_${{ env.RED4EXT_VERSION }}.zip
-            red4ext_${{ env.RED4EXT_VERSION }}_pdbs.zip
+            build/red4ext_${{ env.RED4EXT_VERSION }}.zip
+            build/red4ext_${{ env.RED4EXT_VERSION }}_pdbs.zip

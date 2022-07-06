@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "App.hpp"
 #include "Image.hpp"
 #include "Utils.hpp"
