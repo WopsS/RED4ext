@@ -363,4 +363,4 @@ FodyWeavers.xsd
 
 ### Custom ###
 build
-src/dll/Version.hpp
+src/red4ext/Version.hpp
