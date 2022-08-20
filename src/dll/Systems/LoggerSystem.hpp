@@ -54,12 +54,14 @@ private:
             }
             else
             {
-                const auto logName = aPlugin->GetName();
+                const auto& path = aPlugin->GetPath();
+                const auto stem = path.stem();
+                auto fileName = stem.wstring();
 
-                std::wstring fileName(logName);
                 std::transform(fileName.begin(), fileName.end(), fileName.begin(),
                                [](wchar_t aC) { return std::tolower(aC); });
 
+                const auto logName = aPlugin->GetName();
                 logger =
                     Utils::CreateLogger(logName, fmt::format(L"{}.log", fileName), m_paths, m_config, m_devConsole);
                 m_loggers.emplace(aPlugin, logger);
