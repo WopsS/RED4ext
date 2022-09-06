@@ -148,5 +148,5 @@ const RED4ext::SemVer& Image::GetProductVersion() const
 
 const std::vector<RED4ext::FileVer> Image::GetSupportedVersions() const
 {
-    return {RED4EXT_RUNTIME_1_52, RED4EXT_RUNTIME_1_52_HOTFIX_1};
+    return {RED4EXT_RUNTIME_1_60};
 }
