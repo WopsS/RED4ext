@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "d3d1x.hpp"
+#include "Proxies/Xinput.hpp"
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
@@ -11,7 +11,7 @@ BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 
         try
         {
-            if (!LoadOriginal())
+            if (!Xinput::LoadOriginal())
             {
                 return FALSE;
             }

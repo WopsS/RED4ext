@@ -1,6 +1,6 @@
 add_library(RED4ext.Loader SHARED)
 
-set_target_properties(RED4ext.Loader PROPERTIES OUTPUT_NAME d3d11)
+set_target_properties(RED4ext.Loader PROPERTIES OUTPUT_NAME Xinput9_1_0)
 
 file(GLOB_RECURSE HEADER_FILES *.hpp)
 file(GLOB_RECURSE SOURCE_FILES *.cpp)
