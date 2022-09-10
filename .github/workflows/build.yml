@@ -62,7 +62,7 @@ jobs:
           New-Item -ItemType directory -Path $packagingDir/red4ext/plugins
 
           # Copy the build artifacts.
-          Copy-Item -Path ./${{ matrix.config }}/bin/d3d11.dll -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ matrix.config }}/bin/Xinput9_1_0.dll -Destination $packagingDir/bin/x64
           Copy-Item -Path ./${{ matrix.config }}/bin/RED4ext.dll -Destination $packagingDir/red4ext
 
           # Copy the license and third-party licenses.
@@ -80,7 +80,7 @@ jobs:
           New-Item -ItemType directory -Path $packagingDir/red4ext
 
           # Copy the PDBs.
-          Copy-Item -Path ./${{ matrix.config }}/bin/d3d11.pdb -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ matrix.config }}/bin/Xinput9_1_0.pdb -Destination $packagingDir/bin/x64
           Copy-Item -Path ./${{ matrix.config }}/bin/RED4ext.pdb -Destination $packagingDir/red4ext
 
       - name: Upload ZIP
