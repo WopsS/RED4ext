@@ -13,12 +13,38 @@ Hook<decltype(&_Main)> Main_fnc(Addresses::Global_Main, &_Main);
 
 int32_t _Main()
 {
-    auto app = App::Get();
-    app->Startup();
+    try
+    {
+        auto app = App::Get();
+        app->Startup();
+    }
+    catch (const std::exception& e)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while RED4ext was starting up.\n\n{}",
+                                            Utils::Widen(e.what()));
+    }
+    catch (...)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while RED4ext was starting up.");
+    }
 
     auto result = Main_fnc();
 
-    app->Shutdown();
+    try
+    {
+        auto app = App::Get();
+        app->Shutdown();
+    }
+    catch (const std::exception& e)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while RED4ext was shutting down.\n\n{}",
+                                            Utils::Widen(e.what()));
+    }
+    catch (...)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while RED4ext was shutting down.");
+    }
+
     return result;
 }
 } // namespace
