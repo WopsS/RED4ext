@@ -35,9 +35,8 @@ private:
     {
         m_systems.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         std::sort(m_systems.begin(), m_systems.end(),
-                  [](const std::unique_ptr<ISystem>& lhs, const std::unique_ptr<ISystem>& rhs) {
-                      return lhs->GetType() < rhs->GetType();
-                  });
+                  [](const std::unique_ptr<ISystem>& lhs, const std::unique_ptr<ISystem>& rhs)
+                  { return lhs->GetType() < rhs->GetType(); });
     }
 
     Paths m_paths;

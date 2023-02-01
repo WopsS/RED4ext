@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "MemoryProtection.hpp"
 #include "Utils.hpp"
 
@@ -31,7 +30,8 @@ MemoryProtection::~MemoryProtection()
         return;
     }
 
-    spdlog::trace("Trying to restore the protection at {} ({} byte(s)) to {:#x}...", m_address, m_size, m_oldProtection);
+    spdlog::trace("Trying to restore the protection at {} ({} byte(s)) to {:#x}...", m_address, m_size,
+                  m_oldProtection);
 
     decltype(m_oldProtection) oldProtection;
     if (!::VirtualProtect(m_address, m_size, m_oldProtection, reinterpret_cast<PDWORD>(&oldProtection)))
