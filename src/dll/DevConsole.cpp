@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "DevConsole.hpp"
 #include "Utils.hpp"
 

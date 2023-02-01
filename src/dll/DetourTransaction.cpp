@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "DetourTransaction.hpp"
 #include "Utils.hpp"
 

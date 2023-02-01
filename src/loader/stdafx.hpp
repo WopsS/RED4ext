@@ -4,17 +4,14 @@
 #include <string>
 
 #include <Windows.h>
+
 #include <ShlObj_core.h>
+#include <mmsystem.h>
+#include <mmddk.h>
 
 #include <wil/resource.h>
 #include <wil/stl.h>
 #include <wil/win32_helpers.h>
-
-#include <d3d9.h>
-#include <d3d11.h>
-#include <d3d11on12.h>
-#include <d3d12.h>
-#include <d3dkmthk.h>
 
 #include <fmt/core.h>
 #include <fmt/xchar.h>

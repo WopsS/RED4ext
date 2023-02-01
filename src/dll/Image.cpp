@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "Image.hpp"
 #include "Utils.hpp"
 
@@ -45,7 +44,7 @@ Image::Image()
     {
         WORD language;
         WORD codePage;
-    } * translations;
+    }* translations;
     uint32_t translationsBytes;
 
     if (!VerQueryValue(data.get(), L"\\VarFileInfo\\Translation", reinterpret_cast<void**>(&translations),

@@ -53,7 +53,7 @@ jobs:
           New-Item -ItemType directory -Path $packagingDir/red4ext/plugins
 
           # Copy the build artifacts.
-          Copy-Item -Path ./${{ env.config }}/bin/d3d11.dll -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ env.config }}/bin/winmm.dll -Destination $packagingDir/bin/x64
           Copy-Item -Path ./${{ env.config }}/bin/RED4ext.dll -Destination $packagingDir/red4ext
 
           # Copy the license and third-party licenses.
@@ -74,7 +74,7 @@ jobs:
           New-Item -ItemType directory -Path $packagingDir/red4ext
 
           # Copy the PDBs.
-          Copy-Item -Path ./${{ env.config }}/bin/d3d11.pdb -Destination $packagingDir/bin/x64
+          Copy-Item -Path ./${{ env.config }}/bin/winmm.pdb -Destination $packagingDir/bin/x64
           Copy-Item -Path ./${{ env.config }}/bin/RED4ext.pdb -Destination $packagingDir/red4ext
 
           # Create the ZIP file.

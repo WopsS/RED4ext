@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "Paths.hpp"
 #include "Utils.hpp"
 
