@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "PluginSystem.hpp"
 #include "Image.hpp"
 #include "Utils.hpp"
@@ -229,12 +228,12 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
         if (!isSupported)
         {
             const auto& fileVer = image->GetFileVersion();
-            spdlog::warn(
-                L"{} (version: {}) is incompatible with the current game's version ({}.{}{}, runtime {}.{}.{}.{}). "
-                L"This version of the plugin was compiled for runtime version {}.{}.{}.{}",
-                pluginName, std::to_wstring(pluginVersion), productVer.major, productVer.minor, productVer.patch,
-                fileVer.major, fileVer.minor, fileVer.build, fileVer.revision, requestedRuntime.major,
-                requestedRuntime.minor, requestedRuntime.build, requestedRuntime.revision);
+            const auto currentPatch = Utils::FileVerToPatch(fileVer);
+            const auto requestedPatch = Utils::FileVerToPatch(requestedRuntime);
+
+            spdlog::warn(L"{} (version: {}) is incompatible with the current patch ({}). This version of the plugin "
+                         L"was compiled for patch {}",
+                         pluginName, std::to_wstring(pluginVersion), currentPatch, requestedPatch);
 
             return;
         }
