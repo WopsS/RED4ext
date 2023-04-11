@@ -40,7 +40,7 @@ void PluginSystem::Startup()
         return;
     }
 
-    spdlog::trace("Loading plugins...");
+    spdlog::info("Loading plugins...");
 
     std::error_code ec;
 
@@ -169,7 +169,7 @@ std::shared_ptr<PluginBase> PluginSystem::GetPlugin(HMODULE aModule) const
 
 void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath)
 {
-    spdlog::trace(L"Loading plugin from '{}'...", aPath);
+    spdlog::info(L"Loading plugin from '{}'...", aPath);
 
     uint32_t flags = 0;
     if (aUseAlteredSearchPath)
