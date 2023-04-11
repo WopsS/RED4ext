@@ -68,24 +68,28 @@ App::App()
         spdlog::debug(L"  plugins.ignored: [ {} ]", fmt::join(ignored, L", "));
     }
 
-    spdlog::debug("Base address is {}", reinterpret_cast<void*>(GetModuleHandle(nullptr)));
+    spdlog::debug("Base address is: {}", reinterpret_cast<void*>(GetModuleHandle(nullptr)));
 
     const auto image = Image::Get();
+    const auto& fileVer = image->GetFileVersion();
+
+    auto patch = Utils::FileVerToPatch(fileVer);
+    spdlog::info(L"Game patch: {}", patch);
 
     const auto& productVer = image->GetProductVersion();
-    spdlog::info("Game version is {}.{}{}", productVer.major, productVer.minor, productVer.patch);
+    spdlog::info("Product version: {}.{}{}", productVer.major, productVer.minor, productVer.patch);
 
-    const auto& fileVer = image->GetFileVersion();
-    spdlog::info("File version is {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
+    spdlog::info("File version: {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
 
     if (!image->IsSupported())
     {
-        spdlog::error("This game version ({}.{}{}) is not supported", productVer.major, productVer.minor,
-                      productVer.patch);
+        spdlog::error(L"This game patch ({}) is not supported", patch);
 
         const auto supportedVers = image->GetSupportedVersions();
-        spdlog::error("The current version of RED4ext supports only the following file version(s): {}",
-                      fmt::join(supportedVers, ", "));
+        const auto supportedPatches = Utils::FileVersToPatchs(supportedVers);
+
+        spdlog::error(L"The current version of RED4ext supports only the following patch(es): {}",
+                      fmt::join(supportedPatches, L", "));
         return;
     }
 
