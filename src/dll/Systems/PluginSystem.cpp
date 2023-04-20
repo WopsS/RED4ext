@@ -207,7 +207,6 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
     const auto& pluginVersion = plugin->GetVersion();
 
     const auto image = Image::Get();
-    const auto& productVer = image->GetProductVersion();
 
     const auto& requestedRuntime = plugin->GetRuntimeVersion();
     if (requestedRuntime != RED4EXT_RUNTIME_INDEPENDENT)

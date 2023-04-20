@@ -21,7 +21,6 @@ std::string Narrow(const std::wstring_view aText);
 std::wstring Widen(const std::string_view aText);
 
 std::wstring FileVerToPatch(const RED4ext::FileVer& aVersion);
-std::vector<std::wstring> FileVersToPatchs(const std::vector<RED4ext::FileVer>& aVersions);
 
 template<typename... Args>
 int32_t ShowMessageBox(uint32_t aType, const std::wstring_view aText, Args&&... aArgs)

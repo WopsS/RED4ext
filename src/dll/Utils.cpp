@@ -207,55 +207,42 @@ std::wstring Utils::Widen(const std::string_view aText)
 
 std::wstring Utils::FileVerToPatch(const RED4ext::FileVer& aVersion)
 {
-    if (aVersion == RED4EXT_V0_RUNTIME_1_50)
+    if (aVersion == RED4EXT_RUNTIME_1_50)
     {
         return L"1.50";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_50_HOTFIX_1)
+    else if (aVersion == RED4EXT_RUNTIME_1_50_HOTFIX_1)
     {
         return L"1.50 Hotfix 1";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_50_HOTFIX_2)
+    else if (aVersion == RED4EXT_RUNTIME_1_50_HOTFIX_2)
     {
         return L"1.50 Hotfix 2";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_52)
+    else if (aVersion == RED4EXT_RUNTIME_1_52)
     {
         return L"1.52";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_52_HOTFIX_1)
+    else if (aVersion == RED4EXT_RUNTIME_1_52_HOTFIX_1)
     {
         return L"1.52 Hotfix 1";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_60)
+    else if (aVersion == RED4EXT_RUNTIME_1_60)
     {
         return L"1.60";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_61)
+    else if (aVersion == RED4EXT_RUNTIME_1_61)
     {
         return L"1.61";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_61_HOTFIX_1)
+    else if (aVersion == RED4EXT_RUNTIME_1_61_HOTFIX_1)
     {
         return L"1.61 Hotfix 1";
     }
-    else if (aVersion == RED4EXT_V0_RUNTIME_1_62)
+    else if (aVersion == RED4EXT_RUNTIME_1_62)
     {
         return L"1.62";
     }
 
     return fmt::format(L"Unknown patch ({})", std::to_wstring(aVersion));
-}
-
-std::vector<std::wstring> Utils::FileVersToPatchs(const std::vector<RED4ext::FileVer>& aVersions)
-{
-    std::vector<std::wstring> result;
-
-    for (const auto& version : aVersions)
-    {
-        auto patch = FileVerToPatch(version);
-        result.emplace_back(std::move(patch));
-    }
-
-    return result;
 }

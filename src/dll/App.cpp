@@ -86,10 +86,21 @@ App::App()
         spdlog::error(L"This game patch ({}) is not supported", patch);
 
         const auto supportedVers = image->GetSupportedVersions();
-        const auto supportedPatches = Utils::FileVersToPatchs(supportedVers);
 
-        spdlog::error(L"The current version of RED4ext supports only the following patch(es): {}",
-                      fmt::join(supportedPatches, L", "));
+        auto supportedPatches = fmt::wmemory_buffer();
+        for (const auto& supportedVer : supportedVers)
+        {
+            const auto patch = Utils::FileVerToPatch(supportedVer);
+            fmt::format_to(std::back_inserter(supportedPatches), L"{} ({})", patch, std::to_wstring(supportedVer));
+
+            if (supportedVer != *(supportedVers.end() - 1))
+            {
+                fmt::format_to(std::back_inserter(supportedPatches), L", ");
+            }
+        }
+
+        const std::wstring_view supportedPatchesStr(supportedPatches.data(), supportedPatches.size());
+        spdlog::error(L"The current version of RED4ext supports only the following patch(es): {}", supportedPatchesStr);
         return;
     }
 
