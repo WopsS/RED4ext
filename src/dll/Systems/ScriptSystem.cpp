@@ -23,13 +23,11 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::pat
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found absolute path: {}", resolvedPath.c_str());
-            std::scoped_lock _(m_mutex);
-            m_paths.emplace(aPlugin, std::move(resolvedPath));
-            return true;
+            return _Add(aPlugin, resolvedPath);
         }
         else
         {
-            spdlog::trace(L"Could not find absolute path: {}", resolvedPath.c_str());
+            spdlog::error(L"Could not find absolute path: {}", resolvedPath.c_str());
             return false;
         }
     } else {
@@ -37,16 +35,26 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::pat
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found path relative to plugin: {}", resolvedPath.c_str());
-            std::scoped_lock _(m_mutex);
-            m_paths.emplace(aPlugin, std::move(resolvedPath));
-            return true;
+            return _Add(aPlugin, resolvedPath);
         }
         else
         {
-            spdlog::trace(L"Could not find path relative to plugin: {}", resolvedPath.c_str());
+            spdlog::error(L"Could not find path relative to plugin: {}", resolvedPath.c_str());
             return false;
         }
     }
+}
+
+bool ScriptSystem::_Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path aPath) {
+    std::scoped_lock _(m_mutex);
+    auto pathLength = m_additionalCommandLength + aPath.string().size();
+    if (m_strLength + pathLength > m_strLengthMax) {
+        spdlog::error("Additional path ({} in length) would make compile string too long", pathLength);
+        return false;
+    }
+    m_strLength += pathLength;
+    m_paths.emplace(aPlugin, std::move(aPath));
+    return true;
 }
 
 std::vector<std::filesystem::path> ScriptSystem::GetPaths() {
