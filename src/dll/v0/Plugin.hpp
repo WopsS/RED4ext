@@ -27,5 +27,6 @@ private:
     RED4ext::v0::Logger m_logger;
     RED4ext::v0::Hooking m_hooking;
     RED4ext::v0::GameStates m_gameStates;
+    RED4ext::v0::Scripts m_scripts;
 };
 } // namespace v0

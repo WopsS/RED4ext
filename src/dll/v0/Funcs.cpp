@@ -110,3 +110,20 @@ bool v0::GameStates::Add(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType 
     spdlog::warn(L"The request to add a '{}' state for '{}' has failed", Utils::GetStateName(aType), plugin->GetName());
     return false;
 }
+
+bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, std::filesystem::path aPath) {
+    auto app = App::Get();
+    if (!app)
+    {
+        return false;
+    }
+
+    auto plugin = GetPluginByHandle(aHandle);
+    if (!plugin)
+    {
+        return false;
+    }
+    
+    auto scriptSystem = app->GetScriptSystem();
+    return scriptSystem->Add(plugin, aPath);
+}
