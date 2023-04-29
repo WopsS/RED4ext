@@ -9,19 +9,19 @@ namespace
 {
 bool isAttached = false;
 
-struct StringThing
+struct FixedWString
 {
     uint32_t length;
-    uint32_t unk;
+    uint32_t maxLength;
     wchar_t* str;
 };
 
-void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, StringThing* aArgs,
+void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
                                 RED4ext::CString* aCurrentDirectory, char a5);
 Hook<decltype(&_Scripts_RedscriptCompile)> Scripts_RedscriptCompile(Addresses::Scripts_RedscriptCompile,
                                                                     &_Scripts_RedscriptCompile);
 
-void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, StringThing* aArgs,
+void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
                                 RED4ext::CString* aCurrentDirectory, char a5)
 {
     wchar_t* original = aArgs->str;
@@ -44,13 +44,13 @@ void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, StringThin
         wsprintf(buffer, L"%s -compile \"%s\"", buffer, path.wstring().c_str());
     }
     aArgs->str = buffer;
-    aArgs->unk = aArgs->length = wcslen(buffer);
+    aArgs->maxLength = aArgs->length = wcslen(buffer);
 
     spdlog::info(L"Final redscript compilation arg string: '{}'", aArgs->str);
     auto result = Scripts_RedscriptCompile(a1, aCommand, aArgs, aCurrentDirectory, a5);
 
     aArgs->str = original;
-    aArgs->unk = aArgs->length = wcslen(original);
+    aArgs->maxLength = aArgs->length = wcslen(original);
 
     return result;
 }

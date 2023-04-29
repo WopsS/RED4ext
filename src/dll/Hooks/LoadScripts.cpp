@@ -9,19 +9,19 @@ namespace
 {
 bool isAttached = false;
 
-bool _Scripts_Load(RED4ext::CBaseEngine* engine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4);
+bool _Scripts_Load(RED4ext::CBaseEngine* aEngine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4);
 Hook<decltype(&_Scripts_Load)> Scripts_Load(Addresses::Scripts_Load, &_Scripts_Load);
 
-bool _Scripts_Load(RED4ext::CBaseEngine* engine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4)
+bool _Scripts_Load(RED4ext::CBaseEngine* aEngine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4)
 {
     auto scriptSystem = App::Get()->GetScriptSystem();
     if (scriptSystem->IsUsingRedmod())
     {
-        return Scripts_Load(engine, scriptSystem->GetScriptsBlobPath(), aTimestamp, a4);
+        return Scripts_Load(aEngine, scriptSystem->GetScriptsBlobPath(), aTimestamp, a4);
     }
     else
     {
-        return Scripts_Load(engine, aPath, aTimestamp, a4);
+        return Scripts_Load(aEngine, aPath, aTimestamp, a4);
     }
 }
 } // namespace
