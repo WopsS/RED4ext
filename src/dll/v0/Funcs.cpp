@@ -111,7 +111,7 @@ bool v0::GameStates::Add(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType 
     return false;
 }
 
-bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, std::filesystem::path aPath) {
+bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, const char *aPath) {
     auto app = App::Get();
     if (!app)
     {

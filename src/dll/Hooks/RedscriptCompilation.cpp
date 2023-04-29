@@ -2,6 +2,7 @@
 #include "App.hpp"
 #include "Hook.hpp"
 #include "RedscriptCompilation.hpp"
+#include "Systems/ScriptSystem.hpp"
 #include "stdafx.hpp"
 
 namespace
@@ -15,22 +16,44 @@ struct StringThing
     wchar_t* str;
 };
 
-void* _RedscriptCompilation_Run(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
+void* _Scripts_RedscriptCompile(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
                                 RED4ext::CString* currentDirectory, char a5);
-Hook<decltype(&_RedscriptCompilation_Run)> RedscriptCompilation_Run(Addresses::RedscriptCompilation_Run,
-                                                                         &_RedscriptCompilation_Run);
+Hook<decltype(&_Scripts_RedscriptCompile)> Scripts_RedscriptCompile(Addresses::Scripts_RedscriptCompile,
+                                                                    &_Scripts_RedscriptCompile);
 
-void* _RedscriptCompilation_Run(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
-                     RED4ext::CString* currentDirectory, char a5)
+void* _Scripts_RedscriptCompile(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
+                                RED4ext::CString* currentDirectory, char a5)
 {
-    auto paths = App::Get()->GetScriptSystem()->GetPaths();
+    wchar_t* original = args->str;
+    wchar_t buffer[ScriptSystem::strLengthMax] = {0};
+    auto scriptSystem = App::Get()->GetScriptSystem();
+    if (scriptSystem->usingRedmod)
+    {
+        spdlog::info("Using RedMod configuration");
+        scriptSystem->GetRedModArgs(buffer);
+    }
+    else
+    {
+        wcscpy_s(buffer, args->str);
+    }
+    auto paths = scriptSystem->GetPaths();
     for (auto& path : paths)
     {
-        wsprintf(args->str, L"%s -compile \"%s\"", args->str, path.c_str());
+        spdlog::info("Adding redscript path: '{}'", path.string().c_str());
+        wsprintf(buffer, L"%s -compile \"%s\"", buffer, path.wstring().c_str());
     }
-    args->unk = args->length = wcslen(args->str);
+    args->str = buffer;
+    args->unk = args->length = wcslen(buffer);
 
-    auto result = RedscriptCompilation_Run(scriptCompilation, command, args, currentDirectory, a5);
+    spdlog::info(L"Final redscript compilation args: '{}'", args->str);
+    auto result = Scripts_RedscriptCompile(scriptCompilation, command, args, currentDirectory, a5);
+
+    args->str = original;
+    args->unk = args->length = wcslen(original);
+
+    if (scriptSystem->usingRedmod && scriptSystem->engine) {
+        scriptSystem->engine->scriptsBlobPath = scriptSystem->scriptsBlobPath;
+    }
 
     return result;
 }
@@ -39,9 +62,9 @@ void* _RedscriptCompilation_Run(void* scriptCompilation, RED4ext::CString* comma
 bool Hooks::RedscriptCompilation::Attach()
 {
     spdlog::trace("Trying to attach the hook for the redscript compilation at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::RedscriptCompilation_Run));
+                  RED4EXT_OFFSET_TO_ADDR(Addresses::Scripts_RedscriptCompile));
 
-    auto result = RedscriptCompilation_Run.Attach();
+    auto result = Scripts_RedscriptCompile.Attach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not attach the hook for the redscript compilation. Detour error code: {}", result);
@@ -63,9 +86,9 @@ bool Hooks::RedscriptCompilation::Detach()
     }
 
     spdlog::trace("Trying to detach the hook for the redscript compilation at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::RedscriptCompilation_Run));
+                  RED4EXT_OFFSET_TO_ADDR(Addresses::Scripts_RedscriptCompile));
 
-    auto result = RedscriptCompilation_Run.Detach();
+    auto result = Scripts_RedscriptCompile.Detach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not detach the hook for the redscript compilation. Detour error code: {}", result);

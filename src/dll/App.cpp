@@ -6,6 +6,8 @@
 
 #include "Hooks/CGameApplication.hpp"
 #include "Hooks/Main_Hooks.hpp"
+#include "Hooks/RedscriptCompilation.hpp"
+#include "Hooks/RedmodCompilation.hpp"
 
 namespace
 {
@@ -25,7 +27,7 @@ App::App()
     }
 
     AddSystem<LoggerSystem>(m_paths, m_config, m_devConsole);
-    AddSystem<ScriptSystem>();
+    AddSystem<ScriptSystem>(m_paths);
     AddSystem<HookingSystem>();
     AddSystem<StateSystem>();
     AddSystem<PluginSystem>(m_config.GetPlugins(), m_paths);
@@ -134,7 +136,7 @@ void App::Destruct()
         DetourTransaction transaction;
         if (transaction.IsValid())
         {
-            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach();
+            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() && Hooks::RedscriptCompilation::Detach() && Hooks::RedmodCompilation::Detach();
             if (success)
             {
                 transaction.Commit();
@@ -222,7 +224,7 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach();
+    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::RedscriptCompilation::Attach() && Hooks::RedmodCompilation::Attach();
     if (success)
     {
         return transaction.Commit();
