@@ -7,8 +7,8 @@
 #include "Hooks/CGameApplication.hpp"
 #include "Hooks/LoadScripts.hpp"
 #include "Hooks/Main_Hooks.hpp"
-#include "Hooks/RedmodCompilation.hpp"
-#include "Hooks/RedscriptCompilation.hpp"
+#include "Hooks/InitScripts.hpp"
+#include "Hooks/ExecuteProcess.hpp"
 
 
 namespace
@@ -139,7 +139,7 @@ void App::Destruct()
         if (transaction.IsValid())
         {
             auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() &&
-                           Hooks::RedscriptCompilation::Detach() && Hooks::RedmodCompilation::Detach() &&
+                           Hooks::ExecuteProcess::Detach() && Hooks::InitScripts::Detach() &&
                            Hooks::LoadScripts::Detach();
             if (success)
             {
@@ -229,7 +229,7 @@ bool App::AttachHooks() const
     }
 
     auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() &&
-                   Hooks::RedscriptCompilation::Attach() && Hooks::RedmodCompilation::Attach() &&
+                   Hooks::ExecuteProcess::Attach() && Hooks::InitScripts::Attach() &&
                    Hooks::LoadScripts::Attach();
     if (success)
     {
