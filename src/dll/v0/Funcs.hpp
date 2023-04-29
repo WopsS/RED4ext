@@ -15,7 +15,7 @@ bool Add(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType aType, RED4ext::
 
 namespace Scripts
 {
-bool Add(RED4ext::PluginHandle aHandle, const char *path);
+bool Add(RED4ext::PluginHandle aHandle, const char* path);
 } // namespace Scripts
 
 } // namespace v0

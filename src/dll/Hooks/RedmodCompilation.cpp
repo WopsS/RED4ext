@@ -1,7 +1,7 @@
+#include "RedmodCompilation.hpp"
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "RedmodCompilation.hpp"
 #include "Systems/ScriptSystem.hpp"
 #include "stdafx.hpp"
 
@@ -9,23 +9,22 @@ namespace
 {
 bool isAttached = false;
 
-void* _Scripts_RedmodCompile(RED4ext::CBaseEngine* engine, unsigned __int8 a2, unsigned __int16 a3);
+void* _Scripts_RedmodCompile(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2, unsigned __int16 a3);
 Hook<decltype(&_Scripts_RedmodCompile)> Scripts_RedmodCompile(Addresses::Scripts_RedmodCompile,
                                                               &_Scripts_RedmodCompile);
 
-void* _Scripts_RedmodCompile(RED4ext::CBaseEngine* engine, unsigned __int8 a2, unsigned __int16 a3)
+void* _Scripts_RedmodCompile(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2, unsigned __int16 a3)
 {
     auto scriptSystem = App::Get()->GetScriptSystem();
-    if (engine->scriptsBlobPath.Length())
+    if (aEngine->scriptsBlobPath.Length())
     {
-        spdlog::info("Found scriptsBlobPath: '{}'", engine->scriptsBlobPath.c_str());
-        scriptSystem->usingRedmod = true;
-        scriptSystem->engine = engine;
-        scriptSystem->scriptsBlobPath = engine->scriptsBlobPath;
-        engine->scriptsBlobPath = "";
+        spdlog::info("Found scriptsBlobPath: '{}'", aEngine->scriptsBlobPath.c_str());
+        scriptSystem->SetUsingRedmod(true);
+        scriptSystem->SetScriptsBlobPath(&aEngine->scriptsBlobPath);
+        aEngine->scriptsBlobPath = "";
     }
 
-    auto result = Scripts_RedmodCompile(engine, a2, a3);
+    auto result = Scripts_RedmodCompile(aEngine, a2, a3);
 
     return result;
 }

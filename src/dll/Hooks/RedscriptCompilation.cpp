@@ -1,7 +1,7 @@
+#include "RedscriptCompilation.hpp"
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "RedscriptCompilation.hpp"
 #include "Systems/ScriptSystem.hpp"
 #include "stdafx.hpp"
 
@@ -16,44 +16,41 @@ struct StringThing
     wchar_t* str;
 };
 
-void* _Scripts_RedscriptCompile(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
-                                RED4ext::CString* currentDirectory, char a5);
+void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, StringThing* aArgs,
+                                RED4ext::CString* aCurrentDirectory, char a5);
 Hook<decltype(&_Scripts_RedscriptCompile)> Scripts_RedscriptCompile(Addresses::Scripts_RedscriptCompile,
                                                                     &_Scripts_RedscriptCompile);
 
-void* _Scripts_RedscriptCompile(void* scriptCompilation, RED4ext::CString* command, StringThing* args,
-                                RED4ext::CString* currentDirectory, char a5)
+void* _Scripts_RedscriptCompile(void* a1, RED4ext::CString* aCommand, StringThing* aArgs,
+                                RED4ext::CString* aCurrentDirectory, char a5)
 {
-    wchar_t* original = args->str;
-    wchar_t buffer[ScriptSystem::strLengthMax] = {0};
+    wchar_t* original = aArgs->str;
+    wchar_t buffer[RED4EXT_SCRIPT_ARGS_MAX_LENGTH] = {0};
     auto scriptSystem = App::Get()->GetScriptSystem();
-    if (scriptSystem->usingRedmod)
+    if (scriptSystem->IsUsingRedmod())
     {
         spdlog::info("Using RedMod configuration");
-        scriptSystem->GetRedModArgs(buffer);
+        scriptSystem->WriteRedModArgs(buffer);
     }
     else
     {
-        wcscpy_s(buffer, args->str);
+        wcscpy_s(buffer, aArgs->str);
     }
     auto paths = scriptSystem->GetPaths();
+    spdlog::info("Adding paths to redscript compilation:");
     for (auto& path : paths)
     {
-        spdlog::info("Adding redscript path: '{}'", path.string().c_str());
+        spdlog::info("  '{}'", path.string().c_str());
         wsprintf(buffer, L"%s -compile \"%s\"", buffer, path.wstring().c_str());
     }
-    args->str = buffer;
-    args->unk = args->length = wcslen(buffer);
+    aArgs->str = buffer;
+    aArgs->unk = aArgs->length = wcslen(buffer);
 
-    spdlog::info(L"Final redscript compilation args: '{}'", args->str);
-    auto result = Scripts_RedscriptCompile(scriptCompilation, command, args, currentDirectory, a5);
+    spdlog::info(L"Final redscript compilation arg string: '{}'", aArgs->str);
+    auto result = Scripts_RedscriptCompile(a1, aCommand, aArgs, aCurrentDirectory, a5);
 
-    args->str = original;
-    args->unk = args->length = wcslen(original);
-
-    if (scriptSystem->usingRedmod && scriptSystem->engine) {
-        scriptSystem->engine->scriptsBlobPath = scriptSystem->scriptsBlobPath;
-    }
+    aArgs->str = original;
+    aArgs->unk = aArgs->length = wcslen(original);
 
     return result;
 }

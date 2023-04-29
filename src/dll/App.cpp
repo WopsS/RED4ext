@@ -5,10 +5,11 @@
 #include "Version.hpp"
 
 #include "Hooks/CGameApplication.hpp"
-#include "Hooks/Main_Hooks.hpp"
-#include "Hooks/RedscriptCompilation.hpp"
-#include "Hooks/RedmodCompilation.hpp"
 #include "Hooks/LoadScripts.hpp"
+#include "Hooks/Main_Hooks.hpp"
+#include "Hooks/RedmodCompilation.hpp"
+#include "Hooks/RedscriptCompilation.hpp"
+
 
 namespace
 {
@@ -137,11 +138,9 @@ void App::Destruct()
         DetourTransaction transaction;
         if (transaction.IsValid())
         {
-            auto success = Hooks::CGameApplication::Detach() && 
-                Hooks::Main::Detach() && 
-                Hooks::RedscriptCompilation::Detach() && 
-                Hooks::RedmodCompilation::Detach() && 
-                Hooks::LoadScripts::Detach();
+            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() &&
+                           Hooks::RedscriptCompilation::Detach() && Hooks::RedmodCompilation::Detach() &&
+                           Hooks::LoadScripts::Detach();
             if (success)
             {
                 transaction.Commit();
@@ -229,11 +228,9 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() &&
-      Hooks::CGameApplication::Attach() && 
-      Hooks::RedscriptCompilation::Attach() && 
-      Hooks::RedmodCompilation::Attach() && 
-      Hooks::LoadScripts::Attach();
+    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() &&
+                   Hooks::RedscriptCompilation::Attach() && Hooks::RedmodCompilation::Attach() &&
+                   Hooks::LoadScripts::Attach();
     if (success)
     {
         return transaction.Commit();

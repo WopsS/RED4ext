@@ -1,7 +1,7 @@
+#include "LoadScripts.hpp"
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "LoadScripts.hpp"
 #include "Systems/ScriptSystem.hpp"
 #include "stdafx.hpp"
 
@@ -9,15 +9,18 @@ namespace
 {
 bool isAttached = false;
 
-bool _Scripts_Load(RED4ext::CBaseEngine *engine, RED4ext::CString *aPath, uint64_t aTimestamp, uint64_t a4);
+bool _Scripts_Load(RED4ext::CBaseEngine* engine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4);
 Hook<decltype(&_Scripts_Load)> Scripts_Load(Addresses::Scripts_Load, &_Scripts_Load);
 
-bool  _Scripts_Load(RED4ext::CBaseEngine *engine, RED4ext::CString *aPath, uint64_t aTimestamp, uint64_t a4)
+bool _Scripts_Load(RED4ext::CBaseEngine* engine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4)
 {
     auto scriptSystem = App::Get()->GetScriptSystem();
-    if (scriptSystem->usingRedmod) {
-        return Scripts_Load(engine, &scriptSystem->scriptsBlobPath, aTimestamp, a4);
-    } else {
+    if (scriptSystem->IsUsingRedmod())
+    {
+        return Scripts_Load(engine, scriptSystem->GetScriptsBlobPath(), aTimestamp, a4);
+    }
+    else
+    {
         return Scripts_Load(engine, aPath, aTimestamp, a4);
     }
 }
