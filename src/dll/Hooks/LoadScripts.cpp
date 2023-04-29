@@ -28,17 +28,17 @@ bool _Scripts_Load(RED4ext::CBaseEngine* aEngine, RED4ext::CString* aPath, uint6
 
 bool Hooks::LoadScripts::Attach()
 {
-    spdlog::trace("Trying to attach the hook for the redscript compilation at {}...",
+    spdlog::trace("Trying to attach the hook for redscript loading at {}...",
                   RED4EXT_OFFSET_TO_ADDR(Addresses::Scripts_Load));
 
     auto result = Scripts_Load.Attach();
     if (result != NO_ERROR)
     {
-        spdlog::error("Could not attach the hook for the redscript compilation. Detour error code: {}", result);
+        spdlog::error("Could not attach the hook for redscript loading. Detour error code: {}", result);
     }
     else
     {
-        spdlog::trace("The hook for the redscript compilation was attached");
+        spdlog::trace("The hook for redscript loading was attached");
     }
 
     isAttached = result == NO_ERROR;
@@ -52,17 +52,17 @@ bool Hooks::LoadScripts::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for the redscript compilation at {}...",
+    spdlog::trace("Trying to detach the hook for redscript loading at {}...",
                   RED4EXT_OFFSET_TO_ADDR(Addresses::Scripts_Load));
 
     auto result = Scripts_Load.Detach();
     if (result != NO_ERROR)
     {
-        spdlog::error("Could not detach the hook for the redscript compilation. Detour error code: {}", result);
+        spdlog::error("Could not detach the hook for redscript loading. Detour error code: {}", result);
     }
     else
     {
-        spdlog::trace("The hook for the redscript compilation was detached");
+        spdlog::trace("The hook for redscript loading was detached");
     }
 
     isAttached = result != NO_ERROR;
