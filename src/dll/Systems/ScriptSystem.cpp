@@ -32,12 +32,6 @@ RED4ext::CString* ScriptSystem::GetScriptsBlobPath()
 void ScriptSystem::SetUsingRedmod(bool aUsing)
 {
     m_usingRedmod = aUsing;
-    if (m_usingRedmod)
-    {
-        wchar_t buffer[RED4EXT_SCRIPT_ARGS_MAX_LENGTH] = {0};
-        WriteRedModArgs(buffer);
-        m_strLength = wcslen(buffer);
-    }
 }
 
 bool ScriptSystem::IsUsingRedmod()
@@ -81,13 +75,6 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const char* aPath)
 bool ScriptSystem::_Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
 {
     std::scoped_lock _(m_mutex);
-    auto pathLength = m_additionalCommandLength + aPath->string().size();
-    if (m_strLength + pathLength > RED4EXT_SCRIPT_ARGS_MAX_LENGTH)
-    {
-        spdlog::error("Additional path ({} in length) would make compile string too long", pathLength);
-        return false;
-    }
-    m_strLength += pathLength;
     m_scriptPaths.emplace(aPlugin, std::move(*aPath));
     return true;
 }
@@ -102,11 +89,9 @@ std::vector<std::filesystem::path> ScriptSystem::GetPaths()
     return paths;
 }
 
-void ScriptSystem::WriteRedModArgs(wchar_t* args)
+std::wstring ScriptSystem::WriteRedModArgs()
 {
-    wsprintf(args,
-             L"-compile \"%s\" "
-             L"-customCacheDir \"%s\"",
-             (m_paths.GetRootDir() / "r6" / "scripts").wstring().c_str(),
-             (m_paths.GetRootDir() / "r6" / "cache" / "modded").wstring().c_str());
+    return L"-compile \"" + (m_paths.GetRootDir() / "r6" / "scripts").wstring() + 
+           L"\" -customCacheDir \"" + 
+           (m_paths.GetRootDir() / "r6" / "cache" / "modded").wstring() + L"\"";
 }

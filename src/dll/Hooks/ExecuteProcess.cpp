@@ -16,45 +16,55 @@ struct FixedWString
     wchar_t* str;
 };
 
-void* _Global_ExecuteProcess(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
-                             RED4ext::CString* aCurrentDirectory, char a5);
+bool _Global_ExecuteProcess(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
+                            RED4ext::CString* aCurrentDirectory, char a5);
 Hook<decltype(&_Global_ExecuteProcess)> Global_ExecuteProcess(Addresses::Global_ExecuteProcess,
                                                               &_Global_ExecuteProcess);
 
-void* _Global_ExecuteProcess(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
-                             RED4ext::CString* aCurrentDirectory, char a5)
+bool _Global_ExecuteProcess(void* a1, RED4ext::CString* aCommand, FixedWString* aArgs,
+                            RED4ext::CString* aCurrentDirectory, char a5)
 {
     if (strstr(aCommand->c_str(), "scc.exe") == nullptr)
     {
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
-    wchar_t* original = aArgs->str;
-    wchar_t buffer[RED4EXT_SCRIPT_ARGS_MAX_LENGTH] = {0};
+    std::wstring original = aArgs->str;
+    std::wstring buffer;
     auto scriptSystem = App::Get()->GetScriptSystem();
     if (scriptSystem->IsUsingRedmod())
     {
         spdlog::info("Using RedMod configuration");
-        scriptSystem->WriteRedModArgs(buffer);
+        buffer = scriptSystem->WriteRedModArgs();
     }
     else
     {
-        wcscpy_s(buffer, aArgs->str);
+        buffer = aArgs->str;
     }
     auto paths = scriptSystem->GetPaths();
     spdlog::info("Adding paths to redscript compilation:");
     for (auto& path : paths)
     {
-        spdlog::info("  '{}'", path.string().c_str());
-        wsprintf(buffer, L"%s -compile \"%s\"", buffer, path.wstring().c_str());
+        spdlog::info("  '{}'", path.string());
+        buffer += LR"( -compile ")" + path.wstring() + L'"';
+        if (buffer.size() + aCommand->Length() > RED4EXT_SCRIPT_ARGS_MAX_LENGTH)
+        {
+            spdlog::error("Redscript compilation command is too long:");
+            spdlog::error(L"{}", buffer);
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
+                "During RED4ext's redscript compilation command, too many paths were added to the compile "
+                "command's string, causing it to exceed the 4096 character limit.\n\nYou'll need to remove "
+                "RED4ext mod(s) for the game to launch. See red4ext/logs/red4ext.log for more details.");
+            return 1;
+        }
     }
-    aArgs->str = buffer;
-    aArgs->maxLength = aArgs->length = wcslen(buffer);
+    aArgs->str = buffer.data();
+    aArgs->maxLength = aArgs->length = buffer.size();
 
     spdlog::info(L"Final redscript compilation arg string: '{}'", aArgs->str);
     auto result = Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
 
-    aArgs->str = original;
-    aArgs->maxLength = aArgs->length = wcslen(original);
+    aArgs->str = original.data();
+    aArgs->maxLength = aArgs->length = original.size();
 
     return result;
 }
