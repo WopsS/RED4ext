@@ -9,11 +9,11 @@ namespace
 {
 bool isAttached = false;
 
-bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4);
+bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4);
 Hook<decltype(&_CBaseEngine_LoadScripts)> CBaseEngine_LoadScripts(Addresses::CBaseEngine_LoadScripts,
                                                                   &_CBaseEngine_LoadScripts);
 
-bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, RED4ext::CString* aPath, uint64_t aTimestamp, uint64_t a4)
+bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4)
 {
     auto scriptSystem = App::Get()->GetScriptSystem();
     if (scriptSystem->IsUsingRedmod())

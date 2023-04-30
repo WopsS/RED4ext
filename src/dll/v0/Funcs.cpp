@@ -1,8 +1,6 @@
 #include "Funcs.hpp"
 #include "App.hpp"
 #include "Utils.hpp"
-#include "stdafx.hpp"
-
 
 namespace
 {
@@ -112,7 +110,7 @@ bool v0::GameStates::Add(RED4ext::PluginHandle aHandle, RED4ext::EGameStateType 
     return false;
 }
 
-bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, const char* aPath)
+bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, const wchar_t* aPath)
 {
     auto app = App::Get();
     if (!app)

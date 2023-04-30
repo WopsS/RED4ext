@@ -15,23 +15,24 @@ public:
     void Startup() final;
     void Shutdown() final;
 
-    bool Add(std::shared_ptr<PluginBase> aPlugin, const char* path);
+    bool Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* path);
     std::wstring GetRedModArgs();
-    void SetScriptsBlobPath(RED4ext::CString*);
-    RED4ext::CString* GetScriptsBlobPath();
+    void SetScriptsBlobPath(RED4ext::CString&);
+    const RED4ext::CString& GetScriptsBlobPath() const;
     void SetUsingRedmod(bool);
-    bool IsUsingRedmod();
+    bool IsUsingRedmod() const;
     std::wstring CreatePathsFile();
 
 private:
-    bool _Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* path);
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;
     using MapIter_t = Map_t::iterator;
+
+    bool Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* path);
 
     const Paths& m_paths;
 
     std::mutex m_mutex;
     Map_t m_scriptPaths;
-    bool m_usingRedmod = false;
+    bool m_usingRedmod;
     RED4ext::CString m_scriptsBlobPath;
 };

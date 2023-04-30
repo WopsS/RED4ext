@@ -3,6 +3,7 @@
 
 ScriptSystem::ScriptSystem(const Paths& aPaths)
     : m_paths(aPaths)
+    , m_usingRedmod(false)
 {
 }
 
@@ -19,14 +20,14 @@ void ScriptSystem::Shutdown()
 {
 }
 
-void ScriptSystem::SetScriptsBlobPath(RED4ext::CString* aScriptsBlobPath)
+void ScriptSystem::SetScriptsBlobPath(RED4ext::CString& aScriptsBlobPath)
 {
-    m_scriptsBlobPath = *aScriptsBlobPath;
+    m_scriptsBlobPath = aScriptsBlobPath;
 }
 
-RED4ext::CString* ScriptSystem::GetScriptsBlobPath()
+const RED4ext::CString& ScriptSystem::GetScriptsBlobPath() const
 {
-    return &m_scriptsBlobPath;
+    return m_scriptsBlobPath;
 }
 
 void ScriptSystem::SetUsingRedmod(bool aUsing)
@@ -34,21 +35,21 @@ void ScriptSystem::SetUsingRedmod(bool aUsing)
     m_usingRedmod = aUsing;
 }
 
-bool ScriptSystem::IsUsingRedmod()
+bool ScriptSystem::IsUsingRedmod() const
 {
     return m_usingRedmod;
 }
 
-bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const char* aPath)
+bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
 {
-    spdlog::trace("Adding path to script compilation: '{}'", aPath);
+    spdlog::trace(L"Adding path to script compilation: '{}'", aPath);
     auto resolvedPath = std::filesystem::path(aPath);
     if (resolvedPath.is_absolute())
     {
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found absolute path: {}", resolvedPath.wstring().c_str());
-            return _Add(aPlugin, &resolvedPath);
+            return Add(aPlugin, &resolvedPath);
         }
         else
         {
@@ -62,7 +63,7 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const char* aPath)
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found path relative to plugin: {}", resolvedPath.wstring().c_str());
-            return _Add(aPlugin, &resolvedPath);
+            return Add(aPlugin, &resolvedPath);
         }
         else
         {
@@ -72,37 +73,30 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const char* aPath)
     }
 }
 
-bool ScriptSystem::_Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
+bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
 {
     std::scoped_lock _(m_mutex);
     m_scriptPaths.emplace(aPlugin, std::move(*aPath));
     return true;
 }
 
-std::wstring ScriptSystem::CreatePathsFile() {
-    auto scriptPaths = std::vector<std::filesystem::path>();
-    for (auto it = m_scriptPaths.begin(); it != m_scriptPaths.end(); ++it)
-    {
-        scriptPaths.emplace_back(it->second);
-    }
+std::wstring ScriptSystem::CreatePathsFile()
+{
     spdlog::info("Adding paths to redscript compilation:");
 
-    auto pathsFilePath = m_paths.GetRED4extDir() / "redscript_paths.txt";
-    std::wofstream pathsFile;
-    pathsFile.open(pathsFilePath);
-    for (auto& path : scriptPaths)
+    auto pathsFilePath = m_paths.GetRedscriptPathsFile();
+    std::wofstream pathsFile(pathsFilePath, std::ios::out);
+    for (auto it = m_scriptPaths.begin(); it != m_scriptPaths.end(); ++it)
     {
-        spdlog::info(L"  '{}'", path.wstring());
-        pathsFile << path.wstring() + L'\n';
+        spdlog::info(L"{}: '{}'", it->first->GetName(), it->second.wstring());
+        pathsFile << it->second.wstring() << std::endl;
     }
-    pathsFile.close();
     spdlog::info(L"Paths written to: '{}'", pathsFilePath.wstring());
     return pathsFilePath.wstring();
 }
 
 std::wstring ScriptSystem::GetRedModArgs()
 {
-    return L"-compile \"" + (m_paths.GetRootDir() / "r6" / "scripts").wstring() + 
-           L"\" -customCacheDir \"" + 
-           (m_paths.GetRootDir() / "r6" / "cache" / "modded").wstring() + L"\"";
+    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" -customCacheDir \"" +
+           m_paths.GetR6CacheModded().wstring() + L"\"";
 }
