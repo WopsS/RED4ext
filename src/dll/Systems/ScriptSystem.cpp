@@ -79,17 +79,28 @@ bool ScriptSystem::_Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::pa
     return true;
 }
 
-std::vector<std::filesystem::path> ScriptSystem::GetPaths()
-{
-    auto paths = std::vector<std::filesystem::path>();
+std::wstring ScriptSystem::CreatePathsFile() {
+    auto scriptPaths = std::vector<std::filesystem::path>();
     for (auto it = m_scriptPaths.begin(); it != m_scriptPaths.end(); ++it)
     {
-        paths.emplace_back(it->second);
+        scriptPaths.emplace_back(it->second);
     }
-    return paths;
+    spdlog::info("Adding paths to redscript compilation:");
+
+    auto pathsFilePath = m_paths.GetRED4extDir() / "redscript_paths.txt";
+    std::wofstream pathsFile;
+    pathsFile.open(pathsFilePath);
+    for (auto& path : scriptPaths)
+    {
+        spdlog::info(L"  '{}'", path.wstring());
+        pathsFile << path.wstring() + L'\n';
+    }
+    pathsFile.close();
+    spdlog::info(L"Paths written to: '{}'", pathsFilePath.wstring());
+    return pathsFilePath.wstring();
 }
 
-std::wstring ScriptSystem::WriteRedModArgs()
+std::wstring ScriptSystem::GetRedModArgs()
 {
     return L"-compile \"" + (m_paths.GetRootDir() / "r6" / "scripts").wstring() + 
            L"\" -customCacheDir \"" + 

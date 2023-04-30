@@ -34,29 +34,15 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString* aCommand, FixedWString* 
     if (scriptSystem->IsUsingRedmod())
     {
         spdlog::info("Using RedMod configuration");
-        buffer = scriptSystem->WriteRedModArgs();
+        buffer = scriptSystem->GetRedModArgs();
     }
     else
     {
         buffer = aArgs->str;
     }
-    auto paths = scriptSystem->GetPaths();
-    spdlog::info("Adding paths to redscript compilation:");
-    for (auto& path : paths)
-    {
-        spdlog::info("  '{}'", path.string());
-        buffer += LR"( -compile ")" + path.wstring() + L'"';
-        if (buffer.size() + aCommand->Length() > RED4EXT_SCRIPT_ARGS_MAX_LENGTH)
-        {
-            spdlog::error("Redscript compilation command is too long:");
-            spdlog::error(L"{}", buffer);
-            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
-                "During RED4ext's redscript compilation command, too many paths were added to the compile "
-                "command's string, causing it to exceed the 4096 character limit.\n\nYou'll need to remove "
-                "RED4ext mod(s) for the game to launch. See red4ext/logs/red4ext.log for more details.");
-            return 1;
-        }
-    }
+
+    buffer += LR"( -compilePathsFile ")" + scriptSystem->CreatePathsFile() + L'"';
+
     aArgs->str = buffer.data();
     aArgs->maxLength = aArgs->length = buffer.size();
 

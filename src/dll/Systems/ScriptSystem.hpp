@@ -5,9 +5,6 @@
 #include "Paths.hpp"
 #include "PluginBase.hpp"
 
-// three characters of padding are used for quotes & space around aCommand
-#define RED4EXT_SCRIPT_ARGS_MAX_LENGTH (0x1000 - 3)
-
 class ScriptSystem : public ISystem
 {
 public:
@@ -19,12 +16,12 @@ public:
     void Shutdown() final;
 
     bool Add(std::shared_ptr<PluginBase> aPlugin, const char* path);
-    std::vector<std::filesystem::path> GetPaths();
-    std::wstring WriteRedModArgs();
+    std::wstring GetRedModArgs();
     void SetScriptsBlobPath(RED4ext::CString*);
     RED4ext::CString* GetScriptsBlobPath();
     void SetUsingRedmod(bool);
     bool IsUsingRedmod();
+    std::wstring CreatePathsFile();
 
 private:
     bool _Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* path);
