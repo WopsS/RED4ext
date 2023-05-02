@@ -28,7 +28,6 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     {
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
-    std::wstring original = aArgs.str;
     auto scriptSystem = App::Get()->GetScriptSystem();
 
     auto buffer = fmt::wmemory_buffer();
@@ -43,14 +42,13 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     }
     format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", scriptSystem->CreatePathsFile());
 
-    aArgs.str = buffer.data();
-    aArgs.maxLength = aArgs.length = buffer.size();
+    FixedWString newArgs;
+    newArgs.str = buffer.data();
+    newArgs.maxLength = newArgs.length = buffer.size();
+    newArgs.str[newArgs.length] = 0;
 
-    spdlog::info(L"Final redscript compilation arg string: '{}'", aArgs.str);
-    auto result = Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
-
-    aArgs.str = original.data();
-    aArgs.maxLength = aArgs.length = original.size();
+    spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
+    auto result = Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
 
     return result;
 }
