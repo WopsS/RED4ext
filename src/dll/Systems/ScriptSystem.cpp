@@ -97,6 +97,7 @@ std::wstring ScriptSystem::CreatePathsFile()
 
 std::wstring ScriptSystem::GetRedModArgs()
 {
-    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" -customCacheDir \"" +
-           m_paths.GetR6CacheModded().wstring() + L"\"";
+    wchar_t scriptsBlobPath[0x100];
+    mbstowcs_s(nullptr, scriptsBlobPath, m_scriptsBlobPath.c_str(), m_scriptsBlobPath.Length());
+    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" \"" + scriptsBlobPath + L"\"";
 }
