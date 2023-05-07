@@ -80,10 +80,20 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::file
     return true;
 }
 
-std::wstring ScriptCompilationSystem::CreatePathsFile()
+FixedWString ScriptCompilationSystem::GetCompilationArgs(const FixedWString& original)
 {
+    auto buffer = fmt::wmemory_buffer();
+    if (this->m_usingRedmod)
+    {
+        spdlog::info("Using RedMod configuration");
+        format_to(std::back_inserter(buffer), LR"(-compile "{}" "{}")", m_paths.GetR6Scripts().wstring(),
+                  m_scriptsBlobPath.wstring());
+    }
+    else
+    {
+        format_to(std::back_inserter(buffer), original.str);
+    }
     spdlog::info("Adding paths to redscript compilation:");
-
     auto pathsFilePath = m_paths.GetRedscriptPathsFile();
     std::wofstream pathsFile(pathsFilePath, std::ios::out);
     for (auto it = m_scriptPaths.begin(); it != m_scriptPaths.end(); ++it)
@@ -92,10 +102,13 @@ std::wstring ScriptCompilationSystem::CreatePathsFile()
         pathsFile << it->second.wstring() << std::endl;
     }
     spdlog::info(L"Paths written to: '{}'", pathsFilePath.wstring());
-    return pathsFilePath.wstring();
-}
-
-std::wstring ScriptCompilationSystem::GetRedModArgs()
-{
-    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" \"" + m_scriptsBlobPath.wstring() + L"\"";
+    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", pathsFilePath.wstring());
+    buffer.reserve(buffer.size() + 1);
+    auto newArgs = FixedWString();
+    newArgs.str = buffer.data();
+    newArgs.maxLength = newArgs.length = buffer.size();
+    // null terminate buffer
+    newArgs.str[newArgs.length] = 0;
+    spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
+    return newArgs;
 }

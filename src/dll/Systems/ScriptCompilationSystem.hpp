@@ -5,6 +5,13 @@
 #include "Paths.hpp"
 #include "PluginBase.hpp"
 
+struct FixedWString
+{
+    uint32_t length;
+    uint32_t maxLength;
+    wchar_t* str;
+};
+
 class ScriptCompilationSystem : public ISystem
 {
 public:
@@ -16,12 +23,11 @@ public:
     void Shutdown() final;
 
     bool Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath);
-    std::wstring GetRedModArgs();
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
     void SetUsingRedmod(bool);
     bool IsUsingRedmod() const;
-    std::wstring CreatePathsFile();
+    FixedWString GetCompilationArgs(const FixedWString& original);
 
 private:
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;

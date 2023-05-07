@@ -9,13 +9,6 @@ namespace
 {
 bool isAttached = false;
 
-struct FixedWString
-{
-    uint32_t length;
-    uint32_t maxLength;
-    wchar_t* str;
-};
-
 bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& aArgs,
                             RED4ext::CString& aCurrentDirectory, char a5);
 Hook<decltype(&_Global_ExecuteProcess)> Global_ExecuteProcess(Addresses::Global_ExecuteProcess,
@@ -28,29 +21,10 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     {
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
+
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
-
-    auto buffer = fmt::wmemory_buffer();
-    if (scriptCompilationSystem->IsUsingRedmod())
-    {
-        spdlog::info("Using RedMod configuration");
-        format_to(std::back_inserter(buffer), scriptCompilationSystem->GetRedModArgs());
-    }
-    else
-    {
-        format_to(std::back_inserter(buffer), aArgs.str);
-    }
-    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", scriptCompilationSystem->CreatePathsFile());
-
-    FixedWString newArgs;
-    newArgs.str = buffer.data();
-    newArgs.maxLength = newArgs.length = buffer.size();
-    newArgs.str[newArgs.length] = 0;
-
-    spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
-    auto result = Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
-
-    return result;
+    auto newArgs = scriptCompilationSystem->GetCompilationArgs(aArgs);
+    return Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
 }
 } // namespace
 
