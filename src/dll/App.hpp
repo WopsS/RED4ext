@@ -7,7 +7,7 @@
 #include "Systems/LoggerSystem.hpp"
 #include "Systems/PluginSystem.hpp"
 #include "Systems/StateSystem.hpp"
-#include "Systems/ScriptSystem.hpp"
+#include "Systems/ScriptCompilationSystem.hpp"
 
 class App
 {
@@ -25,7 +25,7 @@ public:
     HookingSystem* GetHookingSystem();
     StateSystem* GetStateSystem();
     PluginSystem* GetPluginSystem();
-    ScriptSystem* GetScriptSystem();
+    ScriptCompilationSystem* GetScriptCompilationSystem();
 
 private:
     App();

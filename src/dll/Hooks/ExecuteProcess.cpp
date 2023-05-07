@@ -2,7 +2,7 @@
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "Systems/ScriptSystem.hpp"
+#include "Systems/ScriptCompilationSystem.hpp"
 #include "stdafx.hpp"
 
 namespace
@@ -28,19 +28,19 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     {
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
-    auto scriptSystem = App::Get()->GetScriptSystem();
+    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
 
     auto buffer = fmt::wmemory_buffer();
-    if (scriptSystem->IsUsingRedmod())
+    if (scriptCompilationSystem->IsUsingRedmod())
     {
         spdlog::info("Using RedMod configuration");
-        format_to(std::back_inserter(buffer), scriptSystem->GetRedModArgs());
+        format_to(std::back_inserter(buffer), scriptCompilationSystem->GetRedModArgs());
     }
     else
     {
         format_to(std::back_inserter(buffer), aArgs.str);
     }
-    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", scriptSystem->CreatePathsFile());
+    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", scriptCompilationSystem->CreatePathsFile());
 
     FixedWString newArgs;
     newArgs.str = buffer.data();

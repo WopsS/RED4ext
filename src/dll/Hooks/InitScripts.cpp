@@ -2,7 +2,7 @@
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "Systems/ScriptSystem.hpp"
+#include "Systems/ScriptCompilationSystem.hpp"
 #include "stdafx.hpp"
 
 namespace
@@ -15,13 +15,13 @@ Hook<decltype(&_CBaseEngine_InitScripts)> CBaseEngine_InitScripts(Addresses::CBa
 
 void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2, unsigned __int16 a3)
 {
-    auto scriptSystem = App::Get()->GetScriptSystem();
+    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
     auto original = aEngine->scriptsBlobPath;
     if (aEngine->scriptsBlobPath.Length())
     {
         spdlog::info("Found scriptsBlobPath: '{}'", aEngine->scriptsBlobPath.c_str());
-        scriptSystem->SetUsingRedmod(true);
-        scriptSystem->SetScriptsBlobPath(aEngine->scriptsBlobPath);
+        scriptCompilationSystem->SetUsingRedmod(true);
+        scriptCompilationSystem->SetScriptsBlob(aEngine->scriptsBlobPath.c_str());
         aEngine->scriptsBlobPath = "";
     }
 

@@ -29,7 +29,7 @@ App::App()
     }
 
     AddSystem<LoggerSystem>(m_paths, m_config, m_devConsole);
-    AddSystem<ScriptSystem>(m_paths);
+    AddSystem<ScriptCompilationSystem>(m_paths);
     AddSystem<HookingSystem>();
     AddSystem<StateSystem>();
     AddSystem<PluginSystem>(m_config.GetPlugins(), m_paths);
@@ -212,10 +212,10 @@ PluginSystem* App::GetPluginSystem()
     return static_cast<PluginSystem*>(system.get());
 }
 
-ScriptSystem* App::GetScriptSystem()
+ScriptCompilationSystem* App::GetScriptCompilationSystem()
 {
     auto& system = m_systems.at(static_cast<size_t>(ESystemType::Script));
-    return static_cast<ScriptSystem*>(system.get());
+    return static_cast<ScriptCompilationSystem*>(system.get());
 }
 
 bool App::AttachHooks() const

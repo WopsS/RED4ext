@@ -1,46 +1,46 @@
-#include "ScriptSystem.hpp"
+#include "ScriptCompilationSystem.hpp"
 #include "stdafx.hpp"
 
-ScriptSystem::ScriptSystem(const Paths& aPaths)
+ScriptCompilationSystem::ScriptCompilationSystem(const Paths& aPaths)
     : m_paths(aPaths)
     , m_usingRedmod(false)
 {
 }
 
-ESystemType ScriptSystem::GetType()
+ESystemType ScriptCompilationSystem::GetType()
 {
     return ESystemType::Script;
 }
 
-void ScriptSystem::Startup()
+void ScriptCompilationSystem::Startup()
 {
 }
 
-void ScriptSystem::Shutdown()
+void ScriptCompilationSystem::Shutdown()
 {
 }
 
-void ScriptSystem::SetScriptsBlobPath(RED4ext::CString& aScriptsBlobPath)
+void ScriptCompilationSystem::SetScriptsBlob(const std::filesystem::path& aPath)
 {
-    m_scriptsBlobPath = aScriptsBlobPath;
+    m_scriptsBlobPath = aPath;
 }
 
-const RED4ext::CString& ScriptSystem::GetScriptsBlobPath() const
+const std::filesystem::path& ScriptCompilationSystem::GetScriptsBlob() const
 {
     return m_scriptsBlobPath;
 }
 
-void ScriptSystem::SetUsingRedmod(bool aUsing)
+void ScriptCompilationSystem::SetUsingRedmod(bool aUsing)
 {
     m_usingRedmod = aUsing;
 }
 
-bool ScriptSystem::IsUsingRedmod() const
+bool ScriptCompilationSystem::IsUsingRedmod() const
 {
     return m_usingRedmod;
 }
 
-bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
+bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
 {
     spdlog::trace(L"Adding path to script compilation: '{}'", aPath);
     auto resolvedPath = std::filesystem::path(aPath);
@@ -73,14 +73,14 @@ bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath
     }
 }
 
-bool ScriptSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
+bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
 {
     std::scoped_lock _(m_mutex);
     m_scriptPaths.emplace(aPlugin, std::move(*aPath));
     return true;
 }
 
-std::wstring ScriptSystem::CreatePathsFile()
+std::wstring ScriptCompilationSystem::CreatePathsFile()
 {
     spdlog::info("Adding paths to redscript compilation:");
 
@@ -95,9 +95,7 @@ std::wstring ScriptSystem::CreatePathsFile()
     return pathsFilePath.wstring();
 }
 
-std::wstring ScriptSystem::GetRedModArgs()
+std::wstring ScriptCompilationSystem::GetRedModArgs()
 {
-    wchar_t scriptsBlobPath[0x100];
-    mbstowcs_s(nullptr, scriptsBlobPath, m_scriptsBlobPath.c_str(), m_scriptsBlobPath.Length());
-    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" \"" + scriptsBlobPath + L"\"";
+    return L"-compile \"" + m_paths.GetR6Scripts().wstring() + L"\" \"" + m_scriptsBlobPath.wstring() + L"\"";
 }

@@ -2,7 +2,7 @@
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "Systems/ScriptSystem.hpp"
+#include "Systems/ScriptCompilationSystem.hpp"
 #include "stdafx.hpp"
 
 namespace
@@ -15,10 +15,11 @@ Hook<decltype(&_CBaseEngine_LoadScripts)> CBaseEngine_LoadScripts(Addresses::CBa
 
 bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4)
 {
-    auto scriptSystem = App::Get()->GetScriptSystem();
-    if (scriptSystem->IsUsingRedmod())
+    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
+    if (scriptCompilationSystem->IsUsingRedmod())
     {
-        return CBaseEngine_LoadScripts(aEngine, scriptSystem->GetScriptsBlobPath(), aTimestamp, a4);
+        RED4ext::CString scriptsBlobPath = scriptCompilationSystem->GetScriptsBlob().string();
+        return CBaseEngine_LoadScripts(aEngine, scriptsBlobPath, aTimestamp, a4);
     }
     else
     {

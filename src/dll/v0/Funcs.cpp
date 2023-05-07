@@ -124,6 +124,6 @@ bool v0::Scripts::Add(RED4ext::PluginHandle aHandle, const wchar_t* aPath)
         return false;
     }
 
-    auto scriptSystem = app->GetScriptSystem();
-    return scriptSystem->Add(plugin, aPath);
+    auto scriptCompilationSystem = app->GetScriptCompilationSystem();
+    return scriptCompilationSystem->Add(plugin, aPath);
 }
