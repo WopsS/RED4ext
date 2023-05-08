@@ -19,7 +19,7 @@ void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2
     auto original = aEngine->scriptsBlobPath;
     if (aEngine->scriptsBlobPath.Length())
     {
-        spdlog::info("Found scriptsBlobPath: '{}'", aEngine->scriptsBlobPath.c_str());
+        spdlog::info("Scripts BLOB is set to '{}'", aEngine->scriptsBlobPath.c_str());
         scriptCompilationSystem->SetScriptsBlob(aEngine->scriptsBlobPath.c_str());
         aEngine->scriptsBlobPath = "";
     }
