@@ -3,7 +3,6 @@
 #include "App.hpp"
 #include "Hook.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
-#include "stdafx.hpp"
 
 namespace
 {

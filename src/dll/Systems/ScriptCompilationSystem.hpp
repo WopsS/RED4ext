@@ -9,7 +9,7 @@ struct FixedWString
 {
     uint32_t length;
     uint32_t maxLength;
-    wchar_t* str;
+    const wchar_t* str;
 };
 
 class ScriptCompilationSystem : public ISystem
@@ -23,16 +23,17 @@ public:
     void Shutdown() final;
 
     bool Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath);
+
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
-    bool HasScriptsBlob() const;
-    FixedWString GetCompilationArgs(const FixedWString& original);
+
+    wchar_t* GetCompilationArgs(const FixedWString& aOriginal);
 
 private:
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;
     using MapIter_t = Map_t::iterator;
 
-    bool Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* path);
+    void Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path path);
 
     const Paths& m_paths;
 

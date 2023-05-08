@@ -1,5 +1,5 @@
 #include "ScriptCompilationSystem.hpp"
-#include "stdafx.hpp"
+#include "Utils.hpp"
 
 ScriptCompilationSystem::ScriptCompilationSystem(const Paths& aPaths)
     : m_paths(aPaths)
@@ -20,6 +20,12 @@ void ScriptCompilationSystem::Shutdown()
 {
 }
 
+void ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path aPath)
+{
+    std::scoped_lock _(m_mutex);
+    m_scriptPaths.emplace(aPlugin, std::move(aPath));
+}
+
 void ScriptCompilationSystem::SetScriptsBlob(const std::filesystem::path& aPath)
 {
     m_scriptsBlobPath = aPath;
@@ -31,11 +37,6 @@ const std::filesystem::path& ScriptCompilationSystem::GetScriptsBlob() const
     return m_scriptsBlobPath;
 }
 
-bool ScriptCompilationSystem::HasScriptsBlob() const
-{
-    return m_hasScriptsBlob;
-}
-
 bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
 {
     spdlog::trace(L"Adding path to script compilation: '{}'", aPath);
@@ -45,7 +46,8 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wch
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found absolute path: {}", resolvedPath.wstring().c_str());
-            return Add(aPlugin, &resolvedPath);
+            Add(aPlugin, resolvedPath);
+            return true;
         }
         else
         {
@@ -59,7 +61,8 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wch
         if (std::filesystem::exists(resolvedPath))
         {
             spdlog::trace(L"Found path relative to plugin: {}", resolvedPath.wstring().c_str());
-            return Add(aPlugin, &resolvedPath);
+            Add(aPlugin, resolvedPath);
+            return true;
         }
         else
         {
@@ -69,21 +72,13 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wch
     }
 }
 
-bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path* aPath)
+wchar_t* ScriptCompilationSystem::GetCompilationArgs(const FixedWString& original)
 {
-    std::scoped_lock _(m_mutex);
-    m_scriptPaths.emplace(aPlugin, std::move(*aPath));
-    return true;
-}
-
-FixedWString ScriptCompilationSystem::GetCompilationArgs(const FixedWString& original)
-{
-    auto buffer = fmt::wmemory_buffer();
-    if (this->m_hasScriptsBlob)
+    fmt::wmemory_buffer buffer;
+    if (m_hasScriptsBlob)
     {
         spdlog::info("Using scriptsBlobPath");
-        format_to(std::back_inserter(buffer), LR"(-compile "{}" "{}")", m_paths.GetR6Scripts().wstring(),
-                  m_scriptsBlobPath.wstring());
+        format_to(std::back_inserter(buffer), LR"(-compile "{}" "{}")", m_paths.GetR6Scripts(), m_scriptsBlobPath);
     }
     else
     {
@@ -92,19 +87,13 @@ FixedWString ScriptCompilationSystem::GetCompilationArgs(const FixedWString& ori
     spdlog::info("Adding paths to redscript compilation:");
     auto pathsFilePath = m_paths.GetRedscriptPathsFile();
     std::wofstream pathsFile(pathsFilePath, std::ios::out);
-    for (auto it = m_scriptPaths.begin(); it != m_scriptPaths.end(); ++it)
+    for (const auto& [plugin, path] : m_scriptPaths)
     {
-        spdlog::info(L"{}: '{}'", it->first->GetName(), it->second.wstring());
-        pathsFile << it->second.wstring() << std::endl;
+        spdlog::info(L"{}: '{}'", plugin->GetName(), path);
+        pathsFile << path << std::endl;
     }
-    spdlog::info(L"Paths written to: '{}'", pathsFilePath.wstring());
-    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", pathsFilePath.wstring());
-    buffer.reserve(buffer.size() + 1);
-    auto newArgs = FixedWString();
-    newArgs.str = buffer.data();
-    newArgs.maxLength = newArgs.length = buffer.size();
-    // null terminate buffer
-    newArgs.str[newArgs.length] = 0;
-    spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
-    return newArgs;
+    spdlog::info(L"Paths written to: '{}'", pathsFilePath);
+    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}"\0)", pathsFilePath);
+    spdlog::info(L"Final redscript compilation arg string: '{}'", buffer.data());
+    return buffer.data();
 }
