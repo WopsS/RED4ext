@@ -25,8 +25,7 @@ public:
     bool Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath);
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
-    void SetUsingRedmod(bool);
-    bool IsUsingRedmod() const;
+    bool HasScriptsBlob() const;
     FixedWString GetCompilationArgs(const FixedWString& original);
 
 private:
@@ -39,6 +38,6 @@ private:
 
     std::mutex m_mutex;
     Map_t m_scriptPaths;
-    bool m_usingRedmod;
+    bool m_hasScriptsBlob;
     std::filesystem::path m_scriptsBlobPath;
 };

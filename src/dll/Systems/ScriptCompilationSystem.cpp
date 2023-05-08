@@ -3,7 +3,7 @@
 
 ScriptCompilationSystem::ScriptCompilationSystem(const Paths& aPaths)
     : m_paths(aPaths)
-    , m_usingRedmod(false)
+    , m_hasScriptsBlob(false)
 {
 }
 
@@ -23,6 +23,7 @@ void ScriptCompilationSystem::Shutdown()
 void ScriptCompilationSystem::SetScriptsBlob(const std::filesystem::path& aPath)
 {
     m_scriptsBlobPath = aPath;
+    m_hasScriptsBlob = true;
 }
 
 const std::filesystem::path& ScriptCompilationSystem::GetScriptsBlob() const
@@ -30,14 +31,9 @@ const std::filesystem::path& ScriptCompilationSystem::GetScriptsBlob() const
     return m_scriptsBlobPath;
 }
 
-void ScriptCompilationSystem::SetUsingRedmod(bool aUsing)
+bool ScriptCompilationSystem::HasScriptsBlob() const
 {
-    m_usingRedmod = aUsing;
-}
-
-bool ScriptCompilationSystem::IsUsingRedmod() const
-{
-    return m_usingRedmod;
+    return m_hasScriptsBlob;
 }
 
 bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
@@ -83,9 +79,9 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, std::file
 FixedWString ScriptCompilationSystem::GetCompilationArgs(const FixedWString& original)
 {
     auto buffer = fmt::wmemory_buffer();
-    if (this->m_usingRedmod)
+    if (this->m_hasScriptsBlob)
     {
-        spdlog::info("Using RedMod configuration");
+        spdlog::info("Using scriptsBlobPath");
         format_to(std::back_inserter(buffer), LR"(-compile "{}" "{}")", m_paths.GetR6Scripts().wstring(),
                   m_scriptsBlobPath.wstring());
     }
