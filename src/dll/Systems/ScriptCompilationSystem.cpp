@@ -90,10 +90,10 @@ std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOr
     for (const auto& [plugin, path] : m_scriptPaths)
     {
         spdlog::info(L"{}: '{}'", plugin->GetName(), path);
-        pathsFile << path << std::endl;
+        pathsFile << path.wstring() << std::endl;
     }
     spdlog::info(L"Paths written to: '{}'", pathsFilePath);
-    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}"\0)", pathsFilePath);
+    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}"{})", pathsFilePath, '\0');
     spdlog::info(L"Final redscript compilation arg string: '{}'", buffer.data());
     return buffer.data();
 }
