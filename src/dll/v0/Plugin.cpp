@@ -12,11 +12,13 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     , m_logger{}
     , m_hooking{}
     , m_gameStates{}
+    , m_scripts{}
 {
     m_sdk.runtime = &m_runtime;
     m_sdk.logger = &m_logger;
     m_sdk.hooking = &m_hooking;
     m_sdk.gameStates = &m_gameStates;
+    m_sdk.scripts = &m_scripts;
 
     m_logger.Trace = v0::Logger::Trace;
     m_logger.TraceF = v0::Logger::TraceF;
@@ -47,6 +49,8 @@ v0::Plugin::Plugin(const std::filesystem::path& aPath, wil::unique_hmodule aModu
     m_hooking.Detach = v0::Hooking::Detach;
 
     m_gameStates.Add = v0::GameStates::Add;
+
+    m_scripts.Add = v0::Scripts::Add;
 }
 
 const uint32_t v0::Plugin::GetApiVersion() const

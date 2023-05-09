@@ -5,7 +5,11 @@
 #include "Version.hpp"
 
 #include "Hooks/CGameApplication.hpp"
+#include "Hooks/LoadScripts.hpp"
 #include "Hooks/Main_Hooks.hpp"
+#include "Hooks/InitScripts.hpp"
+#include "Hooks/ExecuteProcess.hpp"
+
 
 namespace
 {
@@ -25,6 +29,7 @@ App::App()
     }
 
     AddSystem<LoggerSystem>(m_paths, m_config, m_devConsole);
+    AddSystem<ScriptCompilationSystem>(m_paths);
     AddSystem<HookingSystem>();
     AddSystem<StateSystem>();
     AddSystem<PluginSystem>(m_config.GetPlugins(), m_paths);
@@ -133,7 +138,9 @@ void App::Destruct()
         DetourTransaction transaction;
         if (transaction.IsValid())
         {
-            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach();
+            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() &&
+                           Hooks::ExecuteProcess::Detach() && Hooks::InitScripts::Detach() &&
+                           Hooks::LoadScripts::Detach();
             if (success)
             {
                 transaction.Commit();
@@ -205,6 +212,12 @@ PluginSystem* App::GetPluginSystem()
     return static_cast<PluginSystem*>(system.get());
 }
 
+ScriptCompilationSystem* App::GetScriptCompilationSystem()
+{
+    auto& system = m_systems.at(static_cast<size_t>(ESystemType::Script));
+    return static_cast<ScriptCompilationSystem*>(system.get());
+}
+
 bool App::AttachHooks() const
 {
     spdlog::trace("Attaching hooks...");
@@ -215,7 +228,9 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach();
+    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() &&
+                   Hooks::ExecuteProcess::Attach() && Hooks::InitScripts::Attach() &&
+                   Hooks::LoadScripts::Attach();
     if (success)
     {
         return transaction.Commit();

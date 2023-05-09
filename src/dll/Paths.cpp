@@ -37,6 +37,21 @@ std::filesystem::path Paths::GetPluginsDir() const
     return GetRED4extDir() / L"plugins";
 }
 
+std::filesystem::path Paths::GetRedscriptPathsFile() const
+{
+    return GetRED4extDir() / L"redscript_paths.txt";
+}
+
+std::filesystem::path Paths::GetR6Scripts() const
+{
+    return GetRootDir() / L"r6" / L"scripts";
+}
+
+std::filesystem::path Paths::GetR6CacheModded() const
+{
+    return GetRootDir() / L"r6" / L"cache" / L"modded";
+}
+
 const std::filesystem::path Paths::GetConfigFile() const
 {
     return GetRED4extDir() / L"config.ini";

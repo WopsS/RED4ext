@@ -8,6 +8,7 @@ enum class ESystemType : uint8_t
 
     Logger,
     Hooking,
+    Script,
     State,
     Plugin
 };
