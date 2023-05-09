@@ -27,7 +27,7 @@ public:
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
 
-    wchar_t* GetCompilationArgs(const FixedWString& aOriginal);
+    std::wstring GetCompilationArgs(const FixedWString& aOriginal);
 
 private:
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;

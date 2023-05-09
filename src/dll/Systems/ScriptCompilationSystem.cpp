@@ -82,7 +82,7 @@ std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOr
     }
     else
     {
-        format_to(std::back_inserter(buffer), original.str);
+        format_to(std::back_inserter(buffer), aOriginal.str);
     }
     spdlog::info("Adding paths to redscript compilation:");
     auto pathsFilePath = m_paths.GetRedscriptPathsFile();

@@ -24,7 +24,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
     
     FixedWString newArgs;
-    newArgs.str = scriptCompilationSystem->GetCompilationArgs(aArgs);
+    newArgs.str = scriptCompilationSystem->GetCompilationArgs(aArgs).c_str();
     newArgs.length = newArgs.maxLength = wcslen(newArgs.str);
     return Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
 }
