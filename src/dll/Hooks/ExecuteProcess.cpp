@@ -22,6 +22,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     }
 
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
+    
     FixedWString newArgs;
     newArgs.str = scriptCompilationSystem->GetCompilationArgs(aArgs);
     newArgs.length = newArgs.maxLength = wcslen(newArgs.str);
