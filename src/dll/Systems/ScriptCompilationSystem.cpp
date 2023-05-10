@@ -72,7 +72,7 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wch
     }
 }
 
-std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOriginal)
+std::wstring ScriptCompilationSystem::GetCompilationArgs(const RED4ext::red::Process::FixedWString& aOriginal)
 {
     fmt::wmemory_buffer buffer;
     if (m_hasScriptsBlob)
@@ -95,4 +95,8 @@ std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOr
     spdlog::info(L"Paths written to: '{}'", pathsFilePath);
     format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}"{})", pathsFilePath, '\0');
     return buffer.data();
+}
+
+bool ScriptCompilationSystem::HasScripts() const {
+    return !m_scriptPaths.empty();
 }

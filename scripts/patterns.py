@@ -28,7 +28,6 @@ def get_groups() -> List[Group]:
     return [
         Group(name='Global', functions=[
             Item(name='Main', pattern='40 53 48 81 EC ? ? ? ? FF 15 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ?', expected=1, index=0),
-            Item(name='ExecuteProcess', pattern='48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 40 48 8B FA 48 8B F1 48 8D 54 24 30 49 8B C9 49 8B D8', expected=1, index=0),
         ]),
 
         Group(name='CGameApplication', functions=[
@@ -46,7 +45,11 @@ def get_groups() -> List[Group]:
         Group(name='CShutdownState', functions=[
             Item(name='Run', pattern='48 89 6C 24 18 56 48 83 EC 30 48 8B 0D ? ? ? ?', expected=1, index=0)
         ]),
-        
+
+        Group(name='RedProcess', functions=[
+            Item(name='Execute', pattern='48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 40 48 8B FA 48 8B F1 48 8D 54 24 30 49 8B C9 49 8B D8', expected=1, index=0),
+        ]),
+
         Group(name='CBaseEngine', function=[
             Item(name='InitScripts', pattern='48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 41 0F B7 D8 0F B6 FA 48 8B F1 E8', expected=1, index=0),
             Item(name='LoadScripts', pattern='48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 49 8B F9 41 C6 81', expected=1, index=0)
