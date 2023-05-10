@@ -12,6 +12,31 @@ struct FixedWString
     const wchar_t* str;
 };
 
+// aFlags is initially 0
+enum class ExecuteProcess_Flags : unsigned char
+{
+    // unsets CREATE_NO_WINDOW
+    ShouldCreateWindow = 0x1,
+    // sets CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED in Process Creation Flags
+    BreakawayAndSuspend = 0x2,
+    Unk3 = 0x3,
+    // unsets bInheritHandles
+    NoInheritHandles = 0x4,
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(ExecuteProcess_Flags)
+
+struct ScriptCompilation
+{
+  wchar_t command[4096];
+  PHANDLE readPipe;
+  PHANDLE writePipe;
+  HANDLE handle;
+  HANDLE hThread;
+  uint64_t unk2;
+  DWORD errorCode;
+};
+
 class ScriptCompilationSystem : public ISystem
 {
 public:
