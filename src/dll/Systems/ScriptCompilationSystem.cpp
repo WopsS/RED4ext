@@ -93,7 +93,6 @@ std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOr
         pathsFile << path.wstring() << std::endl;
     }
     spdlog::info(L"Paths written to: '{}'", pathsFilePath);
-    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}"{})", pathsFilePath, '\0');
-    spdlog::info(L"Final redscript compilation arg string: '{}'", buffer.data());
-    return buffer.data();
+    format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", pathsFilePath);
+    return fmt::to_string(buffer);
 }
