@@ -9,15 +9,15 @@ namespace
 bool isAttached = false;
 uint32_t runCount = 0;
 
-bool _RedProcess_Execute(RED4ext::red::Process* aThis, RED4ext::CString& aCommand,
-                            RED4ext::red::Process::FixedWString& aArgs, RED4ext::CString& aCurrentDirectory,
-                            RED4ext::red::Process::ExecutionFlags aFlags);
+bool _RedProcess_Execute(RED4ext::Process* aThis, RED4ext::CString& aCommand,
+                            RED4ext::Process::FixedWString& aArgs, RED4ext::CString& aCurrentDirectory,
+                            RED4ext::Process::ExecutionFlags aFlags);
 Hook<decltype(&_RedProcess_Execute)> RedProcess_Execute(Addresses::RedProcess_Execute,
                                                               &_RedProcess_Execute);
 
-bool _RedProcess_Execute(RED4ext::red::Process* aThis, RED4ext::CString& aCommand,
-                            RED4ext::red::Process::FixedWString& aArgs, RED4ext::CString& aCurrentDirectory,
-                            RED4ext::red::Process::ExecutionFlags aFlags)
+bool _RedProcess_Execute(RED4ext::Process* aThis, RED4ext::CString& aCommand,
+                            RED4ext::Process::FixedWString& aArgs, RED4ext::CString& aCurrentDirectory,
+                            RED4ext::Process::ExecutionFlags aFlags)
 {
     if (strstr(aCommand.c_str(), "scc.exe") == nullptr)
     {
@@ -27,14 +27,14 @@ bool _RedProcess_Execute(RED4ext::red::Process* aThis, RED4ext::CString& aComman
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
     auto str = scriptCompilationSystem->GetCompilationArgs(aArgs);
 
-    RED4ext::red::Process::FixedWString newArgs;
+    RED4ext::Process::FixedWString newArgs;
     newArgs.str = str.c_str();
     newArgs.length = newArgs.maxLength = wcslen(newArgs.str);
 
     spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
     auto result = RedProcess_Execute(aThis, aCommand, newArgs, aCurrentDirectory, aFlags);
 
-    auto waitResult = WaitForSingleObject(aThis->handle, RED4ext::red::Process::defaultTimeout);
+    auto waitResult = WaitForSingleObject(aThis->handle, RED4ext::Process::DefaultTimeout);
     switch (waitResult)
     {
     case WAIT_TIMEOUT:

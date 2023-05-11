@@ -72,7 +72,7 @@ bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wch
     }
 }
 
-std::wstring ScriptCompilationSystem::GetCompilationArgs(const RED4ext::red::Process::FixedWString& aOriginal)
+std::wstring ScriptCompilationSystem::GetCompilationArgs(const RED4ext::Process::FixedWString& aOriginal)
 {
     fmt::wmemory_buffer buffer;
     if (m_hasScriptsBlob)

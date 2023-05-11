@@ -4,7 +4,7 @@
 #include "ISystem.hpp"
 #include "Paths.hpp"
 #include "PluginBase.hpp"
-#include <RED4ext/RedProcess.hpp>
+#include <RED4ext/Process.hpp>
 
 class ScriptCompilationSystem : public ISystem
 {
@@ -21,7 +21,7 @@ public:
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
 
-    std::wstring GetCompilationArgs(const RED4ext::red::Process::FixedWString& aOriginal);
+    std::wstring GetCompilationArgs(const RED4ext::Process::FixedWString& aOriginal);
 
     bool HasScripts() const;
 
