@@ -21,11 +21,13 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
 
-    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
+    auto str = App::Get()->GetScriptCompilationSystem()->GetCompilationArgs(aArgs);
     
     FixedWString newArgs;
-    newArgs.str = scriptCompilationSystem->GetCompilationArgs(aArgs).c_str();
-    newArgs.length = newArgs.maxLength = wcslen(newArgs.str);
+    newArgs.str = str.c_str();
+    newArgs.length = str.length();
+    newArgs.maxLength = str.capacity();
+    spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
     return Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
 }
 } // namespace
