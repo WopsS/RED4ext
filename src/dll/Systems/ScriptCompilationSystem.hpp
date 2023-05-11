@@ -4,13 +4,7 @@
 #include "ISystem.hpp"
 #include "Paths.hpp"
 #include "PluginBase.hpp"
-
-struct FixedWString
-{
-    uint32_t length;
-    uint32_t maxLength;
-    const wchar_t* str;
-};
+#include <RED4ext/Process.hpp>
 
 class ScriptCompilationSystem : public ISystem
 {
@@ -27,7 +21,9 @@ public:
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
 
-    std::wstring GetCompilationArgs(const FixedWString& aOriginal);
+    std::wstring GetCompilationArgs(const RED4ext::Process::FixedWString& aOriginal);
+
+    bool HasScripts() const;
 
 private:
     using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;
