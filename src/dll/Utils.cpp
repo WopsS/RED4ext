@@ -251,6 +251,10 @@ std::wstring Utils::FileVerToPatch(const RED4ext::FileVer& aVersion)
     {
         return L"1.63";
     }
+    else if (aVersion == RED4EXT_RUNTIME_1_63_HOTFIX_1)
+    {
+        return L"1.63 Hotfix 1";
+    }
 
     return fmt::format(L"Unknown patch ({})", std::to_wstring(aVersion));
 }
