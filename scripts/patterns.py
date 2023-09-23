@@ -27,28 +27,28 @@ class Group:
 def get_groups() -> List[Group]:
     return [
         Group(name='Global', functions=[
-            Item(name='Main', pattern='40 53 48 81 EC ? ? ? ? FF 15 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ?', expected=1, index=0),
-            Item(name='ExecuteProcess', pattern='48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 40 48 8B FA 48 8B F1 48 8D 54 24 30 49 8B C9 49 8B D8', expected=1, index=0),
+            Item(name='Main', pattern='40 55 53 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? FF 15 ? ? ? ?', expected=1, index=0),
+            Item(name='ExecuteProcess', pattern='48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 41 81 79 ? ? ? ? ?', expected=1, index=0),
         ]),
 
         Group(name='CGameApplication', functions=[
-            Item(name='Run', pattern='48 89 5C 24 08 57 48 83 EC 20 48 8B D9 33 FF 90', expected=3, index=0)
+            Item(name='AddState', pattern='48 89 5C 24 ? 48 89 54 24 ? 57 48 83 EC ? 48 8B 02 48 8D B9 ? ? ? ?', expected=1, index=0)
         ]),
 
         Group(name='CInitializationState', functions=[
-            Item(name='Run', pattern='48 83 EC 28 48 8B 05 ? ? ? ? 4C 8B C2 8B 88 F8 00 00 00', expected=1, index=0)
+            Item(name='Run', pattern='40 53 48 83 EC ? 48 8B 05 ? ? ? ? 33 DB 4C 8B C2 8B 88 ? ? ? ?', expected=1, index=0)
         ]),
 
         Group(name='CRunningState', functions=[
-            Item(name='Run', pattern='40 53 48 83 EC 20 48 8B 0D ? ? ? ? 48 8B DA E8 ? ? ? ? 84 C0', expected=1, index=0)
+            Item(name='Run', pattern='40 53 48 83 EC ? 83 64 24 ? ? 48 8D 05 ? ? ? ? 48 8B 0D ? ? ? ?', expected=1, index=0)
         ]),
 
         Group(name='CShutdownState', functions=[
-            Item(name='Run', pattern='48 89 6C 24 18 56 48 83 EC 30 48 8B 0D ? ? ? ?', expected=1, index=0)
+            Item(name='Run', pattern='40 53 48 83 EC ? 48 8B DA E8 ? ? ? ? 48 8B CB 89 83 ? ? ? ?', expected=1, index=0)
         ]),
 
         Group(name='CBaseEngine', functions=[
-            Item(name='InitScripts', pattern='48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 41 0F B7 D8 0F B6 FA 48 8B F1 E8', expected=1, index=0),
-            Item(name='LoadScripts', pattern='48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 49 8B F9 41 C6 81', expected=1, index=0)
+            Item(name='InitScripts', pattern='48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 48 8B F1 E8 ? ? ? ? 48 8B 0D ? ? ? ?', expected=1, index=0),
+            Item(name='LoadScripts', pattern='48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 49 8D 99 ? ? ? ?', expected=1, index=0)
         ])
     ]

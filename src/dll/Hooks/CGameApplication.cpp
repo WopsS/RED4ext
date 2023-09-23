@@ -1,4 +1,3 @@
-#include "stdafx.hpp"
 #include "CGameApplication.hpp"
 #include "Addresses.hpp"
 #include "Hook.hpp"
@@ -12,153 +11,77 @@ namespace
 {
 bool isAttached = false;
 
-bool _CGameApplication_Run(RED4ext::CGameApplication* aThis);
-Hook<decltype(&_CGameApplication_Run)> CGameApplication_Run(Addresses::CGameApplication_Run, &_CGameApplication_Run);
+bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGameState* aState);
+Hook<decltype(&_CGameApplication_AddState)> CGameApplication_AddState(Addresses::CGameApplication_AddState,
+                                                                      &_CGameApplication_AddState);
 
-bool _CGameApplication_Run(RED4ext::CGameApplication* aThis)
+bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGameState* aState)
 {
     bool success = true;
     try
     {
-        if (aThis->states.size > 0)
+        switch (aState->GetType())
         {
-            spdlog::trace("Changing virtual functions for {} game state(s)...", aThis->states.size);
+        case RED4ext::EGameStateType::BaseInitialization:
+        {
+            success =
+                States::BaseInitializationState::Attach(static_cast<RED4ext::CBaseInitializationState*>(aState)) &&
+                success;
+            break;
+        }
+        case RED4ext::EGameStateType::Initialization:
+        {
+            success =
+                States::InitializationState::Attach(static_cast<RED4ext::CInitializationState*>(aState)) && success;
+            break;
+        }
+        case RED4ext::EGameStateType::Running:
+        {
+            success = States::RunningState::Attach(static_cast<RED4ext::CRunningState*>(aState)) && success;
+            break;
+        }
+        case RED4ext::EGameStateType::Shutdown:
+        {
+            success = States::ShutdownState::Attach(static_cast<RED4ext::CShutdownState*>(aState)) && success;
+            break;
+        }
+        default:
+        {
+            spdlog::warn("State '{}' ({}) is not handled", aState->GetName(), static_cast<int32_t>(aState->GetType()));
+        }
+        }
 
-            for (auto state : aThis->states)
-            {
-                switch (state->GetType())
-                {
-                case RED4ext::EGameStateType::BaseInitialization:
-                {
-                    success = States::BaseInitializationState::Attach(
-                                  static_cast<RED4ext::CBaseInitializationState*>(state)) &&
-                              success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Initialization:
-                {
-                    success = States::InitializationState::Attach(static_cast<RED4ext::CInitializationState*>(state)) &&
-                              success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Running:
-                {
-                    success = States::RunningState::Attach(static_cast<RED4ext::CRunningState*>(state)) && success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Shutdown:
-                {
-                    success = States::ShutdownState::Attach(static_cast<RED4ext::CShutdownState*>(state)) && success;
-                    break;
-                }
-                default:
-                {
-                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), static_cast<int32_t>(state->GetType()));
-                }
-                }
-            }
-
-            if (success)
-            {
-                spdlog::trace("All virtual functions were changed successfully");
-            }
-            else
-            {
-                spdlog::warn(
-                    "One or more game state virtual functions could not be changed, the game will continue running "
-                    "but unexpected behavior might happen");
-            }
+        if (success)
+        {
+            spdlog::trace("All virtual functions were changed successfully");
         }
         else
         {
-            spdlog::warn("No game states found, might be that the structure layout changed, check if a new RED4ext "
-                         "version is available");
+            spdlog::warn(
+                "One or more game state virtual functions could not be changed, the game will continue running "
+                "but unexpected behavior might happen");
         }
     }
     catch (const std::exception& e)
     {
-        spdlog::warn("An exception occured while changing the virtual functions for the game states");
+        spdlog::warn("An exception occurred while changing the virtual functions for the game states");
         spdlog::warn(e.what());
     }
     catch (...)
     {
-        spdlog::warn("An unknown exception occured while changing the virtual functions for the game states");
+        spdlog::warn("An unknown exception occurred while changing the virtual functions for the game states");
     }
 
-    auto result = CGameApplication_Run(aThis);
-    success = true;
-
-    try
-    {
-        if (aThis->states.size > 0)
-        {
-            spdlog::trace("Restoring virtual functions for {} game state(s)...", aThis->states.size);
-
-            for (auto state : aThis->states)
-            {
-                switch (state->GetType())
-                {
-                case RED4ext::EGameStateType::BaseInitialization:
-                {
-                    success = States::BaseInitializationState::Detach(
-                                  static_cast<RED4ext::CBaseInitializationState*>(state)) &&
-                              success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Initialization:
-                {
-                    success = States::InitializationState::Detach(static_cast<RED4ext::CInitializationState*>(state)) &&
-                              success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Running:
-                {
-                    success = States::RunningState::Detach(static_cast<RED4ext::CRunningState*>(state)) && success;
-                    break;
-                }
-                case RED4ext::EGameStateType::Shutdown:
-                {
-                    success = States::ShutdownState::Detach(static_cast<RED4ext::CShutdownState*>(state)) && success;
-                    break;
-                }
-                default:
-                {
-                    spdlog::warn("State '{}' ({}) is not handled", state->GetName(), static_cast<int32_t>(state->GetType()));
-                }
-                }
-            }
-
-            if (success)
-            {
-                spdlog::trace("All virtual functions were restored successfully");
-            }
-            else
-            {
-                spdlog::warn(
-                    "One or more game state virtual functions could not be restored, unexpected behavior might happen");
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        spdlog::warn("An exception occured while restoring the virtual functions for the game states");
-        spdlog::warn(e.what());
-    }
-    catch (...)
-    {
-        spdlog::warn("An unknown exception occured while restoring the virtual functions for the game states");
-    }
-
-    return result;
+    return CGameApplication_AddState(aThis, aState);
 }
 } // namespace
 
 bool Hooks::CGameApplication::Attach()
 {
     spdlog::trace("Trying to attach the hook for the game application at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_Run));
+                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_AddState));
 
-    auto result = CGameApplication_Run.Attach();
+    auto result = CGameApplication_AddState.Attach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not attach the hook for the game application. Detour error code: {}", result);
@@ -180,9 +103,9 @@ bool Hooks::CGameApplication::Detach()
     }
 
     spdlog::trace("Trying to detach the hook for the game application at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_Run));
+                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_AddState));
 
-    auto result = CGameApplication_Run.Detach();
+    auto result = CGameApplication_AddState.Detach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not detach the hook for the game application. Detour error code: {}", result);
