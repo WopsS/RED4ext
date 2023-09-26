@@ -8,23 +8,26 @@ namespace
 {
 bool isAttached = false;
 
-void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2, unsigned __int16 a3);
+void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CString& aScriptsBlobPath, int8_t a3,
+                               int16_t a4);
 Hook<decltype(&_CBaseEngine_InitScripts)> CBaseEngine_InitScripts(Addresses::CBaseEngine_InitScripts,
                                                                   &_CBaseEngine_InitScripts);
 
-void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aEngine, unsigned __int8 a2, unsigned __int16 a3)
+void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CString& aScriptsBlobPath, int8_t a3,
+                               int16_t a4)
 {
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
-    auto original = aEngine->scriptsBlobPath;
-    if (aEngine->scriptsBlobPath.Length())
+    RED4ext::CString original(aThis->scriptsBlobPath);
+
+    if (aThis->scriptsBlobPath.Length())
     {
-        spdlog::info("Scripts BLOB is set to '{}'", aEngine->scriptsBlobPath.c_str());
-        scriptCompilationSystem->SetScriptsBlob(aEngine->scriptsBlobPath.c_str());
-        aEngine->scriptsBlobPath = "";
+        spdlog::info("Scripts BLOB is set to '{}'", aThis->scriptsBlobPath.c_str());
+        scriptCompilationSystem->SetScriptsBlob(aThis->scriptsBlobPath.c_str());
+        aThis->scriptsBlobPath = "";
     }
 
-    auto result = CBaseEngine_InitScripts(aEngine, a2, a3);
-    aEngine->scriptsBlobPath = original;
+    auto result = CBaseEngine_InitScripts(aThis, aScriptsBlobPath, a3, a4);
+    aThis->scriptsBlobPath = original;
     return result;
 }
 } // namespace

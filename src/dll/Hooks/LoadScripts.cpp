@@ -15,7 +15,8 @@ Hook<decltype(&_CBaseEngine_LoadScripts)> CBaseEngine_LoadScripts(Addresses::CBa
 bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4)
 {
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
-    auto scriptsBlobPath = scriptCompilationSystem->GetScriptsBlob();
+    const auto& scriptsBlobPath = scriptCompilationSystem->GetScriptsBlob();
+
     if (!scriptsBlobPath.empty())
     {
         return CBaseEngine_LoadScripts(aEngine, scriptsBlobPath.string(), aTimestamp, a4);

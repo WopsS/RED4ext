@@ -23,7 +23,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
 
     auto str = App::Get()->GetScriptCompilationSystem()->GetCompilationArgs(aArgs);
     
-    FixedWString newArgs;
+    FixedWString newArgs{};
     newArgs.str = str.c_str();
     newArgs.length = str.length();
     newArgs.maxLength = str.capacity();

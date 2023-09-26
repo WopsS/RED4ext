@@ -48,7 +48,7 @@ def get_groups() -> List[Group]:
         ]),
 
         Group(name='CBaseEngine', functions=[
-            Item(name='InitScripts', pattern='48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 48 8B F1 E8 ? ? ? ? 48 8B 0D ? ? ? ?', expected=1, index=0),
+            Item(name='InitScripts', pattern='48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B D9 41 0F B7 F1', expected=1, index=0),
             Item(name='LoadScripts', pattern='48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 49 8D 99 ? ? ? ?', expected=1, index=0)
         ])
     ]
