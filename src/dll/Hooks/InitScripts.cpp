@@ -16,18 +16,18 @@ Hook<decltype(&_CBaseEngine_InitScripts)> CBaseEngine_InitScripts(Addresses::CBa
 void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CString& aScriptsBlobPath, int8_t a3,
                                int16_t a4)
 {
-    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
-    RED4ext::CString original(aThis->scriptsBlobPath);
-
-    if (aThis->scriptsBlobPath.Length())
+    if (!aScriptsBlobPath.Length())
     {
-        spdlog::info("Scripts BLOB is set to '{}'", aThis->scriptsBlobPath.c_str());
-        scriptCompilationSystem->SetScriptsBlob(aThis->scriptsBlobPath.c_str());
-        aThis->scriptsBlobPath = "";
+        return CBaseEngine_InitScripts(aThis, aScriptsBlobPath, a3, a4);
     }
 
-    auto result = CBaseEngine_InitScripts(aThis, aScriptsBlobPath, a3, a4);
-    aThis->scriptsBlobPath = original;
+    spdlog::info("Scripts BLOB is set to '{}'", aScriptsBlobPath.c_str());
+
+    auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
+    scriptCompilationSystem->SetScriptsBlob(aScriptsBlobPath.c_str());
+
+    auto result = CBaseEngine_InitScripts(aThis, "", a3, a4);
+    aThis->scriptsBlobPath = aScriptsBlobPath;
     return result;
 }
 } // namespace
