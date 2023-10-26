@@ -44,7 +44,7 @@ def get_groups() -> List[Group]:
         ]),
 
         Group(name='CShutdownState', functions=[
-            Item(name='Run', pattern='40 53 48 83 EC ? 48 8B DA E8 ? ? ? ? 48 8B CB 89 83 ? ? ? ?', expected=1, index=0)
+            Item(name='Run', pattern='48 89 5C 24 08 57 48 83 EC ? 48 8B 0D ? ? ? ? 48 8B DA BF ? ? ? ? 48 85 C9', expected=1, index=0)
         ]),
 
         Group(name='CBaseEngine', functions=[
