@@ -81,7 +81,7 @@ try:
 
     groups.sort(key=lambda g: g.name.lower())
 
-    addr = find_ptr(pattern='4C 8D 05 ? ? ? ? 48 89 ? ? ? 00 00', expected=9, index=4, offset=3)
+    addr = find_ptr(pattern='48 8D ? ? ? ? ? 49 8D 4E ? E8 ? ? ? ? 48 8D 4C ? ?', expected=2, index=1, offset=3)
     if addr == ida_idaapi.BADADDR:
         raise Exception('The pattern for game\'s version is not found')
 
