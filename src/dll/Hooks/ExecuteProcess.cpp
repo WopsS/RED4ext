@@ -3,6 +3,9 @@
 #include "App.hpp"
 #include "Hook.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
+#include <windows.h>
+
+namespace fs = std::filesystem;
 
 namespace
 {
@@ -21,8 +24,19 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
 
+    auto sccPath = fs::path(aCommand.c_str());
+    auto sccLib = sccPath.replace_filename("scc_shared.dll");
+    auto sccHandle = LoadLibraryA(sccLib.string().c_str());
+    if (sccHandle)
+    {
+        auto scc = scc_load_api(sccHandle);
+        return ExecuteScc(sccPath, scc);
+    }
+
+    spdlog::info("Could not load scc.dll from {}, falling back to the default scc invokation", sccLib.string());
+
     auto str = App::Get()->GetScriptCompilationSystem()->GetCompilationArgs(aArgs);
-    
+
     FixedWString newArgs{};
     newArgs.str = str.c_str();
     newArgs.length = str.length();
@@ -73,4 +87,72 @@ bool Hooks::ExecuteProcess::Detach()
 
     isAttached = result != NO_ERROR;
     return !isAttached;
+}
+
+bool ExecuteScc(fs::path& sccPath, SccApi& scc)
+{
+    auto r6Dir = sccPath.parent_path().parent_path().parent_path() / "r6";
+    auto scriptSystem = App::Get()->GetScriptCompilationSystem();
+
+    auto settings = scc.settings_new(r6Dir.string().c_str());
+
+    if (scriptSystem->HasScriptsBlob())
+    {
+        scc.settings_set_custom_cache_file(settings, scriptSystem->GetScriptsBlob().string().c_str());
+    }
+
+    for (auto [_, path] : scriptSystem->GetScriptPaths())
+    {
+        scc.settings_add_script_path(settings, path.string().c_str());
+    }
+
+    auto result = scc.compile(settings);
+    auto output = scc.get_success(result);
+
+    if (output)
+    {
+        auto& sourceRepo = scriptSystem->GetSourceRefRepository();
+
+        auto count = scc.output_source_ref_count(output);
+        for (auto i = 0; i < count; ++i)
+        {
+            auto link = scc.output_get_source_ref(output, i);
+            if (!scc.source_ref_is_native(output, link))
+            {
+                continue;
+            }
+
+            auto typeTag = scc.source_ref_type(output, link);
+            auto namePtr = scc.source_ref_name(output, link);
+            auto parentNamePtr = scc.source_ref_parent_name(output, link);
+            auto pathPtr = scc.source_ref_path(output, link);
+            auto line = scc.source_ref_line(output, link);
+
+            auto file = sourceRepo.RegisterSourceFile(std::string_view(pathPtr.str, pathPtr.len));
+
+            auto nameStr = std::string_view(namePtr.str, namePtr.len);
+            auto parentNameStr = std::string_view(parentNamePtr.str, parentNamePtr.len);
+            auto ref = SourceRef {file, line};
+            switch (typeTag)
+            {
+            case SCC_SOURCE_REF_TYPE_CLASS:
+                sourceRepo.RegisterClass(nameStr, ref);
+                break;
+            case SCC_SOURCE_REF_TYPE_FIELD:
+                sourceRepo.RegisterProperty(nameStr, parentNameStr, ref);
+                break;
+            case SCC_SOURCE_REF_TYPE_FUNCTION:
+                if (parentNameStr.empty())
+                {
+                    sourceRepo.RegisterFunction(nameStr, ref);
+                }
+                else
+                {
+                    sourceRepo.RegisterMethod(nameStr, parentNameStr, ref);
+                }
+                break;
+            }
+        }
+    }
+    return true;
 }

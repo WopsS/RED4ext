@@ -38,4 +38,8 @@ constexpr uintptr_t CShutdownState_Run = 0x140952B9C - ImageBase; // 48 89 5C 24
 constexpr uintptr_t Global_Main = 0x140827094 - ImageBase; // 40 55 53 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? FF 15 ? ? ? ?, expected: 1, index: 0
 constexpr uintptr_t Global_ExecuteProcess = 0x14082E260 - ImageBase; // 48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 41 81 79 ? ? ? ? ?, expected: 1, index: 0
 #pragma endregion
+
+#pragma region ScriptValidator
+constexpr uintptr_t ScriptValidator_Validate = 0x14060FC3C - ImageBase; // 48 89 5C 24 ? 48 89 4C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B C2, expected: 1, index: 0
+#pragma endregion
 } // namespace Addresses

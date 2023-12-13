@@ -26,4 +26,5 @@ target_link_libraries(RED4ext.Dll
     toml11
     tsl::ordered_map
     WIL
+    redscript
 )

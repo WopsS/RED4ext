@@ -5,11 +5,11 @@
 #include "Version.hpp"
 
 #include "Hooks/CGameApplication.hpp"
+#include "Hooks/ExecuteProcess.hpp"
+#include "Hooks/InitScripts.hpp"
 #include "Hooks/LoadScripts.hpp"
 #include "Hooks/Main_Hooks.hpp"
-#include "Hooks/InitScripts.hpp"
-#include "Hooks/ExecuteProcess.hpp"
-
+#include "Hooks/ValidateScripts.hpp"
 
 namespace
 {
@@ -140,7 +140,7 @@ void App::Destruct()
         {
             auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() &&
                            Hooks::ExecuteProcess::Detach() && Hooks::InitScripts::Detach() &&
-                           Hooks::LoadScripts::Detach();
+                           Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach();
             if (success)
             {
                 transaction.Commit();
@@ -228,9 +228,8 @@ bool App::AttachHooks() const
         return false;
     }
 
-    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() &&
-                   Hooks::ExecuteProcess::Attach() && Hooks::InitScripts::Attach() &&
-                   Hooks::LoadScripts::Attach();
+    auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::ExecuteProcess::Attach() &&
+                   Hooks::InitScripts::Attach() && Hooks::LoadScripts::Attach() && Hooks::ValidateScripts::Attach();
     if (success)
     {
         return transaction.Commit();

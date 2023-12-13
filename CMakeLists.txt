@@ -41,5 +41,6 @@ include(ConfigureAndIncludeSpdlog)
 include(ConfigureAndIncludeToml11)
 include(ConfigureAndIncludeTslOrderedMap)
 include(ConfigureAndIncludeWil)
+include(ConfigureAndIncludeRedscript)
 
 add_subdirectory(src)
