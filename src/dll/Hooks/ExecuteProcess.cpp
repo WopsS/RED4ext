@@ -116,39 +116,39 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
         auto count = scc.output_source_ref_count(output);
         for (auto i = 0; i < count; ++i)
         {
-            auto link = scc.output_get_source_ref(output, i);
-            if (!scc.source_ref_is_native(output, link))
+            auto ref = scc.output_get_source_ref(output, i);
+            if (!scc.source_ref_is_native(output, ref))
             {
                 continue;
             }
 
-            auto typeTag = scc.source_ref_type(output, link);
-            auto namePtr = scc.source_ref_name(output, link);
-            auto parentNamePtr = scc.source_ref_parent_name(output, link);
-            auto pathPtr = scc.source_ref_path(output, link);
-            auto line = scc.source_ref_line(output, link);
+            auto typeTag = scc.source_ref_type(output, ref);
+            auto namePtr = scc.source_ref_name(output, ref);
+            auto parentNamePtr = scc.source_ref_parent_name(output, ref);
+            auto pathPtr = scc.source_ref_path(output, ref);
+            auto line = scc.source_ref_line(output, ref);
 
             auto file = sourceRepo.RegisterSourceFile(std::string_view(pathPtr.str, pathPtr.len));
 
             auto nameStr = std::string_view(namePtr.str, namePtr.len);
             auto parentNameStr = std::string_view(parentNamePtr.str, parentNamePtr.len);
-            auto ref = SourceRef {file, line};
+            auto sourceRef = SourceRef {file, line};
             switch (typeTag)
             {
             case SCC_SOURCE_REF_TYPE_CLASS:
-                sourceRepo.RegisterClass(nameStr, ref);
+                sourceRepo.RegisterClass(nameStr, sourceRef);
                 break;
             case SCC_SOURCE_REF_TYPE_FIELD:
-                sourceRepo.RegisterProperty(nameStr, parentNameStr, ref);
+                sourceRepo.RegisterProperty(nameStr, parentNameStr, sourceRef);
                 break;
             case SCC_SOURCE_REF_TYPE_FUNCTION:
                 if (parentNameStr.empty())
                 {
-                    sourceRepo.RegisterFunction(nameStr, ref);
+                    sourceRepo.RegisterFunction(nameStr, sourceRef);
                 }
                 else
                 {
-                    sourceRepo.RegisterMethod(nameStr, parentNameStr, ref);
+                    sourceRepo.RegisterMethod(nameStr, parentNameStr, sourceRef);
                 }
                 break;
             }
