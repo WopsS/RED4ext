@@ -3,6 +3,7 @@
 #include "App.hpp"
 #include "Hook.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
+#include <cstring>
 #include <windows.h>
 
 namespace fs = std::filesystem;
@@ -132,7 +133,7 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
 
             auto nameStr = std::string_view(namePtr.str, namePtr.len);
             auto parentNameStr = std::string_view(parentNamePtr.str, parentNamePtr.len);
-            auto sourceRef = SourceRef {file, line};
+            auto sourceRef = SourceRef{file, line};
             switch (typeTag)
             {
             case SCC_SOURCE_REF_TYPE_CLASS:
@@ -153,8 +154,36 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
                 break;
             }
         }
-    }
-    scc.free_result(result);
 
-    return true;
+        spdlog::info("scc invoked successfully, {} source refs were returned", count);
+
+        scc.free_result(result);
+        return true;
+    }
+    else
+    {
+        char buffer[128] = {0};
+        scc.copy_error(result, buffer, sizeof(buffer));
+
+        auto errorMessage = std::string(buffer);
+
+        // truncate to first line to keep it short
+        auto lineEnd = errorMessage.find('\n');
+        if (lineEnd != std::string::npos)
+        {
+            errorMessage.resize(lineEnd);
+        }
+
+        // replace trailing characters with ellipsis
+        if (errorMessage.length() > 124)
+        {
+            errorMessage.resize(124);
+            errorMessage.append("...");
+        }
+
+        spdlog::error("scc invokation failed with an error: {}", errorMessage);
+
+        scc.free_result(result);
+        return false;
+    }
 }

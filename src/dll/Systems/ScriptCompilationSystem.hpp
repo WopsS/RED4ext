@@ -18,7 +18,7 @@ struct FixedWString
 
 struct SourceRef {
     std::string_view file;
-    uint32_t line;
+    size_t line;
 };
 
 class SourceRefRepository {
