@@ -174,9 +174,9 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
         }
 
         // replace trailing characters with ellipsis
-        if (errorMessage.length() > 124)
+        if (errorMessage.length() > sizeof(buffer) - 4)
         {
-            errorMessage.resize(124);
+            errorMessage.resize(sizeof(buffer) - 4);
             errorMessage.append("...");
         }
 
