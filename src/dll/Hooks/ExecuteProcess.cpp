@@ -154,5 +154,7 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
             }
         }
     }
+    scc.free_result(result);
+
     return true;
 }
