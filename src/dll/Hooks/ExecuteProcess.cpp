@@ -181,7 +181,7 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
             errorMessage.append("...");
         }
 
-        spdlog::error("scc invokation failed with an error: {}", errorMessage);
+        spdlog::warn("scc invokation failed with an error: {}", errorMessage);
 
         scc.free_result(result);
         return false;
