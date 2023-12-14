@@ -3,9 +3,7 @@
 #include "App.hpp"
 #include "Hook.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
-#include <cstdint>
-#include <tsl/ordered_set.h>
-#include <windows.h>
+#include "RED4ext/Scripting/ScriptReport.hpp"
 
 namespace
 {
@@ -19,8 +17,28 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
 {
     aReport.fillErrors = true;
     auto result = ScriptValidator_Validate(self, a1, aReport);
-    auto message = WriteValidationMessage(aReport);
-    if (!message.empty()) {
+    std::vector<ValidationError> errors;
+
+    for (auto i = 0; i < std::max(aReport.errors->size, 1u) - 1; ++i)
+    {
+        auto message = aReport.errors->entries[i].c_str();
+        auto error = ValidationError::FromString(message);
+        errors.push_back(error);
+
+        auto ref = error.GetSourceRef();
+        if (ref)
+        {
+            spdlog::error("Script validation error: {} at {}:{}", message, ref->file, ref->line);
+        }
+        else
+        {
+            spdlog::error("Script validation error: {}", message);
+        }
+    }
+
+    auto message = WritePopupMessage(errors);
+    if (!message.empty())
+    {
         MessageBoxA(0, message.c_str(), "Script Validation Error", MB_OK | MB_ICONERROR);
     }
 
@@ -106,12 +124,12 @@ ValidationError ValidationError::FromString(const char* str)
                  "Native class '%[^']' has declared base class '%[^']' that is different than current one '%*[^']'",
                  name, (int)sizeof(name), parent, (int)sizeof(parent)) == 2)
     {
-        error.type = ValidationErrorType::MismatchingBaseClass;
+        error.type = ValidationErrorType::BaseClassMismatch;
     }
     else if (sscanf_s(str, "Imported property '%[^.].%[^']' type '%*[^']' does not match with the native one '%*[^']'",
-                      name, (int)sizeof(name), parent, (int)sizeof(parent)) == 2)
+                      parent, (int)sizeof(parent), name, (int)sizeof(name)) == 2)
     {
-        error.type = ValidationErrorType::MismatchingPropertyType;
+        error.type = ValidationErrorType::PropertyTypeMismatch;
     }
     else
     {
@@ -128,47 +146,62 @@ std::optional<SourceRef> ValidationError::GetSourceRef() const
 {
     auto& sourceRepo = App::Get()->GetScriptCompilationSystem()->GetSourceRefRepository();
 
-    switch (type)
+    try
     {
-    case ValidationErrorType::MissingClass:
-        return sourceRepo.GetClass(name.c_str());
-    case ValidationErrorType::MissingGlobalFunction:
-        return sourceRepo.GetFunction(name.c_str());
-    case ValidationErrorType::MissingMethod:
-        return sourceRepo.GetMethod(name.c_str(), parent.c_str());
-    case ValidationErrorType::MissingProperty:
-        return sourceRepo.GetProperty(name.c_str(), parent.c_str());
-    case ValidationErrorType::MissingBaseClass:
-        return sourceRepo.GetClass(name.c_str());
-    case ValidationErrorType::MismatchingBaseClass:
-        return sourceRepo.GetClass(name.c_str());
-    case ValidationErrorType::MismatchingPropertyType:
-        return sourceRepo.GetProperty(name.c_str(), parent.c_str());
-    default:
+        switch (type)
+        {
+        case ValidationErrorType::MissingClass:
+            return sourceRepo.GetClass(name.c_str());
+        case ValidationErrorType::MissingGlobalFunction:
+            return sourceRepo.GetFunction(name.c_str());
+        case ValidationErrorType::MissingMethod:
+            return sourceRepo.GetMethod(name.c_str(), parent.c_str());
+        case ValidationErrorType::MissingProperty:
+            return sourceRepo.GetProperty(name.c_str(), parent.c_str());
+        case ValidationErrorType::MissingBaseClass:
+            return sourceRepo.GetClass(name.c_str());
+        case ValidationErrorType::BaseClassMismatch:
+            return sourceRepo.GetClass(name.c_str());
+        case ValidationErrorType::PropertyTypeMismatch:
+            return sourceRepo.GetProperty(name.c_str(), parent.c_str());
+        default:
+            return {};
+        }
+    }
+    catch (std::out_of_range)
+    {
         return {};
     }
 }
 
-std::string WriteValidationMessage(RED4ext::ScriptReport& aReport)
+std::string WritePopupMessage(const std::vector<ValidationError>& errors)
 {
-    tsl::ordered_set<std::string_view> faultyFiles;
+    std::unordered_set<std::string_view> faultyFiles;
 
-    for (auto i = 0; i < std::max(aReport.errors->size, 1u) - 1; ++i)
+    for (auto error : errors)
     {
-        auto err = ValidationError::FromString(aReport.errors->entries[i].c_str());
-        auto ref = err.GetSourceRef();
-        if (ref) {
+        auto ref = error.GetSourceRef();
+        if (ref)
+        {
             faultyFiles.insert(ref->file);
         }
     }
 
-    if (faultyFiles.empty()) {
+    if (faultyFiles.empty())
+    {
         return "";
     }
 
-    std::string message = "Faulty native definitions have been found in these files:\n";
-    for (auto file: faultyFiles) {
+    std::string message =
+        "The scripts below contain invalid native definitions and will prevent your game from starting:\n";
+    for (auto file : faultyFiles)
+    {
         fmt::format_to(std::back_inserter(message), "- {}\n", file);
     }
+    fmt::format_to(std::back_inserter(message),
+                   "\n"
+                   "Check for updates of the mods that added these files and if you still see this "
+                   "message after updating them, they'll have to be uninstalled.\n"
+                   "More details about the errors can be found in the logs.\n");
     return message;
 }

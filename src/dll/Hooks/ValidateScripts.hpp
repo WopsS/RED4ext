@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
 #include "Systems/ScriptCompilationSystem.hpp"
-#include "RED4ext/Scripting/ScriptReport.hpp"
 
 namespace Hooks::ValidateScripts
 {
@@ -10,24 +8,26 @@ bool Attach();
 bool Detach();
 } // namespace Hooks::ValidateScripts
 
-enum class ValidationErrorType {
+enum class ValidationErrorType
+{
     MissingClass,
     MissingGlobalFunction,
     MissingMethod,
     MissingProperty,
     MissingBaseClass,
-    MismatchingPropertyType,
-    MismatchingBaseClass,
+    PropertyTypeMismatch,
+    BaseClassMismatch,
     Unknown
 };
 
-struct ValidationError {
+struct ValidationError
+{
     ValidationErrorType type;
     std::string name;
     std::string parent;
 
-    static ValidationError FromString(const char *str);
+    static ValidationError FromString(const char* str);
     std::optional<SourceRef> GetSourceRef() const;
 };
 
-std::string WriteValidationMessage(RED4ext::ScriptReport &aReport);
+std::string WritePopupMessage(const std::vector<ValidationError>& errors);

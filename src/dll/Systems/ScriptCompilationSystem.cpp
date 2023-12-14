@@ -1,6 +1,5 @@
 #include "ScriptCompilationSystem.hpp"
 #include "Utils.hpp"
-#include <string>
 
 ScriptCompilationSystem::ScriptCompilationSystem(const Paths& aPaths)
     : m_paths(aPaths)
@@ -113,59 +112,65 @@ SourceRefRepository& ScriptCompilationSystem::GetSourceRefRepository()
     return m_sourceRefs;
 }
 
-// This function avoids allocating strings that are already in the file set. File paths are reused
-// a lot between definitions, so this saves a lot of memory. The returned string_view is
-// always a copy owned by the repository.
 std::string_view SourceRefRepository::RegisterSourceFile(std::string_view aPath)
 {
-    auto it = m_paths.find(aPath);
-    if (it != m_paths.end())
-    {
-        return it->first;
-    }
-
-    auto ptr = std::make_unique<std::string>(aPath);
-    std::string_view view = *ptr;
-    m_paths.emplace(view, std::move(ptr));
-    return view;
+    return InternString(aPath);
 }
 
 void SourceRefRepository::RegisterClass(std::string_view aName, SourceRef aRef)
 {
-    m_classes.emplace(aName, aRef);
+    m_classes.emplace(InternString(aName), aRef);
 }
 
 void SourceRefRepository::RegisterProperty(std::string_view aName, std::string_view aParent, SourceRef aRef)
 {
-    m_fields.emplace(fmt::format("{}::{}", aParent, aName), aRef);
+    Member key = {InternString(aName), InternString(aParent)};
+    m_fields.emplace(key, aRef);
 }
 
 void SourceRefRepository::RegisterMethod(std::string_view aName, std::string_view aParent, SourceRef aRef)
 {
-    m_methods.emplace(fmt::format("{}::{}", aParent, aName), aRef);
+    Member key = {InternString(aName), InternString(aParent)};
+    m_methods.emplace(key, aRef);
 }
 
 void SourceRefRepository::RegisterFunction(std::string_view aName, SourceRef aRef)
 {
-    m_functions.emplace(aName, aRef);
+    m_functions.emplace(InternString(aName), aRef);
 }
 
-const SourceRef& SourceRefRepository::GetClass(const char* aName) const
+const SourceRef& SourceRefRepository::GetClass(std::string_view aName) const
 {
     return m_classes.at(aName);
 }
 
-const SourceRef& SourceRefRepository::GetProperty(const char* aName, const char* aParent) const
+const SourceRef& SourceRefRepository::GetProperty(std::string_view aName, std::string_view aParent) const
 {
-    return m_fields.at(fmt::format("{}::{}", aParent, aName));
+    Member key = {aName, aParent};
+    return m_fields.at(key);
 }
 
-const SourceRef& SourceRefRepository::GetMethod(const char* aName, const char* aParent) const
+const SourceRef& SourceRefRepository::GetMethod(std::string_view aName, std::string_view aParent) const
 {
-    return m_methods.at(fmt::format("{}::{}", aParent, aName));
+    Member key = {aName, aParent};
+    return m_methods.at(key);
 }
 
-const SourceRef& SourceRefRepository::GetFunction(const char* aName) const
+const SourceRef& SourceRefRepository::GetFunction(std::string_view aName) const
 {
     return m_functions.at(aName);
+}
+
+std::string_view SourceRefRepository::InternString(std::string_view aString)
+{
+    auto it = m_internedStrings.find(aString);
+    if (it != m_internedStrings.end())
+    {
+        return it->first;
+    }
+
+    auto ptr = std::make_unique<std::string>(aString);
+    std::string_view view = *ptr;
+    m_internedStrings.emplace(view, std::move(ptr));
+    return view;
 }
