@@ -151,19 +151,19 @@ std::optional<SourceRef> ValidationError::GetSourceRef() const
         switch (type)
         {
         case ValidationErrorType::MissingClass:
-            return sourceRepo.GetClass(name.c_str());
+            return sourceRepo.GetClass(name);
         case ValidationErrorType::MissingGlobalFunction:
-            return sourceRepo.GetFunction(name.c_str());
+            return sourceRepo.GetFunction(name);
         case ValidationErrorType::MissingMethod:
-            return sourceRepo.GetMethod(name.c_str(), parent.c_str());
+            return sourceRepo.GetMethod(name, parent);
         case ValidationErrorType::MissingProperty:
-            return sourceRepo.GetProperty(name.c_str(), parent.c_str());
+            return sourceRepo.GetProperty(name, parent);
         case ValidationErrorType::MissingBaseClass:
-            return sourceRepo.GetClass(name.c_str());
+            return sourceRepo.GetClass(name);
         case ValidationErrorType::BaseClassMismatch:
-            return sourceRepo.GetClass(name.c_str());
+            return sourceRepo.GetClass(name);
         case ValidationErrorType::PropertyTypeMismatch:
-            return sourceRepo.GetProperty(name.c_str(), parent.c_str());
+            return sourceRepo.GetProperty(name, parent);
         default:
             return {};
         }
