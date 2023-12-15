@@ -91,55 +91,47 @@ bool Hooks::ValidateScripts::Detach()
 
 ValidationError ValidationError::FromString(const char* str)
 {
-    ValidationError error;
-
+    ValidationErrorType type = ValidationErrorType::Unknown;
     char name[64] = {0};
     char parent[64] = {0};
 
     if (sscanf_s(str, "Missing native class '%[^']'", name, (int)sizeof(name)) == 1)
     {
-        error.type = ValidationErrorType::MissingClass;
+        type = ValidationErrorType::MissingClass;
     }
     else if (sscanf_s(str, "Missing native global function '%[^']'", name, (int)sizeof(name)) == 1)
     {
-        error.type = ValidationErrorType::MissingGlobalFunction;
+        type = ValidationErrorType::MissingGlobalFunction;
     }
     else if (sscanf_s(str, "Missing native function '%[^']' in native class '%[^']'", name, (int)sizeof(name), parent,
                       (int)sizeof(parent)) == 2)
     {
-        error.type = ValidationErrorType::MissingMethod;
+        type = ValidationErrorType::MissingMethod;
     }
     else if (sscanf_s(str, "Missing native property '%[^']' in native class '%[^']'", name, (int)sizeof(name), parent,
                       (int)sizeof(parent)) == 2)
     {
-        error.type = ValidationErrorType::MissingProperty;
+        type = ValidationErrorType::MissingProperty;
     }
     else if (sscanf_s(str, "Missing base class '%[^']' of native class '%[^']'", parent, (int)sizeof(parent), name,
                       (int)sizeof(name)) == 2)
     {
-        error.type = ValidationErrorType::MissingBaseClass;
+        type = ValidationErrorType::MissingBaseClass;
     }
     else if (sscanf_s(
                  str,
                  "Native class '%[^']' has declared base class '%[^']' that is different than current one '%*[^']'",
                  name, (int)sizeof(name), parent, (int)sizeof(parent)) == 2)
     {
-        error.type = ValidationErrorType::BaseClassMismatch;
+        type = ValidationErrorType::BaseClassMismatch;
     }
     else if (sscanf_s(str, "Imported property '%[^.].%[^']' type '%*[^']' does not match with the native one '%*[^']'",
                       parent, (int)sizeof(parent), name, (int)sizeof(name)) == 2)
     {
-        error.type = ValidationErrorType::PropertyTypeMismatch;
-    }
-    else
-    {
-        error.type = ValidationErrorType::Unknown;
+        type = ValidationErrorType::PropertyTypeMismatch;
     }
 
-    error.name = name;
-    error.parent = parent;
-
-    return error;
+    return { .type = type, .name = name, .parent = parent };
 }
 
 std::optional<SourceRef> ValidationError::GetSourceRef() const
@@ -178,7 +170,7 @@ std::string WritePopupMessage(const std::vector<ValidationError>& errors)
 {
     std::unordered_set<std::string_view> faultyFiles;
 
-    for (auto error : errors)
+    for (const auto& error : errors)
     {
         auto ref = error.GetSourceRef();
         if (ref)
@@ -194,7 +186,7 @@ std::string WritePopupMessage(const std::vector<ValidationError>& errors)
 
     std::string message =
         "The scripts below contain invalid native definitions and will prevent your game from starting:\n";
-    for (auto file : faultyFiles)
+    for (const auto& file : faultyFiles)
     {
         fmt::format_to(std::back_inserter(message), "- {}\n", file);
     }

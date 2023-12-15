@@ -25,7 +25,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
     }
 
     auto sccPath = fs::path(aCommand.c_str());
-    auto sccLib = sccPath.replace_filename("scc_shared.dll");
+    auto& sccLib = sccPath.replace_filename("scc_shared.dll");
     auto sccHandle = LoadLibraryA(sccLib.string().c_str());
     if (sccHandle)
     {

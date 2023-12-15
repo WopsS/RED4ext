@@ -124,13 +124,13 @@ void SourceRefRepository::RegisterClass(std::string_view aName, SourceRef aRef)
 
 void SourceRefRepository::RegisterProperty(std::string_view aName, std::string_view aParent, SourceRef aRef)
 {
-    Member key = {InternString(aName), InternString(aParent)};
+    Member key = {.name = InternString(aName), .parent = InternString(aParent)};
     m_fields.emplace(key, aRef);
 }
 
 void SourceRefRepository::RegisterMethod(std::string_view aName, std::string_view aParent, SourceRef aRef)
 {
-    Member key = {InternString(aName), InternString(aParent)};
+    Member key = {.name = InternString(aName), .parent = InternString(aParent)};
     m_methods.emplace(key, aRef);
 }
 
@@ -146,13 +146,13 @@ const SourceRef& SourceRefRepository::GetClass(std::string_view aName) const
 
 const SourceRef& SourceRefRepository::GetProperty(std::string_view aName, std::string_view aParent) const
 {
-    Member key = {aName, aParent};
+    Member key = {.name = aName, .parent = aParent};
     return m_fields.at(key);
 }
 
 const SourceRef& SourceRefRepository::GetMethod(std::string_view aName, std::string_view aParent) const
 {
-    Member key = {aName, aParent};
+    Member key = {.name = aName, .parent = aParent};
     return m_methods.at(key);
 }
 
