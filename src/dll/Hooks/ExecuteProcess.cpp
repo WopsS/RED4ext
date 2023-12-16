@@ -5,8 +5,6 @@
 #include "Systems/ScriptCompilationSystem.hpp"
 #include <windows.h>
 
-namespace fs = std::filesystem;
-
 namespace
 {
 bool isAttached = false;
@@ -24,16 +22,16 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
         return Global_ExecuteProcess(a1, aCommand, aArgs, aCurrentDirectory, a5);
     }
 
-    auto sccPath = fs::path(aCommand.c_str());
+    auto sccPath = std::filesystem::path(aCommand.c_str());
     auto& sccLib = sccPath.replace_filename("scc_shared.dll");
-    auto sccHandle = LoadLibraryA(sccLib.string().c_str());
+    auto sccHandle = LoadLibrary(sccLib.c_str());
     if (sccHandle)
     {
         auto scc = scc_load_api(sccHandle);
-        return ExecuteScc(sccPath, scc);
+        return ExecuteScc(scc);
     }
 
-    spdlog::info("Could not load the scc library from {}, falling back to the CLI", sccLib.string());
+    spdlog::info("Could not load the scc library from '{}', falling back to the CLI", sccLib.string());
 
     auto str = App::Get()->GetScriptCompilationSystem()->GetCompilationArgs(aArgs);
 
@@ -89,9 +87,9 @@ bool Hooks::ExecuteProcess::Detach()
     return !isAttached;
 }
 
-bool ExecuteScc(fs::path& sccPath, SccApi& scc)
+bool ExecuteScc(SccApi& scc)
 {
-    auto r6Dir = sccPath.parent_path().parent_path().parent_path() / "r6";
+    auto r6Dir = App::Get()->GetPaths()->GetR6Dir();
     auto scriptSystem = App::Get()->GetScriptCompilationSystem();
 
     auto settings = scc.settings_new(r6Dir.string().c_str());
@@ -114,7 +112,7 @@ bool ExecuteScc(fs::path& sccPath, SccApi& scc)
         auto& sourceRepo = scriptSystem->GetSourceRefRepository();
 
         auto count = scc.output_source_ref_count(output);
-        for (auto i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             auto ref = scc.output_get_source_ref(output, i);
             if (!scc.source_ref_is_native(output, ref))

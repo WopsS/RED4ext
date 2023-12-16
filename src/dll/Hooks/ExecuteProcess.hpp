@@ -7,4 +7,4 @@ bool Attach();
 bool Detach();
 } // namespace Hooks::ExecuteProcess
 
-bool ExecuteScc(std::filesystem::path& sccPath, SccApi& scc);
+bool ExecuteScc(SccApi& scc);

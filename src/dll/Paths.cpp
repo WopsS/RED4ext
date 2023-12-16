@@ -52,6 +52,11 @@ std::filesystem::path Paths::GetR6CacheModded() const
     return GetRootDir() / L"r6" / L"cache" / L"modded";
 }
 
+std::filesystem::path Paths::GetR6Dir() const
+{
+    return GetRootDir() / L"r6";
+}
+
 const std::filesystem::path Paths::GetConfigFile() const
 {
     return GetRED4extDir() / L"config.ini";

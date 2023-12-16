@@ -26,6 +26,7 @@ public:
     StateSystem* GetStateSystem();
     PluginSystem* GetPluginSystem();
     ScriptCompilationSystem* GetScriptCompilationSystem();
+    const Paths* GetPaths() const;
 
 private:
     App();

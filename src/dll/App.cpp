@@ -218,6 +218,11 @@ ScriptCompilationSystem* App::GetScriptCompilationSystem()
     return static_cast<ScriptCompilationSystem*>(system.get());
 }
 
+const Paths* App::GetPaths() const
+{
+    return &m_paths;
+}
+
 bool App::AttachHooks() const
 {
     spdlog::trace("Attaching hooks...");
