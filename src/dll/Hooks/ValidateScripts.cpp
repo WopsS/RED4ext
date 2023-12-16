@@ -29,7 +29,7 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
         auto ref = error.GetSourceRef();
         if (ref)
         {
-            spdlog::error("Script validation error: {} at {}:{}", message, ref->file, ref->line);
+            spdlog::error("Script validation error: {} at {}:{}", message, ref->file, ref->line + 1);
         }
         else
         {
