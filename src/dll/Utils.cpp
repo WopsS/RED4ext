@@ -71,8 +71,19 @@ std::shared_ptr<spdlog::logger> Utils::CreateLogger(const std::wstring_view aLog
     }
     catch (const std::exception& e)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"An exception occured while creating the logger:\n{}",
-                                            Utils::Widen(e.what()));
+        std::string_view msg = e.what();
+        if (msg.starts_with("rotating_file_sink: failed renaming"))
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
+                L"Unable to rotate the log file. Please ensure that the game is completely closed and not running in "
+                L"the background.\n\n{}",
+                Utils::Widen(msg));
+        }
+        else
+        {
+            SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"An exception occurred while creating the logger:\n{}",
+                                                Utils::Widen(msg));
+        }
     }
 
     return nullptr;
