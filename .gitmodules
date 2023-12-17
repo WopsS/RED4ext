@@ -19,3 +19,6 @@
 [submodule "deps/ordered-map"]
 	path = deps/ordered-map
 	url = https://github.com/Tessil/ordered-map.git
+[submodule "deps/redscript"]
+	path = deps/redscript
+	url = https://github.com/jac3km4/redscript

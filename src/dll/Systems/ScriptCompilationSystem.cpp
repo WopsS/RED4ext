@@ -37,6 +37,11 @@ const std::filesystem::path& ScriptCompilationSystem::GetScriptsBlob() const
     return m_scriptsBlobPath;
 }
 
+bool ScriptCompilationSystem::HasScriptsBlob() const
+{
+    return m_hasScriptsBlob;
+}
+
 bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
 {
     spdlog::trace(L"Adding path to script compilation: '{}'", aPath);
@@ -95,4 +100,14 @@ std::wstring ScriptCompilationSystem::GetCompilationArgs(const FixedWString& aOr
     spdlog::info(L"Paths written to: '{}'", pathsFilePath);
     format_to(std::back_inserter(buffer), LR"( -compilePathsFile "{}")", pathsFilePath);
     return fmt::to_string(buffer);
+}
+
+const ScriptCompilationSystem::Map_t& ScriptCompilationSystem::GetScriptPaths() const
+{
+    return m_scriptPaths;
+}
+
+SourceRefRepository& ScriptCompilationSystem::GetSourceRefRepository()
+{
+    return m_sourceRefs;
 }

@@ -14,6 +14,7 @@ public:
     std::filesystem::path GetRedscriptPathsFile() const;
     std::filesystem::path GetR6Scripts() const;
     std::filesystem::path GetR6CacheModded() const;
+    std::filesystem::path GetR6Dir() const;
 
     const std::filesystem::path GetConfigFile() const;
 

@@ -4,6 +4,7 @@
 #include "ISystem.hpp"
 #include "Paths.hpp"
 #include "PluginBase.hpp"
+#include "SourceRefRepository.hpp"
 
 struct FixedWString
 {
@@ -14,6 +15,9 @@ struct FixedWString
 
 class ScriptCompilationSystem : public ISystem
 {
+    using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;
+    using MapIter_t = Map_t::iterator;
+
 public:
     ScriptCompilationSystem(const Paths& aPaths);
 
@@ -26,13 +30,14 @@ public:
 
     void SetScriptsBlob(const std::filesystem::path& aPath);
     const std::filesystem::path& GetScriptsBlob() const;
+    bool HasScriptsBlob() const;
 
     std::wstring GetCompilationArgs(const FixedWString& aOriginal);
+    const Map_t& GetScriptPaths() const;
+
+    SourceRefRepository& GetSourceRefRepository();
 
 private:
-    using Map_t = std::unordered_multimap<std::shared_ptr<PluginBase>, std::filesystem::path>;
-    using MapIter_t = Map_t::iterator;
-
     void Add(std::shared_ptr<PluginBase> aPlugin, std::filesystem::path path);
 
     const Paths& m_paths;
@@ -41,4 +46,5 @@ private:
     Map_t m_scriptPaths;
     bool m_hasScriptsBlob;
     std::filesystem::path m_scriptsBlobPath;
+    SourceRefRepository m_sourceRefs;
 };
