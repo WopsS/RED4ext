@@ -4,6 +4,7 @@
 #include "Hook.hpp"
 #include "RED4ext/Scripting/ScriptReport.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
+#include <codecvt>
 
 namespace
 {
@@ -16,14 +17,14 @@ Hook<decltype(&_ScriptValidator_Validate)> ScriptValidator_Validate(Addresses::S
 bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport& aReport)
 {
     aReport.fillErrors = true;
-    auto result = ScriptValidator_Validate(self, a1, aReport);
-    std::vector<ValidationError> errors;
+    const auto result = ScriptValidator_Validate(self, a1, aReport);
+    std::vector<ValidationError> validationErrors;
 
     for (auto i = 0; i < std::max(aReport.errors->size, 1u) - 1; ++i)
     {
         auto message = aReport.errors->entries[i].c_str();
-        auto error = ValidationError::FromString(message);
-        errors.push_back(error);
+        const auto error = ValidationError::FromString(message);
+        validationErrors.push_back(error);
 
         auto ref = error.GetSourceRef();
         if (ref)
@@ -36,11 +37,11 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
         }
     }
 
-    auto& incompatiblePlugins = App::Get()->GetPluginSystem()->GetIncompatiblePlugins();
-    auto message = WritePopupMessage(errors, incompatiblePlugins);
+    const auto& incompatiblePlugins = App::Get()->GetPluginSystem()->GetIncompatiblePlugins();
+    const auto message = WritePopupMessage(validationErrors, incompatiblePlugins);
     if (!message.empty())
     {
-        MessageBoxA(0, message.c_str(), "Script Validation Error", MB_OK | MB_ICONERROR);
+        MessageBoxW(0, message.c_str(), L"Script Validation Error", MB_OK | MB_ICONERROR);
     }
 
     return result;
@@ -90,34 +91,34 @@ bool Hooks::ValidateScripts::Detach()
     return !isAttached;
 }
 
-std::string WritePopupMessage(const std::vector<ValidationError>& validationErrors,
-                              const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
+std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErrors,
+                               const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
 {
     if (validationErrors.empty())
     {
         return {};
     }
 
-    std::string message;
+    std::wstring message;
 
     if (!incompatiblePlugins.empty())
     {
         fmt::format_to(std::back_inserter(message),
-                       "The following red4ext plugins could not be loaded because they are "
-                       "incompatible with the current version of the game:\n");
+                       L"The following red4ext plugins could not be loaded because they are "
+                       L"incompatible with the current version of the game:\n");
 
         for (const auto& plugin : incompatiblePlugins)
         {
             fmt::format_to(std::back_inserter(message), L"- {}\n", plugin);
         }
-        fmt::format_to(std::back_inserter(message), "\n");
+        fmt::format_to(std::back_inserter(message), L"\n");
     }
 
     std::unordered_set<std::string_view> faultyScriptFiles;
 
     for (const auto& error : validationErrors)
     {
-        auto ref = error.GetSourceRef();
+        const auto ref = error.GetSourceRef();
         if (ref)
         {
             faultyScriptFiles.insert(ref->file);
@@ -127,20 +128,23 @@ std::string WritePopupMessage(const std::vector<ValidationError>& validationErro
     if (!faultyScriptFiles.empty())
     {
         fmt::format_to(std::back_inserter(message),
-                       "The following scripts contain invalid native definitions and will prevent "
-                       "your game from starting:\n");
+                       L"The following scripts contain invalid native definitions and will prevent "
+                       L"your game from starting:\n");
+
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         for (const auto& file : faultyScriptFiles)
         {
-            fmt::format_to(std::back_inserter(message), "- {}\n", file);
+            const auto fileWide = converter.from_bytes(std::string(file));
+            fmt::format_to(std::back_inserter(message), L"- {}\n", fileWide);
         }
-        fmt::format_to(std::back_inserter(message), "\n");
+        fmt::format_to(std::back_inserter(message), L"\n");
     }
 
     fmt::format_to(std::back_inserter(message),
-                   "Check if these mods are up-to-date and installed correctly. If you keep seeing "
-                   "this message after updating/re-installing them, you might have to remove them "
-                   "in order to play the game.\n"
-                   "More details can be found in the red4ext logs.\n");
+                   L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
+                   L"this message after updating/re-installing them, you might have to remove them "
+                   L"in order to play the game.\n"
+                   L"More details can be found in the red4ext logs.\n");
 
     return message;
 }
