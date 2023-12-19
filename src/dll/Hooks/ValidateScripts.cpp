@@ -93,18 +93,7 @@ bool Hooks::ValidateScripts::Detach()
 std::string WritePopupMessage(const std::vector<ValidationError>& validationErrors,
                               const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
 {
-    std::unordered_set<std::string_view> faultyScriptFiles;
-
-    for (const auto& error : validationErrors)
-    {
-        auto ref = error.GetSourceRef();
-        if (ref)
-        {
-            faultyScriptFiles.insert(ref->file);
-        }
-    }
-
-    if (incompatiblePlugins.empty() && faultyScriptFiles.empty())
+    if (validationErrors.empty())
     {
         return {};
     }
@@ -122,6 +111,17 @@ std::string WritePopupMessage(const std::vector<ValidationError>& validationErro
             fmt::format_to(std::back_inserter(message), L"- {}\n", plugin);
         }
         fmt::format_to(std::back_inserter(message), "\n");
+    }
+
+    std::unordered_set<std::string_view> faultyScriptFiles;
+
+    for (const auto& error : validationErrors)
+    {
+        auto ref = error.GetSourceRef();
+        if (ref)
+        {
+            faultyScriptFiles.insert(ref->file);
+        }
     }
 
     if (!faultyScriptFiles.empty())
