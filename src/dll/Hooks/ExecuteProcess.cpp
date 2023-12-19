@@ -92,17 +92,19 @@ bool ExecuteScc(SccApi& scc)
     auto r6Dir = App::Get()->GetPaths()->GetR6Dir();
     auto scriptSystem = App::Get()->GetScriptCompilationSystem();
 
-    auto settings = scc.settings_new(reinterpret_cast<const char*>(r6Dir.u8string().c_str()));
+    auto r6DirStr = r6Dir.u8string();
+    auto settings = scc.settings_new(reinterpret_cast<const char*>(r6DirStr.c_str()));
 
     if (scriptSystem->HasScriptsBlob())
     {
-        auto blobPath = reinterpret_cast<const char*>(scriptSystem->GetScriptsBlob().u8string().c_str());
-        scc.settings_set_custom_cache_file(settings, blobPath);
+        auto blobPath = scriptSystem->GetScriptsBlob().u8string();
+        scc.settings_set_custom_cache_file(settings, reinterpret_cast<const char*>(blobPath.c_str()));
     }
 
     for (auto [_, scriptPath] : scriptSystem->GetScriptPaths())
     {
-        scc.settings_add_script_path(settings, reinterpret_cast<const char*>(scriptPath.u8string().c_str()));
+        auto scriptPathStr = scriptPath.u8string();
+        scc.settings_add_script_path(settings, reinterpret_cast<const char*>(scriptPathStr.c_str()));
     }
 
     auto result = scc.compile(settings);
