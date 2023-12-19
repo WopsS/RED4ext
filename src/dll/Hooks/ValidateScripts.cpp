@@ -4,7 +4,6 @@
 #include "Hook.hpp"
 #include "RED4ext/Scripting/ScriptReport.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
-#include <codecvt>
 
 namespace
 {
