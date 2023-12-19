@@ -167,6 +167,11 @@ std::shared_ptr<PluginBase> PluginSystem::GetPlugin(HMODULE aModule) const
     return nullptr;
 }
 
+const std::vector<PluginSystem::PluginName>& PluginSystem::GetIncompatiblePlugins() const
+{
+    return m_incompatiblePlugins;
+}
+
 void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath)
 {
     spdlog::info(L"Loading plugin from '{}'...", aPath);
@@ -233,7 +238,8 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
             spdlog::warn(L"{} (version: {}) is incompatible with the current patch ({}). This version of the plugin "
                          L"was compiled for patch {}",
                          pluginName, std::to_wstring(pluginVersion), currentPatch, requestedPatch);
-
+            
+            m_incompatiblePlugins.emplace_back(pluginName);
             return;
         }
     }

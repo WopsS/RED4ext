@@ -22,5 +22,3 @@ struct ValidationError
     static ValidationError FromString(const char* str);
     std::optional<SourceRef> GetSourceRef() const;
 };
-
-std::string WritePopupMessage(const std::vector<ValidationError>& errors);
