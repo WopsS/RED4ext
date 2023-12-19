@@ -131,11 +131,9 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
                        L"The following scripts contain invalid native definitions and will prevent "
                        L"your game from starting:\n");
 
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         for (const auto& file : faultyScriptFiles)
         {
-            const auto fileWide = converter.from_bytes(std::string(file));
-            fmt::format_to(std::back_inserter(message), L"- {}\n", fileWide);
+            fmt::format_to(std::back_inserter(message), L"- {}\n", Utils::Widen(file));
         }
         fmt::format_to(std::back_inserter(message), L"\n");
     }
