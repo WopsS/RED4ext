@@ -31,7 +31,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
         return ExecuteScc(scc);
     }
 
-    spdlog::info("Could not load the scc library from '{}', falling back to the CLI", sccLib.string());
+    spdlog::info(L"Could not load the scc library from '{}', falling back to the CLI", sccLib.native());
 
     auto str = App::Get()->GetScriptCompilationSystem()->GetCompilationArgs(aArgs);
 
