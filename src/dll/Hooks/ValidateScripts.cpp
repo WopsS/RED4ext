@@ -40,7 +40,7 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
     const auto message = WritePopupMessage(validationErrors, incompatiblePlugins);
     if (!message.empty())
     {
-        MessageBoxW(0, message.c_str(), L"Script Validation Error", MB_OK | MB_ICONERROR);
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("{}", message);
     }
 
     return result;
@@ -98,12 +98,12 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
         return {};
     }
 
-    std::wstring message;
+    fmt::wmemory_buffer message;
 
     if (!incompatiblePlugins.empty())
     {
         fmt::format_to(std::back_inserter(message),
-                       L"The following red4ext plugins could not be loaded because they are "
+                       L"The following RED4ext plugins could not be loaded because they are "
                        L"incompatible with the current version of the game:\n");
 
         for (const auto& plugin : incompatiblePlugins)
@@ -141,7 +141,7 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
                    L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
                    L"this message after updating/re-installing them, you might have to remove them "
                    L"in order to play the game.\n"
-                   L"More details can be found in the red4ext logs.\n");
+                   L"More details can be found in the logs.\n");
 
-    return message;
+    return std::wstring(message.data(), message.size());
 }
