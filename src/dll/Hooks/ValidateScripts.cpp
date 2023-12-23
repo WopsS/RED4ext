@@ -102,15 +102,14 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
 
     if (!incompatiblePlugins.empty())
     {
-        fmt::format_to(std::back_inserter(message),
-                       L"The following RED4ext plugins could not be loaded because they are "
-                       L"incompatible with the current version of the game:\n");
+        fmt::format_to(message, L"The following RED4ext plugins could not be loaded because they are "
+                                L"incompatible with the current version of the game:\n");
 
         for (const auto& plugin : incompatiblePlugins)
         {
-            fmt::format_to(std::back_inserter(message), L"- {}\n", plugin);
+            fmt::format_to(message, L"- {}\n", plugin);
         }
-        fmt::format_to(std::back_inserter(message), L"\n");
+        fmt::format_to(message, L"\n");
     }
 
     std::unordered_set<std::string_view> faultyScriptFiles;
@@ -126,22 +125,20 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
 
     if (!faultyScriptFiles.empty())
     {
-        fmt::format_to(std::back_inserter(message),
-                       L"The following scripts contain invalid native definitions and will prevent "
-                       L"your game from starting:\n");
+        fmt::format_to(message, L"The following scripts contain invalid native definitions and will prevent "
+                                L"your game from starting:\n");
 
         for (const auto& file : faultyScriptFiles)
         {
-            fmt::format_to(std::back_inserter(message), L"- {}\n", Utils::Widen(file));
+            fmt::format_to(message, L"- {}\n", Utils::Widen(file));
         }
-        fmt::format_to(std::back_inserter(message), L"\n");
+        fmt::format_to(message, L"\n");
     }
 
-    fmt::format_to(std::back_inserter(message),
-                   L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
-                   L"this message after updating/re-installing them, you might have to remove them "
-                   L"in order to play the game.\n"
-                   L"More details can be found in the logs.\n");
+    fmt::format_to(message, L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
+                            L"this message after updating/re-installing them, you might have to remove them "
+                            L"in order to play the game.\n"
+                            L"More details can be found in the logs.\n");
 
     return std::wstring(message.data(), message.size());
 }
