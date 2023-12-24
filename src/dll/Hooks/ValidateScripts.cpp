@@ -40,7 +40,7 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
     const auto message = WritePopupMessage(validationErrors, incompatiblePlugins);
     if (!message.empty())
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("{}", message);
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"{}", message);
     }
 
     return result;
