@@ -1,9 +1,9 @@
 #include "ScriptCompiler.hpp"
 
-ScriptCompilerSourceRef::ScriptCompilerSourceRef(SccApi& api, SccOutput* output, SccSourceRef* sourceRef)
-    : m_scc(api)
-    , m_output(output)
-    , m_sourceRef(sourceRef)
+ScriptCompilerSourceRef::ScriptCompilerSourceRef(SccApi& aApi, SccOutput* aOutput, SccSourceRef* aSourceRef)
+    : m_scc(aApi)
+    , m_output(aOutput)
+    , m_sourceRef(aSourceRef)
 {
 }
 
@@ -40,10 +40,10 @@ bool ScriptCompilerSourceRef::IsNative() const
     return m_scc.source_ref_is_native(m_output, m_sourceRef);
 }
 
-ScriptCompilerOutput::ScriptCompilerOutput(SccApi& api, SccResult* result, SccOutput* output, Key key)
-    : m_scc(api)
-    , m_output(output)
-    , m_result(result)
+ScriptCompilerOutput::ScriptCompilerOutput(SccApi& aApi, SccResult* aResult, SccOutput* aOutput, Key aKey)
+    : m_scc(aApi)
+    , m_output(aOutput)
+    , m_result(aResult)
 {
 }
 
@@ -57,20 +57,20 @@ size_t ScriptCompilerOutput::GetSourceRefCount() const
     return m_scc.output_source_ref_count(m_output);
 }
 
-ScriptCompilerSourceRef ScriptCompilerOutput::GetSourceRef(size_t index) const
+ScriptCompilerSourceRef ScriptCompilerOutput::GetSourceRef(size_t aIndex) const
 {
-    auto sourceRef = m_scc.output_get_source_ref(m_output, index);
+    auto sourceRef = m_scc.output_get_source_ref(m_output, aIndex);
     return ScriptCompilerSourceRef(m_scc, m_output, sourceRef);
 }
 
-ScriptCompilerFailure::ScriptCompilerFailure(SccApi& scc, SccResult* m_result, Key key)
-    : m_scc(scc)
-    , m_result(m_result)
+ScriptCompilerFailure::ScriptCompilerFailure(SccApi& aApi, SccResult* aResult, Key aKey)
+    : m_scc(aApi)
+    , m_result(aResult)
 {
     char buffer[256] = {0};
-    m_scc.copy_error(m_result, buffer, sizeof(buffer));
+    m_scc.copy_error(aResult, buffer, sizeof(buffer));
 
-    auto errorMessage = std::string(buffer);
+    std::string errorMessage(buffer);
 
     // truncate to first line to keep it short
     auto lineEnd = errorMessage.find('\n');
@@ -99,36 +99,39 @@ const std::string& ScriptCompilerFailure::GetMessage() const
     return m_message;
 }
 
-ScriptCompilerSettings::ScriptCompilerSettings(SccApi& m_scc, std::u8string r6Path)
-    : m_scc(m_scc)
-    , m_r6Path(r6Path)
+ScriptCompilerSettings::ScriptCompilerSettings(SccApi& aApi, std::filesystem::path aR6Path)
+    : m_scc(aApi)
+    , m_r6Path(aR6Path)
 {
 }
 
-ScriptCompilerSettings* ScriptCompilerSettings::AddScriptPath(std::u8string path)
+ScriptCompilerSettings* ScriptCompilerSettings::AddScriptPath(std::filesystem::path aPath)
 {
-    m_scriptPaths.emplace_back(path);
+    m_scriptPaths.emplace_back(aPath);
     return this;
 }
 
-ScriptCompilerSettings* ScriptCompilerSettings::SetCustomCacheFile(std::u8string path)
+ScriptCompilerSettings* ScriptCompilerSettings::SetCustomCacheFile(std::filesystem::path aPath)
 {
-    m_customCacheFile = path;
+    m_customCacheFile = aPath;
     return this;
 }
 
 ScriptCompilerSettings::Result ScriptCompilerSettings::Compile()
 {
-    const auto settings = m_scc.settings_new(reinterpret_cast<const char*>(m_r6Path.c_str()));
+    auto r6PathStr = m_r6Path.u8string();
+    const auto settings = m_scc.settings_new(reinterpret_cast<const char*>(r6PathStr.c_str()));
 
     if (!m_customCacheFile.empty())
     {
-        m_scc.settings_set_custom_cache_file(settings, reinterpret_cast<const char*>(m_customCacheFile.c_str()));
+        auto customCacheFileStr = m_customCacheFile.u8string();
+        m_scc.settings_set_custom_cache_file(settings, reinterpret_cast<const char*>(customCacheFileStr.c_str()));
     }
 
     for (const auto& path : m_scriptPaths)
     {
-        m_scc.settings_add_script_path(settings, reinterpret_cast<const char*>(path.c_str()));
+        auto pathStr = path.u8string();
+        m_scc.settings_add_script_path(settings, reinterpret_cast<const char*>(pathStr.c_str()));
     }
 
     auto result = m_scc.compile(settings);

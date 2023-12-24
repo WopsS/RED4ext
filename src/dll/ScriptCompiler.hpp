@@ -12,7 +12,7 @@ public:
     bool IsNative() const;
 
 private:
-    ScriptCompilerSourceRef(SccApi& api, SccOutput* output, SccSourceRef* sourceRef);
+    ScriptCompilerSourceRef(SccApi& aApi, SccOutput* aOutput, SccSourceRef* aSourceRef);
 
     SccApi& m_scc;
     SccOutput* m_output;
@@ -31,13 +31,13 @@ class ScriptCompilerOutput
     };
 
 public:
-    ScriptCompilerOutput(SccApi& scc, SccResult* result, SccOutput* output, Key key);
+    ScriptCompilerOutput(SccApi& aApi, SccResult* aResult, SccOutput* aOutput, Key aKey);
     ScriptCompilerOutput(const ScriptCompilerOutput&) = delete;
     ScriptCompilerOutput& operator=(const ScriptCompilerOutput&) = delete;
     ~ScriptCompilerOutput();
 
     size_t GetSourceRefCount() const;
-    ScriptCompilerSourceRef GetSourceRef(size_t index) const;
+    ScriptCompilerSourceRef GetSourceRef(size_t aIndex) const;
 
 private:
     SccApi& m_scc;
@@ -57,7 +57,7 @@ class ScriptCompilerFailure
     };
 
 public:
-    ScriptCompilerFailure(SccApi& scc, SccResult* result, Key key);
+    ScriptCompilerFailure(SccApi& aApi, SccResult* aResult, Key aKey);
     ScriptCompilerFailure(const ScriptCompilerFailure&) = delete;
     ScriptCompilerFailure& operator=(const ScriptCompilerFailure&) = delete;
     ~ScriptCompilerFailure();
@@ -77,15 +77,15 @@ class ScriptCompilerSettings
 public:
     using Result = std::variant<ScriptCompilerFailure, ScriptCompilerOutput>;
 
-    ScriptCompilerSettings(SccApi& m_scc, std::u8string r6Path);
+    ScriptCompilerSettings(SccApi& aApi, std::filesystem::path aR6Path);
 
-    ScriptCompilerSettings* AddScriptPath(std::u8string path);
-    ScriptCompilerSettings* SetCustomCacheFile(std::u8string path);
+    ScriptCompilerSettings* AddScriptPath(std::filesystem::path aPath);
+    ScriptCompilerSettings* SetCustomCacheFile(std::filesystem::path aPath);
     Result Compile();
 
 private:
     SccApi& m_scc;
-    std::u8string m_r6Path;
-    std::vector<std::u8string> m_scriptPaths;
-    std::u8string m_customCacheFile;
+    std::filesystem::path m_r6Path;
+    std::vector<std::filesystem::path> m_scriptPaths;
+    std::filesystem::path m_customCacheFile;
 };
