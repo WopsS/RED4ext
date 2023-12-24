@@ -1,5 +1,5 @@
 #pragma once
-#include "ScriptCompiler.hpp"
+#include <scc.h>
 
 namespace Hooks::ExecuteProcess
 {

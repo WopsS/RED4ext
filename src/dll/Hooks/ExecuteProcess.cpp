@@ -2,6 +2,7 @@
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
+#include "ScriptCompiler/ScriptCompilerSettings.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
 #include <windows.h>
 
@@ -123,7 +124,7 @@ bool ExecuteScc(SccApi& scc)
             continue;
         }
 
-        const SourceRef sourceRef {.file = sourceRepo.RegisterSourceFile(sccRef.GetPath()), .line = sccRef.GetLine()};
+        const SourceRef sourceRef{.file = sourceRepo.RegisterSourceFile(sccRef.GetPath()), .line = sccRef.GetLine()};
 
         switch (sccRef.GetType())
         {
