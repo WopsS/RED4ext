@@ -93,14 +93,14 @@ bool ExecuteScc(SccApi& scc)
     const auto r6Dir = App::Get()->GetPaths()->GetR6Dir();
     auto scriptSystem = App::Get()->GetScriptCompilationSystem();
 
-    ScriptCompilerSettings settings(scc, r6Dir.u8string());
+    ScriptCompilerSettings settings(scc, r6Dir);
     if (scriptSystem->HasScriptsBlob())
     {
-        settings.SetCustomCacheFile(scriptSystem->GetScriptsBlob().u8string());
+        settings.SetCustomCacheFile(scriptSystem->GetScriptsBlob());
     }
     for (const auto& [_, path] : scriptSystem->GetScriptPaths())
     {
-        settings.AddScriptPath(path.u8string());
+        settings.AddScriptPath(path);
     }
 
     const auto result = settings.Compile();
