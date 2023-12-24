@@ -8,6 +8,8 @@
 class PluginSystem : public ISystem
 {
 public:
+    using PluginName = std::wstring;
+
     PluginSystem(const Config::PluginsConfig& aConfig, const Paths& aPaths);
     ~PluginSystem() = default;
 
@@ -17,6 +19,7 @@ public:
     void Shutdown() final;
 
     std::shared_ptr<PluginBase> GetPlugin(HMODULE aModule) const;
+    const std::vector<PluginName>& GetIncompatiblePlugins() const;
 
 private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;
@@ -31,4 +34,5 @@ private:
     const Paths& m_paths;
 
     Map_t m_plugins;
+    std::vector<PluginName> m_incompatiblePlugins;
 };

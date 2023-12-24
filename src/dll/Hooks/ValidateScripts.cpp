@@ -2,9 +2,8 @@
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
-#include "Systems/ScriptCompilationSystem.hpp"
 #include "RED4ext/Scripting/ScriptReport.hpp"
-#include "ScriptValidationError.hpp"
+#include "Systems/ScriptCompilationSystem.hpp"
 
 namespace
 {
@@ -17,14 +16,14 @@ Hook<decltype(&_ScriptValidator_Validate)> ScriptValidator_Validate(Addresses::S
 bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport& aReport)
 {
     aReport.fillErrors = true;
-    auto result = ScriptValidator_Validate(self, a1, aReport);
-    std::vector<ValidationError> errors;
+    const auto result = ScriptValidator_Validate(self, a1, aReport);
+    std::vector<ValidationError> validationErrors;
 
     for (auto i = 0; i < std::max(aReport.errors->size, 1u) - 1; ++i)
     {
         auto message = aReport.errors->entries[i].c_str();
-        auto error = ValidationError::FromString(message);
-        errors.push_back(error);
+        const auto error = ValidationError::FromString(message);
+        validationErrors.push_back(error);
 
         auto ref = error.GetSourceRef();
         if (ref)
@@ -37,10 +36,11 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
         }
     }
 
-    auto message = WritePopupMessage(errors);
+    const auto& incompatiblePlugins = App::Get()->GetPluginSystem()->GetIncompatiblePlugins();
+    const auto message = WritePopupMessage(validationErrors, incompatiblePlugins);
     if (!message.empty())
     {
-        MessageBoxA(0, message.c_str(), "Script Validation Error", MB_OK | MB_ICONERROR);
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"{}", message);
     }
 
     return result;
@@ -88,4 +88,57 @@ bool Hooks::ValidateScripts::Detach()
 
     isAttached = result != NO_ERROR;
     return !isAttached;
+}
+
+std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErrors,
+                               const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
+{
+    if (validationErrors.empty())
+    {
+        return {};
+    }
+
+    fmt::wmemory_buffer message;
+
+    if (!incompatiblePlugins.empty())
+    {
+        fmt::format_to(message, L"The following RED4ext plugins could not be loaded because they are "
+                                L"incompatible with the current version of the game:\n");
+
+        for (const auto& plugin : incompatiblePlugins)
+        {
+            fmt::format_to(message, L"- {}\n", plugin);
+        }
+        fmt::format_to(message, L"\n");
+    }
+
+    std::unordered_set<std::string_view> faultyScriptFiles;
+
+    for (const auto& error : validationErrors)
+    {
+        const auto ref = error.GetSourceRef();
+        if (ref)
+        {
+            faultyScriptFiles.insert(ref->file);
+        }
+    }
+
+    if (!faultyScriptFiles.empty())
+    {
+        fmt::format_to(message, L"The following scripts contain invalid native definitions and will prevent "
+                                L"your game from starting:\n");
+
+        for (const auto& file : faultyScriptFiles)
+        {
+            fmt::format_to(message, L"- {}\n", Utils::Widen(file));
+        }
+        fmt::format_to(message, L"\n");
+    }
+
+    fmt::format_to(message, L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
+                            L"this message after updating/re-installing them, you might have to remove them "
+                            L"in order to play the game.\n"
+                            L"More details can be found in the logs.\n");
+
+    return std::wstring(message.data(), message.size());
 }

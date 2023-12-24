@@ -77,35 +77,3 @@ std::optional<SourceRef> ValidationError::GetSourceRef() const
         return {};
     }
 }
-
-std::string WritePopupMessage(const std::vector<ValidationError>& errors)
-{
-    std::unordered_set<std::string_view> faultyFiles;
-
-    for (const auto& error : errors)
-    {
-        auto ref = error.GetSourceRef();
-        if (ref)
-        {
-            faultyFiles.insert(ref->file);
-        }
-    }
-
-    if (faultyFiles.empty())
-    {
-        return "";
-    }
-
-    std::string message =
-        "The scripts below contain invalid native definitions and will prevent your game from starting:\n";
-    for (const auto& file : faultyFiles)
-    {
-        fmt::format_to(std::back_inserter(message), "- {}\n", file);
-    }
-    fmt::format_to(std::back_inserter(message),
-                   "\n"
-                   "Check for updates of the mods that added these files and if you still see this "
-                   "message after updating them, they'll have to be uninstalled.\n"
-                   "More details about the errors can be found in the logs.\n");
-    return message;
-}
