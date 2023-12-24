@@ -31,6 +31,7 @@ class SourceRefRepository
 public:
     SourceRefRepository() = default;
     SourceRefRepository(const SourceRefRepository&) = delete;
+    SourceRefRepository& operator=(const SourceRefRepository&) = delete;
 
     std::string_view RegisterSourceFile(std::string_view aPath);
 
