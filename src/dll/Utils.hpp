@@ -25,7 +25,7 @@ std::wstring FileVerToPatch(const RED4ext::FileVer& aVersion);
 template<typename... Args>
 int32_t ShowMessageBox(uint32_t aType, const std::wstring_view aText, Args&&... aArgs)
 {
-    return ShowMessageBox(fmt::format(aText, std::forward<Args>(aArgs)...), aType);
+    return ShowMessageBox(fmt::format(fmt::runtime(aText), std::forward<Args>(aArgs)...), aType);
 }
 
 template<typename... Args>
@@ -39,7 +39,7 @@ void ShowLastErrorMessage(uint32_t aType, const std::wstring_view aAdditionalTex
 
         if constexpr (sizeof...(Args) > 0)
         {
-            msg = fmt::format(msg, std::forward<Args>(aArgs)...);
+            msg = fmt::format(fmt::runtime(msg), std::forward<Args>(aArgs)...);
         }
     }
 
