@@ -8,5 +8,5 @@ bool Attach();
 bool Detach();
 } // namespace Hooks::ValidateScripts
 
-std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErrors,
-                               const std::vector<PluginSystem::PluginName>& incompatiblePlugins);
+std::optional<std::wstring> WritePopupMessage(const std::vector<ValidationError>& validationErrors,
+                                              const std::vector<PluginSystem::PluginName>& incompatiblePlugins);

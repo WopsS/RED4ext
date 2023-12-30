@@ -38,9 +38,9 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
 
     const auto& incompatiblePlugins = App::Get()->GetPluginSystem()->GetIncompatiblePlugins();
     const auto message = WritePopupMessage(validationErrors, incompatiblePlugins);
-    if (!message.empty())
+    if (message)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"{}", message);
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"{}", message.value());
     }
 
     return result;
@@ -90,12 +90,28 @@ bool Hooks::ValidateScripts::Detach()
     return !isAttached;
 }
 
-std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErrors,
-                               const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
+std::optional<std::wstring> WritePopupMessage(const std::vector<ValidationError>& validationErrors,
+                                              const std::vector<PluginSystem::PluginName>& incompatiblePlugins)
 {
     if (validationErrors.empty())
     {
         return {};
+    }
+
+    std::unordered_set<std::string_view> faultyScriptFiles;
+
+    for (const auto& error : validationErrors)
+    {
+        if (const auto ref = error.GetSourceRef())
+        {
+            faultyScriptFiles.insert(ref->file);
+        }
+    }
+
+    if (faultyScriptFiles.empty() && incompatiblePlugins.empty())
+    {
+        return L"Script validation has failed for an unknown reason. "
+               L"You should verify game files with Steam/GOG and retry.";
     }
 
     fmt::wmemory_buffer message;
@@ -104,7 +120,7 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
     if (!incompatiblePlugins.empty())
     {
         fmt::format_to(outIt, L"The following RED4ext plugins could not be loaded because they are "
-                           L"incompatible with the current version of the game:\n");
+                              L"incompatible with the current version of the game:\n");
 
         for (const auto& plugin : incompatiblePlugins)
         {
@@ -113,21 +129,10 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
         fmt::format_to(outIt, L"\n");
     }
 
-    std::unordered_set<std::string_view> faultyScriptFiles;
-
-    for (const auto& error : validationErrors)
-    {
-        const auto ref = error.GetSourceRef();
-        if (ref)
-        {
-            faultyScriptFiles.insert(ref->file);
-        }
-    }
-
     if (!faultyScriptFiles.empty())
     {
         fmt::format_to(outIt, L"The following scripts contain invalid native definitions and will prevent "
-                           L"your game from starting:\n");
+                              L"your game from starting:\n");
 
         for (const auto& file : faultyScriptFiles)
         {
@@ -137,9 +142,9 @@ std::wstring WritePopupMessage(const std::vector<ValidationError>& validationErr
     }
 
     fmt::format_to(outIt, L"Check if these mods are up-to-date and installed correctly. If you keep seeing "
-                       L"this message after updating/re-installing them, you might have to remove them "
-                       L"in order to play the game.\n"
-                       L"More details can be found in the logs.\n");
+                          L"this message after updating/re-installing them, you might have to remove them "
+                          L"in order to play the game.\n"
+                          L"More details can be found in the logs.\n");
 
     return std::wstring(message.data(), message.size());
 }
