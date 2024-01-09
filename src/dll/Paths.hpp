@@ -7,6 +7,7 @@ public:
     ~Paths() = default;
 
     std::filesystem::path GetRootDir() const;
+    std::filesystem::path GetExe() const;
 
     std::filesystem::path GetRED4extDir() const;
     std::filesystem::path GetLogsDir() const;
@@ -20,4 +21,5 @@ public:
 
 private:
     std::filesystem::path m_root;
+    std::filesystem::path m_exe;
 };

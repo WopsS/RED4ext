@@ -11,8 +11,8 @@ Paths::Paths()
         return;
     }
 
-    std::filesystem::path exe = fileName;
-    m_root = exe.parent_path()   // Resolve to "x64" directory.
+    m_exe = fileName;
+    m_root = m_exe.parent_path()   // Resolve to "x64" directory.
                  .parent_path()  // Resolve to "bin" directory.
                  .parent_path(); // Resolve to game's root directory.
 }
@@ -20,6 +20,11 @@ Paths::Paths()
 std::filesystem::path Paths::GetRootDir() const
 {
     return m_root;
+}
+
+std::filesystem::path Paths::GetExe() const
+{
+    return m_exe;
 }
 
 std::filesystem::path Paths::GetRED4extDir() const

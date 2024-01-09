@@ -134,6 +134,9 @@ void PluginSystem::Startup()
         }
     }
 
+    // In the case where the exe is hosted, check if the host exe has RED4Ext exports
+    Load(m_paths.GetExe(), false);
+
     spdlog::info("{} plugin(s) loaded", m_plugins.size());
 }
 
@@ -184,7 +187,12 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
 
     const auto stem = aPath.stem();
 
-    wil::unique_hmodule handle(LoadLibraryEx(aPath.c_str(), nullptr, flags));
+    wil::unique_hmodule handle;
+    if (aPath.extension() == L".exe")
+        handle.reset(GetModuleHandleA(nullptr));
+    else
+        handle.reset(LoadLibraryEx(aPath.c_str(), nullptr, flags));
+
     if (!handle)
     {
         auto msg = Utils::FormatLastError();
