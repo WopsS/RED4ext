@@ -36,7 +36,16 @@ App::App()
 
     m_systems.shrink_to_fit();
 
-    auto logger = Utils::CreateLogger(L"RED4ext", L"red4ext.log", m_paths, m_config, m_devConsole);
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+    // Convert to std::tm for formatting
+    std::tm now_tm = *std::localtime(&now_c);
+
+    const auto filename = fmt::format(L"red4ext-{:04d}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}.log", now_tm.tm_year + 1900,
+                                       now_tm.tm_mon + 1, now_tm.tm_mday, now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec);
+
+    auto logger = Utils::CreateLogger(L"RED4ext", filename, m_paths, m_config, m_devConsole);
     spdlog::set_default_logger(logger);
 
     spdlog::info("RED4ext (v{}) is initializing...", RED4EXT_VERSION_STR);
