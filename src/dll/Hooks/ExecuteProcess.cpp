@@ -107,6 +107,7 @@ bool ExecuteScc(SccApi& scc)
 
     if (const auto error = std::get_if<ScriptCompilerFailure>(&result))
     {
+        RED4ext::CGameEngine::Get()->scriptsCompilationErrors = error->GetMessage().c_str();
         spdlog::warn("scc invokation failed with an error: {}", error->GetMessage());
         return false;
     }
