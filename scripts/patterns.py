@@ -50,5 +50,9 @@ def get_groups() -> List[Group]:
         Group(name='CBaseEngine', functions=[
             Item(name='InitScripts', pattern='48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B D9 41 0F B7 F1', expected=1, index=0),
             Item(name='LoadScripts', pattern='48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 49 8D 99 ? ? ? ?', expected=1, index=0)
+        ]),
+
+        Group(name='ScriptValidator', functions=[
+            Item(name='Validate', pattern='48 89 5C 24 ? 48 89 4C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B C2', expected=1, index=0)
         ])
     ]
