@@ -62,8 +62,10 @@ private:
                                [](wchar_t aC) { return std::tolower(aC); });
 
                 const auto logName = aPlugin->GetName();
+
+                fileName = fmt::format(L"{}-{}.log", fileName, Utils::FormatCurrentTimestamp());
                 logger =
-                    Utils::CreateLogger(logName, fmt::format(L"{}.log", fileName), m_paths, m_config, m_devConsole);
+                    Utils::CreateLogger(logName, fileName, m_paths, m_config, m_devConsole);
                 m_loggers.emplace(aPlugin, logger);
             }
         }

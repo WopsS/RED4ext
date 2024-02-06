@@ -13,6 +13,7 @@ std::wstring GetStateName(RED4ext::EGameStateType aStateType);
 
 std::wstring FormatSystemMessage(uint32_t aMessageId);
 std::wstring FormatLastError();
+std::wstring FormatCurrentTimestamp();
 
 int32_t ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType = MB_OK);
 int32_t ShowMessageBox(const std::wstring_view aText, uint32_t aType = MB_OK);
