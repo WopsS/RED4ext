@@ -1,10 +1,10 @@
 #include "Addresses.hpp"
-#include "Addresses.generated.hpp"
 
 #include <ios>
 #include <string>
 #include <string_view>
 
+#include <RED4ext/Relocation.hpp>
 #include <spdlog/spdlog.h>
 
 #include "Utils.hpp"
@@ -15,25 +15,6 @@ std::unique_ptr<Addresses> g_addresses;
 }
 
 Addresses::Addresses(const Paths& aPaths)
-    : m_addresses(
-          {{RED4ext::FNV1a64("CBaseFunction_Handlers"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::CBaseFunction_Handlers))},
-           {RED4ext::FNV1a64("CGameEngine"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::CGameEngine))},
-           {RED4ext::FNV1a64("CRTTIRegistrator_RTTIAsyncId"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::CRTTIRegistrator_RTTIAsyncId))},
-           {RED4ext::FNV1a64("CStack_vtbl"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::CStack_vtbl))},
-           {RED4ext::FNV1a64("JobDispatcher"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::JobDispatcher))},
-           {RED4ext::FNV1a64("Memory_Vault"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::Memory_Vault))},
-           {RED4ext::FNV1a64("OpcodeHandlers"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::OpcodeHandlers))},
-           {RED4ext::FNV1a64("ResourceDepot"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::ResourceDepot))},
-           {RED4ext::FNV1a64("ResourceLoader"),
-            reinterpret_cast<std::uintptr_t>(RED4EXT_OFFSET_TO_ADDR(AddressesGen::ResourceLoader))}})
 {
     constexpr auto filename = L"cyberpunk2077_addresses.json";
     auto filePath = aPaths.GetX64Dir() / filename;
@@ -51,7 +32,7 @@ Addresses* Addresses::Instance()
     return g_addresses.get();
 }
 
-std::uintptr_t Addresses::Resolve(const std::uint64_t aHash) const
+std::uintptr_t Addresses::Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint64_t aHash) const
 {
     auto it = m_addresses.find(aHash);
     if (it == m_addresses.end())
@@ -59,7 +40,18 @@ std::uintptr_t Addresses::Resolve(const std::uint64_t aHash) const
         return 0;
     }
 
-    return it->second;
+    auto address = it->second;
+    switch (aSegment)
+    {
+    case RED4ext::UniversalRelocSegment::Text:
+    {
+        return address + m_codeOffset;
+    }
+    default:
+    {
+        return address;
+    }
+    }
 }
 
 void Addresses::LoadAddresses(const std::filesystem::path& aPath)
@@ -93,16 +85,16 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
 
     simdjson::ondemand::array knownAddresses = root.at(0);
 
-    std::string_view constantOffsetStr;
-    error = knownAddresses.at(0)["Code constant offset"].get_string().get(constantOffsetStr);
+    std::string_view codeOffsetStr;
+    error = knownAddresses.at(0)["Code constant offset"].get_string().get(codeOffsetStr);
     if (error)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"Could not get the offset for an address: {}",
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"Could not get the code constant offset for an address: {}",
                                             Utils::Widen(simdjson::error_message(error)));
         return;
     }
 
-    auto constantOffset = std::stoull(constantOffsetStr.data(), nullptr, 16);
+    m_codeOffset = std::stoull(codeOffsetStr.data(), nullptr, 16);
     auto base = reinterpret_cast<std::uintptr_t>(GetModuleHandle(nullptr));
 
     root.reset();
@@ -139,9 +131,8 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
                 std::uintptr_t offset;
                 stream >> std::hex >> offset;
 
-                offset += constantOffset + base;
-
-                m_addresses.emplace(hash, offset);
+                auto address = offset + base;
+                m_addresses.emplace(hash, address);
             }
         }
     }
@@ -149,7 +140,8 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
     spdlog::info("{} game addresses loaded", m_addresses.size());
 }
 
-RED4EXT_C_EXPORT std::uintptr_t RED4EXT_CALL RED4ext_ResolveAddress(const std::uint64_t aHash)
+RED4EXT_C_EXPORT std::uintptr_t RED4EXT_CALL RED4ext_ResolveAddress(const RED4ext::UniversalRelocSegment aSegment,
+                                                                    const std::uint64_t aHash)
 {
-    return Addresses::Instance()->Resolve(aHash);
+    return Addresses::Instance()->Resolve(aSegment, aHash);
 }

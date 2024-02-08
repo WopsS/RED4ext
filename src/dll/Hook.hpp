@@ -30,7 +30,7 @@ public:
         if (m_address == 0)
         {
             auto address = Addresses::Instance();
-            return address->Resolve(m_hash);
+            return address->Resolve(RED4ext::UniversalRelocSegment::Text, m_hash);
         }
 
         return reinterpret_cast<uintptr_t>(m_address);

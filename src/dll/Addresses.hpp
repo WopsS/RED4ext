@@ -14,12 +14,13 @@ public:
 
     ~Addresses() = default;
 
-    std::uintptr_t Resolve(const std::uint64_t aHash) const;
+    std::uintptr_t Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint64_t aHash) const;
 
 private:
     Addresses(const Paths& aPaths);
 
     void LoadAddresses(const std::filesystem::path& aPath);
 
+    std::uintptr_t m_codeOffset;
     std::unordered_map<std::uint64_t, std::uintptr_t> m_addresses;
 };
