@@ -10,8 +10,7 @@ namespace
 bool isAttached = false;
 
 bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport& aReport);
-Hook<decltype(&_ScriptValidator_Validate)> ScriptValidator_Validate(Addresses::ScriptValidator_Validate,
-                                                                    &_ScriptValidator_Validate);
+Hook<decltype(&_ScriptValidator_Validate)> ScriptValidator_Validate(0x359024C2, &_ScriptValidator_Validate);
 
 bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport& aReport)
 {
@@ -49,8 +48,7 @@ bool _ScriptValidator_Validate(uint64_t self, uint64_t a1, RED4ext::ScriptReport
 
 bool Hooks::ValidateScripts::Attach()
 {
-    spdlog::trace("Trying to attach the hook for validate scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::ScriptValidator_Validate));
+    spdlog::trace("Trying to attach the hook for validate scripts at {:#x}...", ScriptValidator_Validate.GetAddress());
 
     auto result = ScriptValidator_Validate.Attach();
     if (result != NO_ERROR)
@@ -73,8 +71,7 @@ bool Hooks::ValidateScripts::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for validate scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::ScriptValidator_Validate));
+    spdlog::trace("Trying to detach the hook for validate scripts at {:#x}...", ScriptValidator_Validate.GetAddress());
 
     auto result = ScriptValidator_Validate.Detach();
     if (result != NO_ERROR)

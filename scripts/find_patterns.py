@@ -88,7 +88,7 @@ try:
     version = idc.get_strlit_contents(addr)
 
     print(f'Finding {total} item(s)...')
-    with open('Addresses.hpp', 'w') as file:
+    with open('Addresses.generated.hpp', 'w') as file:
         file.write('#pragma once\n')
         file.write('\n')
         file.write('/*\n')
@@ -100,7 +100,8 @@ try:
         file.write('#include <cstdint>\n')
         file.write('\n')
         file.write(f'// Addresses for Cyberpunk 2077, version {version.decode()}.\n')
-        file.write('namespace Addresses\n')
+        file.write('// clang-format off\n')
+        file.write('namespace AddressesGen\n')
         file.write('{\n')
         file.write(f'constexpr uintptr_t ImageBase = 0x{ida_nalt.get_imagebase():X};\n')
         file.write('\n')
@@ -155,7 +156,8 @@ try:
             if group != groups[-1]:
                 file.write('\n')
 
-        file.write('} // namespace Addresses\n')
+        file.write('} // namespace AddressesGen\n')
+        file.write('// clang-format on\n')
 
         print('Done!')
         ida_kernwin.beep()

@@ -63,7 +63,7 @@ bool HookingSystem::Attach(std::shared_ptr<PluginBase> aPlugin, void* aTarget, v
     {
         if (aOriginal)
         {
-            *aOriginal = reinterpret_cast<void*>(item.hook.Get());
+            *aOriginal = reinterpret_cast<void*>(item.hook.GetAddress());
         }
 
         m_hooks.emplace(aPlugin, std::move(item));

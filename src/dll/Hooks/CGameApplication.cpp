@@ -12,8 +12,7 @@ namespace
 bool isAttached = false;
 
 bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGameState* aState);
-Hook<decltype(&_CGameApplication_AddState)> CGameApplication_AddState(Addresses::CGameApplication_AddState,
-                                                                      &_CGameApplication_AddState);
+Hook<decltype(&_CGameApplication_AddState)> CGameApplication_AddState(0xFBC216B3, &_CGameApplication_AddState);
 
 bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGameState* aState)
 {
@@ -78,8 +77,10 @@ bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGame
 
 bool Hooks::CGameApplication::Attach()
 {
-    spdlog::trace("Trying to attach the hook for the game application at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_AddState));
+    auto addresses = Addresses::Instance();
+
+    spdlog::trace("Trying to attach the hook for the game application at {:#x}...",
+                  CGameApplication_AddState.GetAddress());
 
     auto result = CGameApplication_AddState.Attach();
     if (result != NO_ERROR)
@@ -102,8 +103,8 @@ bool Hooks::CGameApplication::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for the game application at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CGameApplication_AddState));
+    spdlog::trace("Trying to detach the hook for the game application at {:#x}...",
+                  CGameApplication_AddState.GetAddress());
 
     auto result = CGameApplication_AddState.Detach();
     if (result != NO_ERROR)

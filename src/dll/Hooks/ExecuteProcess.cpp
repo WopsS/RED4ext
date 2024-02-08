@@ -12,8 +12,7 @@ bool isAttached = false;
 
 bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& aArgs,
                             RED4ext::CString& aCurrentDirectory, char a5);
-Hook<decltype(&_Global_ExecuteProcess)> Global_ExecuteProcess(Addresses::Global_ExecuteProcess,
-                                                              &_Global_ExecuteProcess);
+Hook<decltype(&_Global_ExecuteProcess)> Global_ExecuteProcess(0x835D1F2F, &_Global_ExecuteProcess);
 
 bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& aArgs,
                             RED4ext::CString& aCurrentDirectory, char a5)
@@ -47,8 +46,7 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
 
 bool Hooks::ExecuteProcess::Attach()
 {
-    spdlog::trace("Trying to attach the hook for execute process at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::Global_ExecuteProcess));
+    spdlog::trace("Trying to attach the hook for execute process at {:#x}...", Global_ExecuteProcess.GetAddress());
 
     auto result = Global_ExecuteProcess.Attach();
     if (result != NO_ERROR)
@@ -71,8 +69,7 @@ bool Hooks::ExecuteProcess::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for execute process at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::Global_ExecuteProcess));
+    spdlog::trace("Trying to detach the hook for execute process at {:#x}...", Global_ExecuteProcess.GetAddress());
 
     auto result = Global_ExecuteProcess.Detach();
     if (result != NO_ERROR)
@@ -108,7 +105,7 @@ bool ExecuteScc(SccApi& scc)
     if (const auto error = std::get_if<ScriptCompilerFailure>(&result))
     {
         RED4ext::CGameEngine::Get()->scriptsCompilationErrors = error->GetMessage().c_str();
-        spdlog::warn("scc invokation failed with an error: {}", error->GetMessage());
+        spdlog::warn("scc invocation failed with an error: {}", error->GetMessage());
         return false;
     }
 

@@ -22,6 +22,7 @@ target_link_libraries(RED4ext.Dll
     Detours
     fmt
     RED4ext::SDK
+    simdjson::simdjson
     spdlog
     toml11
     tsl::ordered_map

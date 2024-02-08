@@ -6,8 +6,8 @@
 #include "Systems/HookingSystem.hpp"
 #include "Systems/LoggerSystem.hpp"
 #include "Systems/PluginSystem.hpp"
-#include "Systems/StateSystem.hpp"
 #include "Systems/ScriptCompilationSystem.hpp"
+#include "Systems/StateSystem.hpp"
 
 class App
 {
@@ -26,6 +26,7 @@ public:
     StateSystem* GetStateSystem();
     PluginSystem* GetPluginSystem();
     ScriptCompilationSystem* GetScriptCompilationSystem();
+
     const Paths* GetPaths() const;
 
 private:

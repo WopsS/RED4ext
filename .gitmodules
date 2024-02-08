@@ -22,3 +22,6 @@
 [submodule "deps/redscript"]
 	path = deps/redscript
 	url = https://github.com/jac3km4/redscript
+[submodule "deps/simdjson"]
+	path = deps/simdjson
+	url = https://github.com/simdjson/simdjson.git

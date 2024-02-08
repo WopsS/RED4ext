@@ -27,6 +27,7 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include <simdjson.h>
 #include <spdlog/spdlog.h>
 #include <toml.hpp>
 #include <tsl/ordered_map.h>

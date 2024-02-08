@@ -26,33 +26,39 @@ class Group:
 
 def get_groups() -> List[Group]:
     return [
-        Group(name='Global', functions=[
-            Item(name='Main', pattern='40 55 53 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? FF 15 ? ? ? ?', expected=1, index=0),
-            Item(name='ExecuteProcess', pattern='48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 41 81 79 ? ? ? ? ?', expected=1, index=0),
+        Group(name='CBaseFunction', pointers=[
+            Item(name='Handlers', pattern='4C 8D 05 ? ? ? ? 48 8D 0D ? ? ? ? 4C 89 9B ? ? ? ?', expected=2, index=1, offset=3)
         ]),
 
-        Group(name='CGameApplication', functions=[
-            Item(name='AddState', pattern='48 89 5C 24 ? 48 89 54 24 ? 57 48 83 EC ? 48 8B 02 48 8D B9 ? ? ? ?', expected=1, index=0)
+        Group(name='CGameEngine', pointers=[
+            Item(pattern='48 89 05 ? ? ? ? 48 8B D8 48 8B 10 FF 92 ? ? ? ?', offset=3)
         ]),
 
-        Group(name='CInitializationState', functions=[
-            Item(name='Run', pattern='40 53 48 83 EC ? 48 8B 05 ? ? ? ? 33 DB 4C 8B C2 8B 88 ? ? ? ?', expected=1, index=0)
+        Group(name='CRTTIRegistrator', pointers=[
+            Item(name='RTTIAsyncId', pattern='F0 0F C1 05 ? ? ? ? FF C0 48 8D 0D ? ? ? ? 89 05 ? ? ? ? E8 ? ? ? ?', expected=11821, index=0, offset=4)
         ]),
 
-        Group(name='CRunningState', functions=[
-            Item(name='Run', pattern='40 53 48 83 EC ? 83 64 24 ? ? 48 8D 05 ? ? ? ? 48 8B 0D ? ? ? ?', expected=1, index=0)
+        Group(name='CStack', pointers=[
+            Item(name='vtbl', pattern='48 8D 05 ? ? ? ? 48 89 45 ? 48 8D 45 ? 48 89 45 ? 66 0F 7F 45 ?', offset=3, expected=1, index=0)
         ]),
 
-        Group(name='CShutdownState', functions=[
-            Item(name='Run', pattern='48 89 5C 24 08 57 48 83 EC ? 48 8B 0D ? ? ? ? 48 8B DA BF ? ? ? ? 48 85 C9', expected=1, index=0)
+        Group(name='JobDispatcher', pointers=[
+            Item(pattern='48 89 05 ? ? ? ? 48 83 C4 ? 5F C3', offset=3, expected=6, index=4)
         ]),
 
-        Group(name='CBaseEngine', functions=[
-            Item(name='InitScripts', pattern='48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B D9 41 0F B7 F1', expected=1, index=0),
-            Item(name='LoadScripts', pattern='48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 49 8D 99 ? ? ? ?', expected=1, index=0)
+        Group(name='Memory', pointers=[
+            Item(name='Vault', pattern='C6 04 0A 01 48 8D 0D ? ? ? ? 8B 50 ? 48 8B C1', offset=7, expected=2, index=0),
         ]),
 
-        Group(name='ScriptValidator', functions=[
-            Item(name='Validate', pattern='48 89 5C 24 ? 48 89 4C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B C2', expected=1, index=0)
-        ])
+        Group(name='OpcodeHandlers', pointers=[
+            Item(pattern='4C 8D 05 ? ? ? ? 48 8D 0D ? ? ? ? 4C 89 9B ? ? ? ?', offset=3, expected=2, index=0)
+        ]),
+
+        Group(name='ResourceDepot', pointers=[
+            Item(pattern="48 89 05 ? ? ? ? 49 8B 5B ? 49 8B 73", offset=3, expected=1, index=0)
+        ]),
+
+        Group(name='ResourceLoader', pointers=[
+            Item(pattern='48 89 05 ? ? ? ? 48 83 C4 ? 5F C3', offset=3, expected=6, index=2)
+        ]),
     ]

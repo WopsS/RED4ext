@@ -10,8 +10,7 @@ bool isAttached = false;
 
 void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CString& aScriptsBlobPath, int8_t a3,
                                int16_t a4);
-Hook<decltype(&_CBaseEngine_InitScripts)> CBaseEngine_InitScripts(Addresses::CBaseEngine_InitScripts,
-                                                                  &_CBaseEngine_InitScripts);
+Hook<decltype(&_CBaseEngine_InitScripts)> CBaseEngine_InitScripts(0xAB652585, &_CBaseEngine_InitScripts);
 
 void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CString& aScriptsBlobPath, int8_t a3,
                                int16_t a4)
@@ -34,8 +33,7 @@ void* _CBaseEngine_InitScripts(RED4ext::CBaseEngine* aThis, const RED4ext::CStri
 
 bool Hooks::InitScripts::Attach()
 {
-    spdlog::trace("Trying to attach the hook for init scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CBaseEngine_InitScripts));
+    spdlog::trace("Trying to attach the hook for init scripts at {:#x}...", CBaseEngine_InitScripts.GetAddress());
 
     auto result = CBaseEngine_InitScripts.Attach();
     if (result != NO_ERROR)
@@ -58,8 +56,7 @@ bool Hooks::InitScripts::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for init scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CBaseEngine_InitScripts));
+    spdlog::trace("Trying to detach the hook for init scripts at {:#x}...", CBaseEngine_InitScripts.GetAddress());
 
     auto result = CBaseEngine_InitScripts.Detach();
     if (result != NO_ERROR)
