@@ -32,7 +32,7 @@ Addresses* Addresses::Instance()
     return g_addresses.get();
 }
 
-std::uintptr_t Addresses::Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint64_t aHash) const
+std::uintptr_t Addresses::Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint32_t aHash) const
 {
     auto it = m_addresses.find(aHash);
     if (it == m_addresses.end())
@@ -128,11 +128,11 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
                 std::stringstream stream;
                 stream << offsetStr;
 
-                std::uintptr_t offset;
+                std::uint32_t offset;
                 stream >> std::hex >> offset;
 
                 auto address = offset + base;
-                m_addresses.emplace(hash, address);
+                m_addresses.emplace(static_cast<std::uint32_t>(hash), address);
             }
         }
     }
@@ -141,7 +141,7 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
 }
 
 RED4EXT_C_EXPORT std::uintptr_t RED4EXT_CALL RED4ext_ResolveAddress(const RED4ext::UniversalRelocSegment aSegment,
-                                                                    const std::uint64_t aHash)
+                                                                    const std::uint32_t aHash)
 {
     return Addresses::Instance()->Resolve(aSegment, aHash);
 }

@@ -14,7 +14,7 @@ public:
     {
     }
 
-    Hook(uintptr_t aHash, T aDetour)
+    Hook(std::uint32_t aHash, T aDetour)
         : Hook(reinterpret_cast<T>(0), aDetour)
     {
         m_hash = aHash;
