@@ -8,11 +8,12 @@ namespace
 {
 bool isAttached = false;
 
-bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4);
-Hook<decltype(&_CBaseEngine_LoadScripts)> CBaseEngine_LoadScripts(Addresses::CBaseEngine_LoadScripts,
-                                                                  &_CBaseEngine_LoadScripts);
+bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp,
+                              uint64_t a4);
+Hook<decltype(&_CBaseEngine_LoadScripts)> CBaseEngine_LoadScripts(0xD4CB1D59, &_CBaseEngine_LoadScripts);
 
-bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp, uint64_t a4)
+bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CString& aPath, uint64_t aTimestamp,
+                              uint64_t a4)
 {
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
     const auto& scriptsBlobPath = scriptCompilationSystem->GetScriptsBlob();
@@ -30,8 +31,7 @@ bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CStr
 
 bool Hooks::LoadScripts::Attach()
 {
-    spdlog::trace("Trying to attach the hook for load scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CBaseEngine_LoadScripts));
+    spdlog::trace("Trying to attach the hook for load scripts at {:#x}...", CBaseEngine_LoadScripts.GetAddress());
 
     auto result = CBaseEngine_LoadScripts.Attach();
     if (result != NO_ERROR)
@@ -54,8 +54,7 @@ bool Hooks::LoadScripts::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for load scripts at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::CBaseEngine_LoadScripts));
+    spdlog::trace("Trying to detach the hook for load scripts at {:#x}...", CBaseEngine_LoadScripts.GetAddress());
 
     auto result = CBaseEngine_LoadScripts.Detach();
     if (result != NO_ERROR)

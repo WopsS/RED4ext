@@ -1,4 +1,5 @@
 #include "App.hpp"
+#include "Addresses.hpp"
 #include "DetourTransaction.hpp"
 #include "Image.hpp"
 #include "Utils.hpp"
@@ -80,36 +81,12 @@ App::App()
     const auto image = Image::Get();
     const auto& fileVer = image->GetFileVersion();
 
-    auto patch = Utils::FileVerToPatch(fileVer);
-    spdlog::info(L"Game patch: {}", patch);
-
     const auto& productVer = image->GetProductVersion();
     spdlog::info("Product version: {}.{}{}", productVer.major, productVer.minor, productVer.patch);
 
     spdlog::info("File version: {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
 
-    if (!image->IsSupported())
-    {
-        spdlog::error(L"This game patch ({}) is not supported", patch);
-
-        const auto supportedVers = image->GetSupportedVersions();
-
-        auto supportedPatches = fmt::wmemory_buffer();
-        for (const auto& supportedVer : supportedVers)
-        {
-            const auto patch = Utils::FileVerToPatch(supportedVer);
-            fmt::format_to(std::back_inserter(supportedPatches), L"{} ({})", patch, std::to_wstring(supportedVer));
-
-            if (supportedVer != *(supportedVers.end() - 1))
-            {
-                fmt::format_to(std::back_inserter(supportedPatches), L", ");
-            }
-        }
-
-        const std::wstring_view supportedPatchesStr(supportedPatches.data(), supportedPatches.size());
-        spdlog::error(L"The current version of RED4ext supports only the following patch(es): {}", supportedPatchesStr);
-        return;
-    }
+    Addresses::Construct(m_paths);
 
     if (AttachHooks())
     {
@@ -132,21 +109,17 @@ void App::Destruct()
 
     // Detaching hooks here and not in dtor, since the dtor can be called by CRT when the processes exists. We don't
     // really care if this will be called or not when the game exist ungracefully.
-    const auto image = Image::Get();
-    if (image->IsSupported())
-    {
-        spdlog::trace("Detaching the hooks...");
 
-        DetourTransaction transaction;
-        if (transaction.IsValid())
+    spdlog::trace("Detaching the hooks...");
+
+    DetourTransaction transaction;
+    if (transaction.IsValid())
+    {
+        auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() && Hooks::ExecuteProcess::Detach() &&
+                       Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach();
+        if (success)
         {
-            auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() &&
-                           Hooks::ExecuteProcess::Detach() && Hooks::InitScripts::Detach() &&
-                           Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach();
-            if (success)
-            {
-                transaction.Commit();
-            }
+            transaction.Commit();
         }
     }
 

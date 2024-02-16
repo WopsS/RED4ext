@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Addresses.hpp"
+
 template<typename T>
 class Hook
 {
@@ -8,12 +10,14 @@ public:
         : m_isAttached(false)
         , m_address(aAddress)
         , m_detour(aDetour)
+        , m_hash(0)
     {
     }
 
-    Hook(uintptr_t aOffset, T aDetour)
-        : Hook(reinterpret_cast<T>(reinterpret_cast<uintptr_t>(GetModuleHandle(nullptr)) + aOffset), aDetour)
+    Hook(std::uint32_t aHash, T aDetour)
+        : Hook(reinterpret_cast<T>(0), aDetour)
     {
+        m_hash = aHash;
     }
 
     operator T() const
@@ -21,8 +25,14 @@ public:
         return m_address;
     }
 
-    uintptr_t Get() const
+    uintptr_t GetAddress() const
     {
+        if (m_address == 0)
+        {
+            auto address = Addresses::Instance();
+            return address->Resolve(RED4ext::UniversalRelocSegment::Text, m_hash);
+        }
+
         return reinterpret_cast<uintptr_t>(m_address);
     }
 
@@ -31,6 +41,11 @@ public:
         if (m_isAttached)
         {
             return 0;
+        }
+
+        if (m_address == 0)
+        {
+            m_address = reinterpret_cast<T>(GetAddress());
         }
 
         auto result = DetourAttach(&m_address, m_detour);
@@ -56,4 +71,6 @@ private:
     bool m_isAttached;
     T m_address;
     T m_detour;
+
+    uintptr_t m_hash;
 };

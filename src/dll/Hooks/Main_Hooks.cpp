@@ -1,15 +1,15 @@
-#include "stdafx.hpp"
 #include "Main_Hooks.hpp"
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
+#include "stdafx.hpp"
 
 namespace
 {
 bool isAttached = false;
 
 int32_t _Main();
-Hook<decltype(&_Main)> Main_fnc(Addresses::Global_Main, &_Main);
+Hook<decltype(&_Main)> Main_fnc(0xD9820B65, &_Main);
 
 int32_t _Main()
 {
@@ -20,12 +20,12 @@ int32_t _Main()
     }
     catch (const std::exception& e)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while RED4ext was starting up.\n\n{}",
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occurred while RED4ext was starting up.\n\n{}",
                                             Utils::Widen(e.what()));
     }
     catch (...)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while RED4ext was starting up.");
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occurred while RED4ext was starting up.");
     }
 
     auto result = Main_fnc();
@@ -37,12 +37,12 @@ int32_t _Main()
     }
     catch (const std::exception& e)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occured while RED4ext was shutting down.\n\n{}",
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An exception occurred while RED4ext was shutting down.\n\n{}",
                                             Utils::Widen(e.what()));
     }
     catch (...)
     {
-        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occured while RED4ext was shutting down.");
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occurred while RED4ext was shutting down.");
     }
 
     return result;
@@ -51,8 +51,7 @@ int32_t _Main()
 
 bool Hooks::Main::Attach()
 {
-    spdlog::trace("Trying to attach the hook for the main function at {}...",
-                  RED4EXT_OFFSET_TO_ADDR(Addresses::Global_Main));
+    spdlog::trace("Trying to attach the hook for the main function at {:#x}...", Main_fnc.GetAddress());
 
     auto result = Main_fnc.Attach();
     if (result != NO_ERROR)
@@ -75,7 +74,7 @@ bool Hooks::Main::Detach()
         return false;
     }
 
-    spdlog::trace("Trying to detach the hook for the main function at {}...", RED4EXT_OFFSET_TO_ADDR(Addresses::Global_Main));
+    spdlog::trace("Trying to detach the hook for the main function at {:#x}...", Main_fnc.GetAddress());
 
     auto result = Main_fnc.Detach();
     if (result != NO_ERROR)

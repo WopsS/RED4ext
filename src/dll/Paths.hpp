@@ -7,12 +7,15 @@ public:
     ~Paths() = default;
 
     std::filesystem::path GetRootDir() const;
+    std::filesystem::path GetX64Dir() const;
+
     std::filesystem::path GetExe() const;
 
     std::filesystem::path GetRED4extDir() const;
     std::filesystem::path GetLogsDir() const;
     std::filesystem::path GetPluginsDir() const;
     std::filesystem::path GetRedscriptPathsFile() const;
+
     std::filesystem::path GetR6Scripts() const;
     std::filesystem::path GetR6CacheModded() const;
     std::filesystem::path GetR6Dir() const;

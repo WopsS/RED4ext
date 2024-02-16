@@ -37,6 +37,7 @@ add_compile_options(
 include(ConfigureAndIncludeDetours)
 include(ConfigureAndIncludeFmt)
 include(ConfigureAndIncludeRED4extSdk)
+include(ConfigureAndIncludeSimdjson)
 include(ConfigureAndIncludeSpdlog)
 include(ConfigureAndIncludeToml11)
 include(ConfigureAndIncludeTslOrderedMap)
