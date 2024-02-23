@@ -20,6 +20,7 @@ Addresses::Addresses(const Paths& aPaths)
     auto filePath = aPaths.GetX64Dir() / filename;
 
     LoadAddresses(filePath);
+    LoadSections();
 }
 
 void Addresses::Construct(const Paths& aPaths)
@@ -34,18 +35,26 @@ Addresses* Addresses::Instance()
 
 std::uintptr_t Addresses::Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint32_t aHash) const
 {
-    auto it = m_addresses.find(aHash);
+    const auto it = m_addresses.find(aHash);
     if (it == m_addresses.end())
     {
         return 0;
     }
 
-    auto address = it->second;
+    const auto address = it->second;
     switch (aSegment)
     {
     case RED4ext::UniversalRelocSegment::Text:
     {
         return address + m_codeOffset;
+    }
+    case RED4ext::UniversalRelocSegment::Data:
+    {
+        return address + m_dataOffset;
+    }
+    case RED4ext::UniversalRelocSegment::Rdata:
+    {
+        return address + m_rdataOffset;
     }
     default:
     {
@@ -138,6 +147,46 @@ void Addresses::LoadAddresses(const std::filesystem::path& aPath)
     }
 
     spdlog::info("{} game addresses loaded", m_addresses.size());
+}
+
+void Addresses::LoadSections()
+{
+    HMODULE hModule = GetModuleHandle(NULL);
+    if (hModule == NULL)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"Error: Could not get module handle.");
+        return;
+    }
+
+    // Access the DOS header
+    IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)hModule;
+    // Access the PE header
+    IMAGE_NT_HEADERS* peHeader = (IMAGE_NT_HEADERS*)((BYTE*)hModule + dosHeader->e_lfanew);
+
+    // Check for PE signature
+    if (peHeader->Signature != IMAGE_NT_SIGNATURE)
+    {
+        SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(L"Error: PE signature not found.");
+        return;
+    }
+
+    // Access the section headers
+    IMAGE_SECTION_HEADER* sectionHeaders = IMAGE_FIRST_SECTION(peHeader);
+    const int numberOfSections = peHeader->FileHeader.NumberOfSections;
+
+    DebugBreak();
+
+    // List the sections
+    for (int i = 0; i < numberOfSections; i++)
+    {
+        IMAGE_SECTION_HEADER* sectionHeader = &sectionHeaders[i];
+        if (strcmp(reinterpret_cast<const char*>(sectionHeader->Name), ".text") == 0)
+            m_codeOffset = sectionHeader->VirtualAddress;
+        else if (strcmp(reinterpret_cast<const char*>(sectionHeader->Name), ".data") == 0)
+            m_dataOffset = sectionHeader->VirtualAddress;
+        else if (strcmp(reinterpret_cast<const char*>(sectionHeader->Name), ".rdata") == 0)
+            m_rdataOffset = sectionHeader->VirtualAddress;
+    }
 }
 
 RED4EXT_C_EXPORT std::uintptr_t RED4EXT_CALL RED4ext_ResolveAddress(const RED4ext::UniversalRelocSegment aSegment,
