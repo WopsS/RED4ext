@@ -174,8 +174,6 @@ void Addresses::LoadSections()
     IMAGE_SECTION_HEADER* sectionHeaders = IMAGE_FIRST_SECTION(peHeader);
     const int numberOfSections = peHeader->FileHeader.NumberOfSections;
 
-    DebugBreak();
-
     // List the sections
     for (int i = 0; i < numberOfSections; i++)
     {
