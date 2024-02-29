@@ -147,5 +147,5 @@ const RED4ext::SemVer& Image::GetProductVersion() const
 
 const std::vector<RED4ext::FileVer> Image::GetSupportedVersions() const
 {
-    return {RED4EXT_RUNTIME_LATEST};
+    return {m_fileVersion};
 }
