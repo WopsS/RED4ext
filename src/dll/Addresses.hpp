@@ -14,7 +14,7 @@ public:
 
     ~Addresses() = default;
 
-    std::uintptr_t Resolve(const RED4ext::UniversalRelocSegment aSegment, const std::uint32_t aHash) const;
+    std::uintptr_t Resolve(std::uint32_t aHash) const;
 
 private:
     Addresses(const Paths& aPaths);

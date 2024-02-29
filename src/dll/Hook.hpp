@@ -29,8 +29,8 @@ public:
     {
         if (m_address == 0)
         {
-            auto address = Addresses::Instance();
-            return address->Resolve(RED4ext::UniversalRelocSegment::Text, m_hash);
+            const auto address = Addresses::Instance();
+            m_address = reinterpret_cast<T>(address->Resolve(m_hash));
         }
 
         return reinterpret_cast<uintptr_t>(m_address);
@@ -69,7 +69,7 @@ public:
 
 private:
     bool m_isAttached;
-    T m_address;
+    mutable T m_address;
     T m_detour;
 
     uintptr_t m_hash;
