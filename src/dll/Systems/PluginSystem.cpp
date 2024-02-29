@@ -7,7 +7,7 @@
 #define MINIMUM_API_VERSION RED4EXT_API_VERSION_0
 #define LATEST_API_VERSION RED4EXT_API_VERSION_LATEST
 
-#define MINIMUM_SDK_VERSION RED4EXT_SDK_0_3_0
+#define MINIMUM_SDK_VERSION RED4EXT_SDK_0_5_0
 #define LATEST_SDK_VERSION RED4EXT_SDK_LATEST
 
 #define LOG_FS_ERROR(text, ec)                                                                                         \
@@ -239,14 +239,10 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
 
         if (!isSupported)
         {
-            const auto& fileVer = image->GetFileVersion();
-            const auto currentPatch = Utils::FileVerToPatch(fileVer);
-            const auto requestedPatch = Utils::FileVerToPatch(requestedRuntime);
+            spdlog::warn(
+                L"{} (version: {}) is incompatible with the current patch. The requested runtime of the plugin is {}",
+                pluginName, std::to_wstring(pluginVersion), requestedRuntime);
 
-            spdlog::warn(L"{} (version: {}) is incompatible with the current patch ({}). This version of the plugin "
-                         L"was compiled for patch {}",
-                         pluginName, std::to_wstring(pluginVersion), currentPatch, requestedPatch);
-            
             m_incompatiblePlugins.emplace_back(pluginName);
             return;
         }
@@ -268,7 +264,7 @@ void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSear
 
     if (!plugin->Main(RED4ext::EMainReason::Load))
     {
-        spdlog::warn(L"{} did not initalize properly, unloading...", pluginName);
+        spdlog::warn(L"{} did not initialize properly, unloading...", pluginName);
         Unload(plugin);
 
         return;
@@ -319,14 +315,14 @@ std::shared_ptr<PluginBase> PluginSystem::CreatePlugin(const std::filesystem::pa
     }
     catch (const std::exception& e)
     {
-        spdlog::warn(L"An exception occured while calling 'Supports' function exported by '{}'. Path: '{}'", stem,
+        spdlog::warn(L"An exception occurred while calling 'Supports' function exported by '{}'. Path: '{}'", stem,
                      aPath);
         spdlog::warn(e.what());
         return nullptr;
     }
     catch (...)
     {
-        spdlog::warn(L"An unknown exception occured while calling 'Supports' function exported by '{}'. Path: '{}'",
+        spdlog::warn(L"An unknown exception occurred while calling 'Supports' function exported by '{}'. Path: '{}'",
                      stem, aPath);
         return nullptr;
     }
