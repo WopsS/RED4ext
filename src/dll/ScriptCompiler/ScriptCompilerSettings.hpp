@@ -10,8 +10,11 @@ public:
 
     ScriptCompilerSettings(SccApi& aApi, std::filesystem::path aR6Path);
 
+    bool SupportsOutputCacheFileParameter() const;
+
     ScriptCompilerSettings* AddScriptPath(std::filesystem::path aPath);
     ScriptCompilerSettings* SetCustomCacheFile(std::filesystem::path aPath);
+    ScriptCompilerSettings* SetOutputCacheFile(std::filesystem::path aPath);
     Result Compile();
 
 private:
@@ -19,4 +22,5 @@ private:
     std::filesystem::path m_r6Path;
     std::vector<std::filesystem::path> m_scriptPaths;
     std::filesystem::path m_customCacheFile;
+    std::filesystem::path m_outputCacheFile;
 };
