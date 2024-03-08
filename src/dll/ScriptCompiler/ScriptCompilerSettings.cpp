@@ -6,6 +6,12 @@ ScriptCompilerSettings::ScriptCompilerSettings(SccApi& aApi, std::filesystem::pa
 {
 }
 
+bool ScriptCompilerSettings::SupportsOutputCacheFileParameter() const
+{
+    // added in redscript 0.5.18, previous versions will have this set to NULL
+    return m_scc.settings_set_output_cache_file != nullptr;
+}
+
 ScriptCompilerSettings* ScriptCompilerSettings::AddScriptPath(std::filesystem::path aPath)
 {
     m_scriptPaths.emplace_back(aPath);
@@ -18,6 +24,12 @@ ScriptCompilerSettings* ScriptCompilerSettings::SetCustomCacheFile(std::filesyst
     return this;
 }
 
+ScriptCompilerSettings* ScriptCompilerSettings::SetOutputCacheFile(std::filesystem::path aPath)
+{
+    m_outputCacheFile = aPath;
+    return this;
+}
+
 ScriptCompilerSettings::Result ScriptCompilerSettings::Compile()
 {
     auto r6PathStr = m_r6Path.u8string();
@@ -27,6 +39,12 @@ ScriptCompilerSettings::Result ScriptCompilerSettings::Compile()
     {
         auto customCacheFileStr = m_customCacheFile.u8string();
         m_scc.settings_set_custom_cache_file(settings, reinterpret_cast<const char*>(customCacheFileStr.c_str()));
+    }
+
+    if (SupportsOutputCacheFileParameter() && !m_outputCacheFile.empty())
+    {
+        auto outputCacheFileStr = m_outputCacheFile.u8string();
+        m_scc.settings_set_output_cache_file(settings, reinterpret_cast<const char*>(outputCacheFileStr.c_str()));
     }
 
     for (const auto& path : m_scriptPaths)

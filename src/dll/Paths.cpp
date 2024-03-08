@@ -58,6 +58,11 @@ std::filesystem::path Paths::GetR6Scripts() const
     return GetRootDir() / L"r6" / L"scripts";
 }
 
+std::filesystem::path Paths::GetDefaultScriptsBlob() const
+{
+    return GetRootDir() / L"r6" / L"cache" / "final.redscripts";
+}
+
 std::filesystem::path Paths::GetR6CacheModded() const
 {
     return GetRootDir() / L"r6" / L"cache" / L"modded";

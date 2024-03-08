@@ -87,14 +87,25 @@ bool Hooks::ExecuteProcess::Detach()
 
 bool ExecuteScc(SccApi& scc)
 {
-    const auto r6Dir = App::Get()->GetPaths()->GetR6Dir();
     auto scriptSystem = App::Get()->GetScriptCompilationSystem();
+    auto engine = RED4ext::CGameEngine::Get();
 
-    ScriptCompilerSettings settings(scc, r6Dir);
+    ScriptCompilerSettings settings(scc, App::Get()->GetPaths()->GetR6Dir());
+
+    std::filesystem::path blobPath = scriptSystem->HasScriptsBlob() ? scriptSystem->GetScriptsBlob()
+                                                                    : App::Get()->GetPaths()->GetDefaultScriptsBlob();
+    auto moddedCacheFile = blobPath.replace_extension("redscripts.modded");
+
     if (scriptSystem->HasScriptsBlob())
     {
-        settings.SetCustomCacheFile(scriptSystem->GetScriptsBlob());
+        settings.SetCustomCacheFile(blobPath);
     }
+
+    if (settings.SupportsOutputCacheFileParameter())
+    {
+        settings.SetOutputCacheFile(moddedCacheFile);
+    }
+
     for (const auto& [_, path] : scriptSystem->GetScriptPaths())
     {
         settings.AddScriptPath(path);
@@ -104,7 +115,7 @@ bool ExecuteScc(SccApi& scc)
 
     if (const auto error = std::get_if<ScriptCompilerFailure>(&result))
     {
-        RED4ext::CGameEngine::Get()->scriptsCompilationErrors = error->GetMessage().c_str();
+        engine->scriptsCompilationErrors = error->GetMessage().c_str();
         spdlog::warn("scc invocation failed with an error: {}", error->GetMessage());
         return false;
     }
@@ -146,6 +157,14 @@ bool ExecuteScc(SccApi& scc)
         }
     }
 
-    spdlog::info("scc invoked successfully, {} source refs were returned", refCount);
+    spdlog::info("scc invoked successfully, {} source refs were registered", refCount);
+
+    if (settings.SupportsOutputCacheFileParameter())
+    {
+        scriptSystem->SetModdedScriptsBlob(moddedCacheFile);
+        engine->scriptsBlobPath = Utils::Narrow(moddedCacheFile.c_str());
+        spdlog::info(L"Scripts blob path was updated to '{}'", moddedCacheFile);
+    }
+
     return true;
 }

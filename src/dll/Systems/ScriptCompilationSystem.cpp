@@ -42,6 +42,22 @@ bool ScriptCompilationSystem::HasScriptsBlob() const
     return m_hasScriptsBlob;
 }
 
+void ScriptCompilationSystem::SetModdedScriptsBlob(const std::filesystem::path& aPath)
+{
+    m_moddedScriptsBlobPath = aPath;
+    m_hasModdedScriptsBlob = true;
+}
+
+const std::filesystem::path& ScriptCompilationSystem::GetModdedScriptsBlob() const
+{
+    return m_moddedScriptsBlobPath;
+}
+
+bool ScriptCompilationSystem::HasModdedScriptsBlob() const
+{
+    return m_hasModdedScriptsBlob;
+}
+
 bool ScriptCompilationSystem::Add(std::shared_ptr<PluginBase> aPlugin, const wchar_t* aPath)
 {
     spdlog::trace(L"Adding path to script compilation: '{}'", aPath);

@@ -16,16 +16,12 @@ bool _CBaseEngine_LoadScripts(RED4ext::CBaseEngine* aEngine, const RED4ext::CStr
                               uint64_t a4)
 {
     auto scriptCompilationSystem = App::Get()->GetScriptCompilationSystem();
-    const auto& scriptsBlobPath = scriptCompilationSystem->GetScriptsBlob();
+    const auto& scriptsBlobPath =
+        scriptCompilationSystem->HasModdedScriptsBlob() ? scriptCompilationSystem->GetModdedScriptsBlob().string()
+        : scriptCompilationSystem->HasScriptsBlob()     ? scriptCompilationSystem->GetScriptsBlob().string()
+                                                        : aPath;
 
-    if (!scriptsBlobPath.empty())
-    {
-        return CBaseEngine_LoadScripts(aEngine, scriptsBlobPath.string(), aTimestamp, a4);
-    }
-    else
-    {
-        return CBaseEngine_LoadScripts(aEngine, aPath, aTimestamp, a4);
-    }
+    return CBaseEngine_LoadScripts(aEngine, scriptsBlobPath, aTimestamp, a4);
 }
 } // namespace
 
