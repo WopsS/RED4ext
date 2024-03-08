@@ -95,7 +95,7 @@ bool ExecuteScc(SccApi& scc)
     std::filesystem::path blobPath = scriptSystem->HasScriptsBlob()
                                          ? scriptSystem->GetScriptsBlob()
                                          : App::Get()->GetPaths()->GetDefaultScriptBundleFile();
-    auto outputCacheFile = blobPath.replace_extension("redscripts.modded");
+    auto moddedCacheFile = blobPath.replace_extension("redscripts.modded");
 
     if (scriptSystem->HasScriptsBlob())
     {
@@ -104,7 +104,7 @@ bool ExecuteScc(SccApi& scc)
 
     if (settings.SupportsOutputCacheFileParameter())
     {
-        settings.SetOutputCacheFile(outputCacheFile);
+        settings.SetOutputCacheFile(moddedCacheFile);
     }
 
     for (const auto& [_, path] : scriptSystem->GetScriptPaths())
@@ -162,9 +162,9 @@ bool ExecuteScc(SccApi& scc)
 
     if (settings.SupportsOutputCacheFileParameter())
     {
-        scriptSystem->SetScriptsBlob(outputCacheFile);
-        engine->scriptsBlobPath = Utils::Narrow(outputCacheFile.c_str());
-        spdlog::info(L"script blob path was updated to '{}'", outputCacheFile);
+        scriptSystem->SetModdedScriptsBlob(moddedCacheFile);
+        engine->scriptsBlobPath = Utils::Narrow(moddedCacheFile.c_str());
+        spdlog::info(L"Scripts blob path was updated to '{}'", moddedCacheFile);
     }
 
     return true;
