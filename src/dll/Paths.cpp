@@ -58,7 +58,7 @@ std::filesystem::path Paths::GetR6Scripts() const
     return GetRootDir() / L"r6" / L"scripts";
 }
 
-std::filesystem::path Paths::GetDefaultScriptBundleFile() const
+std::filesystem::path Paths::GetDefaultScriptsBlob() const
 {
     return GetRootDir() / L"r6" / L"cache" / "final.redscripts";
 }
