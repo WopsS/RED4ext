@@ -16,6 +16,24 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 configure_version_from_git()
 configure_default_output_directories()
 
+option(RED4EXT_EXTRA_WARNINGS "Enable extra warnings." ON)
+if(RED4EXT_EXTRA_WARNINGS)
+  if(MSVC)
+    add_compile_options(/W4)
+  else()
+    add_compile_options(-Wall -Wextra)
+  endif()
+endif()
+
+option(RED4EXT_TREAT_WARNINGS_AS_ERRORS "Treat compiler warnings as errors." OFF)
+if(RED4EXT_TREAT_WARNINGS_AS_ERRORS)
+  if(MSVC)
+    add_compile_options(/WX)
+  else()
+    add_compile_options(-Werror)
+  endif()
+endif()
+
 add_compile_definitions(
   # Support Windows 7 and above.
   WINVER=0x0601
