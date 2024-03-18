@@ -4,6 +4,7 @@
 ScriptCompilationSystem::ScriptCompilationSystem(const Paths& aPaths)
     : m_paths(aPaths)
     , m_hasScriptsBlob(false)
+    , m_hasModdedScriptsBlob(false)
 {
 }
 
