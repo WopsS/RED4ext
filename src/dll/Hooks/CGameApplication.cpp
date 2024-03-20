@@ -77,8 +77,6 @@ bool _CGameApplication_AddState(RED4ext::CGameApplication* aThis, RED4ext::IGame
 
 bool Hooks::CGameApplication::Attach()
 {
-    auto addresses = Addresses::Instance();
-
     spdlog::trace("Trying to attach the hook for the game application at {:#x}...",
                   CGameApplication_AddState.GetAddress());
 

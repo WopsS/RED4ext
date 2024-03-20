@@ -2,6 +2,7 @@
 
 #include <cstdarg>
 #include <cstdint>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <list>

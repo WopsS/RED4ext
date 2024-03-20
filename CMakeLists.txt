@@ -32,6 +32,15 @@ add_compile_definitions(
 add_compile_options(
   # Enable correct reporting of C++ version, see https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus.
   $<$<BOOL:MSVC>:/Zc:__cplusplus>
+
+  # Mark all dependencies headers as external.
+  $<$<BOOL:MSVC>:/external:I${PROJECT_SOURCE_DIR}/deps>
+
+  # Set the default warning level for external includes.
+  $<$<BOOL:MSVC>:/external:W0>
+
+  # Allow warnings if some template code is used in our code base.
+  $<$<BOOL:MSVC>:/external:templates->
 )
 
 include(ConfigureAndIncludeDetours)

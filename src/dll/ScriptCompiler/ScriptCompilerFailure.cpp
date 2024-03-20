@@ -4,6 +4,8 @@ ScriptCompilerFailure::ScriptCompilerFailure(SccApi& aApi, SccResult* aResult, K
     : m_scc(aApi)
     , m_result(aResult)
 {
+    RED4EXT_UNUSED_PARAMETER(aKey);
+
     char buffer[256] = {0};
     m_scc.copy_error(aResult, buffer, sizeof(buffer));
 

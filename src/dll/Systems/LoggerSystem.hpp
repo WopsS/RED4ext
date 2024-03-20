@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cwctype>
+
 #include "ISystem.hpp"
 #include "PluginBase.hpp"
 #include "Utils.hpp"
@@ -59,7 +61,7 @@ private:
                 auto fileName = stem.wstring();
 
                 std::transform(fileName.begin(), fileName.end(), fileName.begin(),
-                               [](wchar_t aC) { return std::tolower(aC); });
+                               [](wchar_t aC) { return std::towlower(aC); });
 
                 const auto logName = aPlugin->GetName();
 

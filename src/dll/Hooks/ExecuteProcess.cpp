@@ -37,8 +37,8 @@ bool _Global_ExecuteProcess(void* a1, RED4ext::CString& aCommand, FixedWString& 
 
     FixedWString newArgs{};
     newArgs.str = str.c_str();
-    newArgs.length = str.length();
-    newArgs.maxLength = str.capacity();
+    newArgs.length = static_cast<std::uint32_t>(str.length());
+    newArgs.maxLength = static_cast<std::uint32_t>(str.capacity());
     spdlog::info(L"Final redscript compilation arg string: '{}'", newArgs.str);
     return Global_ExecuteProcess(a1, aCommand, newArgs, aCurrentDirectory, a5);
 }

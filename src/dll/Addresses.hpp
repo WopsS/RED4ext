@@ -22,8 +22,8 @@ private:
     void LoadAddresses(const std::filesystem::path& aPath);
     void LoadSections();
 
-    std::uintptr_t m_codeOffset;
-    std::uintptr_t m_dataOffset;
-    std::uintptr_t m_rdataOffset;
+    std::uint32_t m_codeOffset;
+    std::uint32_t m_dataOffset;
+    std::uint32_t m_rdataOffset;
     std::unordered_map<std::uint32_t, std::uintptr_t> m_addresses;
 };

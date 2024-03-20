@@ -5,6 +5,7 @@ ScriptCompilerOutput::ScriptCompilerOutput(SccApi& aApi, SccResult* aResult, Scc
     , m_output(aOutput)
     , m_result(aResult)
 {
+    RED4EXT_UNUSED_PARAMETER(aKey);
 }
 
 ScriptCompilerOutput::~ScriptCompilerOutput()

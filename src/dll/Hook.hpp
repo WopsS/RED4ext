@@ -72,5 +72,5 @@ private:
     mutable T m_address;
     T m_detour;
 
-    uintptr_t m_hash;
+    uint32_t m_hash;
 };

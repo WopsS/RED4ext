@@ -4,6 +4,8 @@
 
 BOOL APIENTRY DllMain(HMODULE aModule, DWORD aReason, LPVOID aReserved)
 {
+    RED4EXT_UNUSED_PARAMETER(aReserved);
+
     switch (aReason)
     {
     case DLL_PROCESS_ATTACH:

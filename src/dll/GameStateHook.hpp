@@ -25,7 +25,7 @@ public:
         auto name = aState->GetName();
         auto vtbl = *reinterpret_cast<Func_t**>(aState);
 
-        spdlog::trace("Changing vritual functions for '{}' state at {}...", name, fmt::ptr(vtbl));
+        spdlog::trace("Changing virtual functions for '{}' state at {}...", name, fmt::ptr(vtbl));
 
         m_onEnter.orig = reinterpret_cast<Func_t>(vtbl[3]);
         m_onUpdate.orig = reinterpret_cast<Func_t>(vtbl[4]);
@@ -45,7 +45,7 @@ public:
         auto name = aState->GetName();
         auto vtbl = *reinterpret_cast<void**>(aState);
 
-        spdlog::trace("Restoring vritual functions for '{}' state at {}...", name, vtbl);
+        spdlog::trace("Restoring virtual functions for '{}' state at {}...", name, vtbl);
 
         if (SwapVFuncs(aState, m_onEnter.orig, m_onUpdate.orig, m_onExit.orig))
         {

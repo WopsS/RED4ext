@@ -1,8 +1,10 @@
-#include "stdafx.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
 #include "DevConsole.hpp"
 #include "Paths.hpp"
+#include "stdafx.hpp"
+
+#include <ctime>
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -24,7 +26,7 @@ std::shared_ptr<spdlog::logger> Utils::CreateLogger(const std::wstring_view aLog
             auto msg = category.message(errVal);
 
             SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
-                L"An error occured while checking logs directory existence:\n{}\n\nDirectory: {}", Utils::Widen(msg),
+                L"An error occurred while checking logs directory existence:\n{}\n\nDirectory: {}", Utils::Widen(msg),
                 dir);
 
             return nullptr;
@@ -40,7 +42,7 @@ std::shared_ptr<spdlog::logger> Utils::CreateLogger(const std::wstring_view aLog
                 auto msg = category.message(errVal);
 
                 SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE(
-                    L"An error occured while creating the logs directory:\n{}\n\nDirectory: {}", Utils::Widen(msg),
+                    L"An error occurred while creating the logs directory:\n{}\n\nDirectory: {}", Utils::Widen(msg),
                     dir);
 
                 return nullptr;
@@ -159,10 +161,11 @@ std::wstring Utils::FormatCurrentTimestamp()
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
 
     // Convert to std::tm for formatting
-    std::tm now_tm = *std::localtime(&now_c);
+    std::tm now_tm;
+    localtime_s(&now_tm, &now_c);
 
-    return fmt::format(L"{:04d}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}", now_tm.tm_year + 1900,
-                        now_tm.tm_mon + 1, now_tm.tm_mday, now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec);
+    return fmt::format(L"{:04d}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}", now_tm.tm_year + 1900, now_tm.tm_mon + 1,
+                       now_tm.tm_mday, now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec);
 }
 
 int32_t Utils::ShowMessageBoxEx(const std::wstring_view aCaption, const std::wstring_view aText, uint32_t aType)

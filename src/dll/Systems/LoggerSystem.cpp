@@ -23,7 +23,7 @@ void LoggerSystem::Shutdown()
 
     spdlog::trace("Flusing {} logger(s)...", count);
 
-    for (auto [plugin, logger] : m_loggers)
+    for (auto& [plugin, logger] : m_loggers)
     {
         logger->flush();
     }
