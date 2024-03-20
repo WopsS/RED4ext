@@ -9,7 +9,7 @@ namespace
 bool isAttached = false;
 
 int32_t _Main();
-Hook<decltype(&_Main)> Main_fnc(0xD9820B65, &_Main);
+Hook<decltype(&_Main)> Main_fnc(3545369307UL, &_Main);
 
 int32_t _Main()
 {
