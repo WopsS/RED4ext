@@ -92,9 +92,11 @@ bool ExecuteScc(SccApi& scc)
 
     ScriptCompilerSettings settings(scc, App::Get()->GetPaths()->GetR6Dir());
 
-    std::filesystem::path blobPath = scriptSystem->HasScriptsBlob() ? scriptSystem->GetScriptsBlob()
-                                                                    : App::Get()->GetPaths()->GetDefaultScriptsBlob();
-    auto moddedCacheFile = blobPath.replace_extension("redscripts.modded");
+    const auto blobPath = scriptSystem->HasScriptsBlob() ? scriptSystem->GetScriptsBlob()
+                                                         : App::Get()->GetPaths()->GetDefaultScriptsBlob();
+
+    auto moddedCacheFile = blobPath;
+    moddedCacheFile.replace_extension("redscripts.modded");
 
     if (scriptSystem->HasScriptsBlob())
     {
