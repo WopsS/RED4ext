@@ -5,6 +5,7 @@
 #include "stdafx.hpp"
 
 #include <ctime>
+#include <cwctype>
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -229,4 +230,9 @@ std::wstring Utils::Widen(const std::string_view aText)
     }
 
     return result;
+}
+
+void Utils::ToLower(std::wstring& aText)
+{
+    std::transform(aText.begin(), aText.end(), aText.begin(), std::towlower);
 }

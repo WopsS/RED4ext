@@ -20,6 +20,7 @@ public:
 
     std::shared_ptr<PluginBase> GetPlugin(HMODULE aModule) const;
     const std::vector<PluginName>& GetIncompatiblePlugins() const;
+    std::vector<PluginName> GetActivePlugins() const;
 
 private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;

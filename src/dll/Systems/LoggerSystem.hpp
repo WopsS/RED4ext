@@ -16,6 +16,8 @@ public:
     void Startup() final;
     void Shutdown() final;
 
+    void RotateLogs(std::vector<std::wstring>& plugins) const;
+
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::string_view aText);
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::wstring_view aText);
 
@@ -60,14 +62,12 @@ private:
                 const auto stem = path.stem();
                 auto fileName = stem.wstring();
 
-                std::transform(fileName.begin(), fileName.end(), fileName.begin(),
-                               [](wchar_t aC) { return std::towlower(aC); });
+                Utils::ToLower(fileName);
 
                 const auto logName = aPlugin->GetName();
 
                 fileName = fmt::format(L"{}-{}.log", fileName, Utils::FormatCurrentTimestamp());
-                logger =
-                    Utils::CreateLogger(logName, fileName, m_paths, m_config, m_devConsole);
+                logger = Utils::CreateLogger(logName, fileName, m_paths, m_config, m_devConsole);
                 m_loggers.emplace(aPlugin, logger);
             }
         }

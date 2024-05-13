@@ -185,6 +185,18 @@ const std::vector<PluginSystem::PluginName>& PluginSystem::GetIncompatiblePlugin
     return m_incompatiblePlugins;
 }
 
+std::vector<PluginSystem::PluginName> PluginSystem::GetActivePlugins() const
+{
+    std::vector<PluginSystem::PluginName> plugins;
+
+    plugins.reserve(m_plugins.size());
+    for (const auto& [handle, plugin] : m_plugins)
+    {
+        plugins.emplace_back(plugin->GetName());
+    }
+    return plugins;
+}
+
 void PluginSystem::Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath)
 {
     spdlog::info(L"Loading plugin from '{}'...", aPath);
