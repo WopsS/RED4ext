@@ -25,6 +25,12 @@ private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;
     using MapIter_t = Map_t::iterator;
 
+    struct PluginLoadInfo
+    {
+        std::filesystem::path path;
+        bool useAlteredSearchPath;
+    };
+
     void Load(const std::filesystem::path& aPath, bool aUseAlteredSearchPath);
     MapIter_t Unload(std::shared_ptr<PluginBase> aPlugin);
 

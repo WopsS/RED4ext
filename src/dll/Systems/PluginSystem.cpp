@@ -71,6 +71,8 @@ void PluginSystem::Startup()
         return;
     }
 
+    std::vector<PluginLoadInfo> pluginInfos;
+
     auto end = std::filesystem::end(iter);
     for (; iter != end; iter.increment(ec))
     {
@@ -126,12 +128,20 @@ void PluginSystem::Startup()
             }
 
             bool useAlteredSearchPath = depth == 1;
-            Load(path, useAlteredSearchPath);
+
+            pluginInfos.push_back({path, useAlteredSearchPath});
         }
         else if (ec)
         {
             LOG_FS_ENTRY_ERROR(L"Could not check if the entry is a regular file", path, ec);
         }
+    }
+
+    // Load plugins after iterating with filesystem. Allow plugins to change their
+    // directory's structure without breaking loading of other plugins.
+    for (const auto& pluginInfo : pluginInfos)
+    {
+        Load(pluginInfo.path, pluginInfo.useAlteredSearchPath);
     }
 
     // In the case where the exe is hosted, check if the host exe has RED4Ext exports
