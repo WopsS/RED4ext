@@ -25,7 +25,7 @@ private:
     using Map_t = std::unordered_map<HMODULE, std::shared_ptr<PluginBase>>;
     using MapIter_t = Map_t::iterator;
 
-    struct PluginEntry
+    struct PluginLoadInfo
     {
         std::filesystem::path path;
         bool useAlteredSearchPath;

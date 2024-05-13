@@ -71,7 +71,7 @@ void PluginSystem::Startup()
         return;
     }
 
-    std::vector<PluginEntry> plugins;
+    std::vector<PluginLoadInfo> pluginInfos;
 
     auto end = std::filesystem::end(iter);
     for (; iter != end; iter.increment(ec))
@@ -129,7 +129,7 @@ void PluginSystem::Startup()
 
             bool useAlteredSearchPath = depth == 1;
 
-            plugins.push_back({path, useAlteredSearchPath});
+            pluginInfos.push_back({path, useAlteredSearchPath});
         }
         else if (ec)
         {
@@ -139,9 +139,9 @@ void PluginSystem::Startup()
 
     // Load plugins after iterating with filesystem. Allow plugins to change their
     // directory's structure without breaking loading of other plugins.
-    for (const auto& plugin : plugins)
+    for (const auto& pluginInfo : pluginInfos)
     {
-        Load(plugin.path, plugin.useAlteredSearchPath);
+        Load(pluginInfo.path, pluginInfo.useAlteredSearchPath);
     }
 
     // In the case where the exe is hosted, check if the host exe has RED4Ext exports
