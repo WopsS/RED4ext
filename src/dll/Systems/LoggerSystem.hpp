@@ -16,7 +16,7 @@ public:
     void Startup() final;
     void Shutdown() final;
 
-    void RotateLogs(std::vector<std::wstring>& plugins) const;
+    void RotateLogs(std::vector<std::wstring> plugins) const;
 
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::string_view aText);
     void Trace(std::shared_ptr<PluginBase> aPlugin, std::wstring_view aText);

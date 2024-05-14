@@ -34,7 +34,7 @@ void LoggerSystem::Shutdown()
     spdlog::trace("{} logger(s) flushed", count);
 }
 
-void LoggerSystem::RotateLogs(std::vector<std::wstring>& pluginNames) const
+void LoggerSystem::RotateLogs(std::vector<std::wstring> pluginNames) const
 {
     std::error_code error;
     auto files = std::filesystem::directory_iterator(m_paths.GetLogsDir(), error);
