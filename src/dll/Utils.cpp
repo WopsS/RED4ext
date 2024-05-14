@@ -232,7 +232,10 @@ std::wstring Utils::Widen(const std::string_view aText)
     return result;
 }
 
-void Utils::ToLower(std::wstring& aText)
+std::wstring Utils::ToLower(const std::wstring& acText)
 {
-    std::transform(aText.begin(), aText.end(), aText.begin(), std::towlower);
+    std::wstring text = acText;
+
+    std::transform(text.begin(), text.end(), text.begin(), std::towlower);
+    return text;
 }

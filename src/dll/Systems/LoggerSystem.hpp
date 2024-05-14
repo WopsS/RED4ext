@@ -62,7 +62,7 @@ private:
                 const auto stem = path.stem();
                 auto fileName = stem.wstring();
 
-                Utils::ToLower(fileName);
+                fileName = Utils::ToLower(fileName);
 
                 const auto logName = aPlugin->GetName();
 

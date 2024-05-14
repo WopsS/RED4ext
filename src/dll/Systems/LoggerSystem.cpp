@@ -64,7 +64,7 @@ void LoggerSystem::RotateLogs(std::vector<std::wstring> pluginNames) const
     // Rotate oldest logs per plugin.
     for (auto pluginName : pluginNames)
     {
-        Utils::ToLower(pluginName);
+        pluginName = Utils::ToLower(pluginName);
         std::vector<std::filesystem::path> pluginLogs;
 
         logs.erase(std::remove_if(logs.begin(), logs.end(),
