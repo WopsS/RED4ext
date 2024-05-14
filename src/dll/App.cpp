@@ -149,6 +149,9 @@ void App::Startup()
         system->Startup();
     }
 
+    auto pluginNames = GetPluginSystem()->GetActivePlugins();
+    GetLoggerSystem()->RotateLogs(pluginNames);
+
     spdlog::info("RED4ext has been started");
 }
 

@@ -21,6 +21,8 @@ int32_t ShowMessageBox(const std::wstring_view aText, uint32_t aType = MB_OK);
 std::string Narrow(const std::wstring_view aText);
 std::wstring Widen(const std::string_view aText);
 
+std::wstring ToLower(const std::wstring& acText);
+
 template<typename... Args>
 int32_t ShowMessageBox(uint32_t aType, const std::wstring_view aText, Args&&... aArgs)
 {
