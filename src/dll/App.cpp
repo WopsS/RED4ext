@@ -5,6 +5,7 @@
 #include "Utils.hpp"
 #include "Version.hpp"
 
+#include "Hooks/AssertionFailed.hpp"
 #include "Hooks/CGameApplication.hpp"
 #include "Hooks/CollectSaveableSystems.hpp"
 #include "Hooks/ExecuteProcess.hpp"
@@ -122,7 +123,8 @@ void App::Destruct()
     if (transaction.IsValid())
     {
         auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() && Hooks::ExecuteProcess::Detach() &&
-                       Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach();
+                       Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach() &&
+                       Hooks::AssertionFailed::Detach();
         if (success)
         {
             transaction.Commit();
@@ -219,7 +221,7 @@ bool App::AttachHooks() const
 
     auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::ExecuteProcess::Attach() &&
                    Hooks::InitScripts::Attach() && Hooks::LoadScripts::Attach() && Hooks::ValidateScripts::Attach() &&
-                   Hooks::CollectSaveableSystems::Attach();
+                   Hooks::AssertionFailed::Attach() && Hooks::CollectSaveableSystems::Attach();
     if (success)
     {
         return transaction.Commit();
