@@ -7,6 +7,7 @@
 
 #include "Hooks/AssertionFailed.hpp"
 #include "Hooks/CGameApplication.hpp"
+#include "Hooks/CollectSaveableSystems.hpp"
 #include "Hooks/ExecuteProcess.hpp"
 #include "Hooks/InitScripts.hpp"
 #include "Hooks/LoadScripts.hpp"
@@ -220,7 +221,7 @@ bool App::AttachHooks() const
 
     auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::ExecuteProcess::Attach() &&
                    Hooks::InitScripts::Attach() && Hooks::LoadScripts::Attach() && Hooks::ValidateScripts::Attach() &&
-                   Hooks::AssertionFailed::Attach();
+                   Hooks::AssertionFailed::Attach() && Hooks::CollectSaveableSystems::Attach();
     if (success)
     {
         return transaction.Commit();
