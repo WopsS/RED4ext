@@ -8,7 +8,7 @@ namespace
 bool isAttached = false;
 
 void _CollectSaveableSystems(void* a1, const RED4ext::DynArray<RED4ext::Handle<RED4ext::IScriptable>>& aAllSystems);
-Hook<decltype(&_CollectSaveableSystems)> GameInstance_CollectSaveableSystems(3389547420UL, &_CollectSaveableSystems);
+Hook<decltype(&_CollectSaveableSystems)> GameInstance_CollectSaveableSystems(3230163856UL, &_CollectSaveableSystems);
 
 void _CollectSaveableSystems(void* a1, const RED4ext::DynArray<RED4ext::Handle<RED4ext::IScriptable>>& aAllSystems)
 {
