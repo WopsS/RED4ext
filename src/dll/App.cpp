@@ -12,6 +12,7 @@
 #include "Hooks/InitScripts.hpp"
 #include "Hooks/LoadScripts.hpp"
 #include "Hooks/Main_Hooks.hpp"
+#include "Hooks/ReportErrorCode.hpp"
 #include "Hooks/ValidateScripts.hpp"
 
 namespace
@@ -123,8 +124,9 @@ void App::Destruct()
     if (transaction.IsValid())
     {
         auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() && Hooks::ExecuteProcess::Detach() &&
-                       Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() && Hooks::ValidateScripts::Detach() &&
-                       Hooks::AssertionFailed::Detach();
+                       Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() &&
+                       Hooks::ValidateScripts::Detach() && Hooks::AssertionFailed::Detach() &&
+                       Hooks::ReportErrorCode::Detach();
         if (success)
         {
             transaction.Commit();
@@ -221,7 +223,8 @@ bool App::AttachHooks() const
 
     auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::ExecuteProcess::Attach() &&
                    Hooks::InitScripts::Attach() && Hooks::LoadScripts::Attach() && Hooks::ValidateScripts::Attach() &&
-                   Hooks::AssertionFailed::Attach() && Hooks::CollectSaveableSystems::Attach();
+                   Hooks::AssertionFailed::Attach() && Hooks::CollectSaveableSystems::Attach() &&
+                   Hooks::ReportErrorCode::Attach();
     if (success)
     {
         return transaction.Commit();
