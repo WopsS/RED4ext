@@ -12,7 +12,7 @@
 #include "Hooks/InitScripts.hpp"
 #include "Hooks/LoadScripts.hpp"
 #include "Hooks/Main_Hooks.hpp"
-#include "Hooks/ReportErrorCode.hpp"
+#include "Hooks/SessionActive_ReportErrorCode.hpp"
 #include "Hooks/ValidateScripts.hpp"
 
 namespace
@@ -126,7 +126,7 @@ void App::Destruct()
         auto success = Hooks::CGameApplication::Detach() && Hooks::Main::Detach() && Hooks::ExecuteProcess::Detach() &&
                        Hooks::InitScripts::Detach() && Hooks::LoadScripts::Detach() &&
                        Hooks::ValidateScripts::Detach() && Hooks::AssertionFailed::Detach() &&
-                       Hooks::ReportErrorCode::Detach();
+                       Hooks::SessionActive_ReportErrorCode::Detach();
         if (success)
         {
             transaction.Commit();
@@ -224,7 +224,7 @@ bool App::AttachHooks() const
     auto success = Hooks::Main::Attach() && Hooks::CGameApplication::Attach() && Hooks::ExecuteProcess::Attach() &&
                    Hooks::InitScripts::Attach() && Hooks::LoadScripts::Attach() && Hooks::ValidateScripts::Attach() &&
                    Hooks::AssertionFailed::Attach() && Hooks::CollectSaveableSystems::Attach() &&
-                   Hooks::ReportErrorCode::Attach();
+                   Hooks::SessionActive_ReportErrorCode::Attach();
     if (success)
     {
         return transaction.Commit();

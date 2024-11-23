@@ -1,5 +1,5 @@
 #pragma once
-namespace Hooks::ReportErrorCode
+namespace Hooks::SessionActive_ReportErrorCode
 {
 bool Attach();
 bool Detach();
