@@ -1,4 +1,4 @@
-#include "SessionActive_ReportErrorCode.hpp"
+#include "gsmState_SessionActive.hpp"
 #include "Addresses.hpp"
 #include "App.hpp"
 #include "Hook.hpp"
@@ -9,7 +9,7 @@ namespace
 bool isAttached = false;
 
 void _GsmState_SessionActive_ReportErrorCode(uintptr_t);
-Hook<decltype(&_GsmState_SessionActive_ReportErrorCode)> State_SessionActive_ReportErrorCode(
+Hook<decltype(&_GsmState_SessionActive_ReportErrorCode)> GsmState_SessionActive_ReportErrorCode(
     0x7FA31576, &_GsmState_SessionActive_ReportErrorCode);
 
 void _GsmState_SessionActive_ReportErrorCode(uintptr_t aThis)
@@ -26,16 +26,16 @@ void _GsmState_SessionActive_ReportErrorCode(uintptr_t aThis)
         spdlog::error("=======");
     }
 
-    return State_SessionActive_ReportErrorCode(aThis);
+    return GsmState_SessionActive_ReportErrorCode(aThis);
 }
 } // namespace
 
-bool Hooks::SessionActive_ReportErrorCode::Attach()
+bool Hooks::gsmState_SessionActive::Attach()
 {
     spdlog::trace("Trying to attach the hook for the game session error code reporter at {:#x}...",
-                  State_SessionActive_ReportErrorCode.GetAddress());
+                  GsmState_SessionActive_ReportErrorCode.GetAddress());
 
-    auto result = State_SessionActive_ReportErrorCode.Attach();
+    auto result = GsmState_SessionActive_ReportErrorCode.Attach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not attach the hook for the game session error code reporter. Detour error code: {}",
@@ -50,7 +50,7 @@ bool Hooks::SessionActive_ReportErrorCode::Attach()
     return isAttached;
 }
 
-bool Hooks::SessionActive_ReportErrorCode::Detach()
+bool Hooks::gsmState_SessionActive::Detach()
 {
     if (!isAttached)
     {
@@ -58,9 +58,9 @@ bool Hooks::SessionActive_ReportErrorCode::Detach()
     }
 
     spdlog::trace("Trying to detach the hook for the game session error code reporter at {:#x}...",
-                  State_SessionActive_ReportErrorCode.GetAddress());
+                  GsmState_SessionActive_ReportErrorCode.GetAddress());
 
-    auto result = State_SessionActive_ReportErrorCode.Detach();
+    auto result = GsmState_SessionActive_ReportErrorCode.Detach();
     if (result != NO_ERROR)
     {
         spdlog::error("Could not detach the hook for the game session error code reporter. Detour error code: {}",
