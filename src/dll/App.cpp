@@ -88,9 +88,9 @@ App::App()
     spdlog::info("Product version: {}.{}{}", productVer.major, productVer.minor, productVer.patch);
     spdlog::info("File version: {}.{}.{}.{}", fileVer.major, fileVer.minor, fileVer.build, fileVer.revision);
 
-    if (fileVer < RED4EXT_RUNTIME_2_12)
+    if (fileVer < RED4EXT_RUNTIME_2_20)
     {
-        spdlog::error(L"To use this version of RED4ext, ensure your game is updated to patch 2.12 or newer");
+        spdlog::error(L"To use this version of RED4ext, ensure your game is updated to patch 2.2 or newer");
         return;
     }
 
