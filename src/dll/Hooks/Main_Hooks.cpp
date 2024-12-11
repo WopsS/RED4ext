@@ -8,10 +8,10 @@ namespace
 {
 bool isAttached = false;
 
-int32_t _Main();
+int WINAPI _Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);
 Hook<decltype(&_Main)> Main_fnc(240386859ul, &_Main);
 
-int32_t _Main()
+int WINAPI _Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
     try
     {
@@ -28,7 +28,7 @@ int32_t _Main()
         SHOW_MESSAGE_BOX_AND_EXIT_FILE_LINE("An unknown exception occurred while RED4ext was starting up.");
     }
 
-    auto result = Main_fnc();
+    auto result = Main_fnc(hInstance, hPrevInstance, pCmdLine, nCmdShow);
 
     try
     {
