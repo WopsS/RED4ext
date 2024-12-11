@@ -8,10 +8,10 @@ namespace
 {
 bool isAttached = false;
 
-int32_t _Main();
+int32_t __stdcall _Main(intptr_t hInstance, intptr_t hPrevInstance, wchar_t* pCmdLine, int32_t nCmdShow);
 Hook<decltype(&_Main)> Main_fnc(240386859ul, &_Main);
 
-int32_t _Main()
+int32_t __stdcall _Main(intptr_t hInstance, intptr_t hPrevInstance, wchar_t* pCmdLine, int32_t nCmdShow)
 {
     try
     {
